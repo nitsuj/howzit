@@ -179,6 +179,16 @@
       margin-top: 20px;
       border-radius: 8px;
     }
+    #taplist .item {
+        background-color: white;
+        border: 1px solid #000;
+        padding: 10px;
+    }
+    section {
+        border-bottom: 1px solid #000;
+        padding-bottom: 20px;
+        margin-bottom
+    }
   </style>
 </head>
 <body>
@@ -331,6 +341,17 @@
     togoWrapper.style.display = 'none';
     noTogoMsg.style.display = 'block';
   }
+</script>
+
+  <script>
+    window.addEventListener('scroll', function() {
+        const bubble = document.getElementById('bubble');
+        if (window.scrollY > 50) {
+            bubble.style.display = 'none';
+        } else {
+            bubble.style.display = 'block';
+        }
+    });
 </script>
 
 </body>
