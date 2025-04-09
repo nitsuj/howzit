@@ -319,19 +319,13 @@
   </section>
 
   <script>
-    const days = ['sun','mon','tue','wed','thu','fri','sat'];
-    const today = new Date().getDay();
-    const todayId = days[today];
-    const todayElem = document.getElementById(todayId);
-    if (todayElem) {
-      todayElem.classList.add('today');
-    }
-
+    
     function scrollCarousel(id, direction) {
       const carousel = document.getElementById(id);
       const scrollAmount = carousel.offsetWidth * 0.5;
       carousel.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
     }
+    
   // Toggle To-Go carousel based on availability
   const toGoAvailable = false; // Set to false when no to-go beers available
   const togoWrapper = document.getElementById('togo-wrapper');
@@ -341,15 +335,14 @@
     togoWrapper.style.display = 'none';
     noTogoMsg.style.display = 'block';
   }
-</script>
 
-  <script>
+    // Code for logo to disappear on scroll
     window.addEventListener('scroll', function() {
-        const bubble = document.getElementById('bubble');
+        const logo = document.querySelector('.logo');
         if (window.scrollY > 50) {
-            bubble.style.display = 'none';
+            logo.style.display = 'none';
         } else {
-            bubble.style.display = 'block';
+            logo.style.display = 'block';
         }
     });
 </script>
