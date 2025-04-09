@@ -199,18 +199,19 @@
   </section>
 
   <section id="togo">
-    <h2>To Go</h2>
-    <div class="carousel-wrapper">
-      <button class="carousel-arrow left-arrow" onclick="scrollCarousel('togo-carousel', -1)">&#10094;</button>
-      <div class="carousel" id="togo-carousel">
-        <div class="carousel-item"><img src="https://via.placeholder.com/300" alt="To Go 1"><a href="https://untappd.com">Can One</a></div>
-        <div class="carousel-item"><img src="https://via.placeholder.com/300" alt="To Go 2"><a href="https://untappd.com">Can Two</a></div>
-        <div class="carousel-item"><img src="https://via.placeholder.com/300" alt="To Go 3"><a href="https://untappd.com">Can Three</a></div>
-        <div class="carousel-item"><img src="https://via.placeholder.com/300" alt="To Go 4"><a href="https://untappd.com">Can Four</a></div>
-      </div>
-      <button class="carousel-arrow right-arrow" onclick="scrollCarousel('togo-carousel', 1)">&#10095;</button>
+  <h2>To Go</h2>
+  <p id="no-togo-message" style="display: none;">No to-go beers at this time.</p>
+  <div class="carousel-wrapper" id="togo-wrapper">
+    <button class="carousel-arrow left-arrow" onclick="scrollCarousel('togo-carousel', -1)">&#10094;</button>
+    <div class="carousel" id="togo-carousel">
+      <div class="carousel-item"><img src="https://via.placeholder.com/300" alt="To Go 1"><a href="https://untappd.com">Can One</a></div>
+      <div class="carousel-item"><img src="https://via.placeholder.com/300" alt="To Go 2"><a href="https://untappd.com">Can Two</a></div>
+      <div class="carousel-item"><img src="https://via.placeholder.com/300" alt="To Go 3"><a href="https://untappd.com">Can Three</a></div>
+      <div class="carousel-item"><img src="https://via.placeholder.com/300" alt="To Go 4"><a href="https://untappd.com">Can Four</a></div>
     </div>
-  </section>
+    <button class="carousel-arrow right-arrow" onclick="scrollCarousel('togo-carousel', 1)">&#10095;</button>
+  </div>
+</section>
 
   <section id="visit" class="contact">
     <h2>Visit Us</h2>
@@ -259,7 +260,16 @@
       const scrollAmount = carousel.offsetWidth * 0.5;
       carousel.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
     }
-  </script>
+  // Toggle To-Go carousel based on availability
+  const toGoAvailable = true; // Set to false when no to-go beers available
+  const togoWrapper = document.getElementById('togo-wrapper');
+  const noTogoMsg = document.getElementById('no-togo-message');
+
+  if (!toGoAvailable) {
+    togoWrapper.style.display = 'none';
+    noTogoMsg.style.display = 'block';
+  }
+</script>
 
 </body>
 </html>
