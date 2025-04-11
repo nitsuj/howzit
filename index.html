@@ -275,11 +275,15 @@
    
     /* RESTYLE FOR LOGO CENTERED OVER TOP NAV ON MOBILE DEVICES */
 
-   @media screen and (max-width: 768px) {
+  @media screen and (max-width: 768px) {
   nav {
-    flex-direction: column;
+    display: flex;
+    flex-direction: row; /* keep links horizontal */
+    justify-content: center;
     align-items: center;
-    padding-top: 60px; /* give space for the logo above */
+    padding-top: 60px; /* space for logo above */
+    flex-wrap: wrap; /* allow wrapping if needed */
+    position: relative;
   }
 
   nav img.logo {
@@ -296,6 +300,7 @@
     font-size: 14px;
   }
 }
+
   </style>
 </head>
 <body>
