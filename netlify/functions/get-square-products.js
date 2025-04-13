@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async function (event, context) {
   const SQUARE_ACCESS_TOKEN = process.env.SQUARE_TOKEN;
-  const CATEGORY_ID = 'RBLASICHDD63MPUYOCMUVWO2'; // "Tees" category
+  const ITEM_ID = 'IRBP5IVMIC44HDQXWBFD2PY5'; // your exact item
 
   try {
     const response = await fetch(
@@ -27,8 +27,7 @@ exports.handler = async function (event, context) {
 
     const items = all.filter(obj =>
       obj.type === 'ITEM' &&
-      obj.item_data &&
-      obj.item_data.category_id === CATEGORY_ID
+      obj.id === ITEM_ID
     );
 
     const output = items.map(item => {
