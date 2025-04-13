@@ -4,8 +4,7 @@ exports.handler = async function(event, context) {
   const SQUARE_ACCESS_TOKEN = process.env.SQUARE_TOKEN;
 
   try {
-    const response = await fetch('https://connect.squareup.com/v2/catalog/list', {
-      method: 'GET',
+    const response = await fetch('https://connect.squareup.com/v2/catalog/list?types=ITEM,IMAGE', {
       headers: {
         Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
         'Content-Type': 'application/json',
@@ -13,18 +12,34 @@ exports.handler = async function(event, context) {
     });
 
     const catalog = await response.json();
+    const allObjects = catalog.objects;
 
-    const items = catalog.objects.filter(obj => obj.type === 'ITEM');
+    // Build image lookup map
+    const imageMap = {};
+    for (let obj of allObjects) {
+      if (obj.type === 'IMAGE') {
+        imageMap[obj.id] = obj.image_data.url;
+      }
+    }
+
+    // Get only visible/published ITEMs
+    const items = allObjects.filter(obj => {
+      return (
+        obj.type === 'ITEM' &&
+        obj.item_data &&
+        obj.present_at_all_locations &&
+        obj.item_data.visibility !== 'HIDDEN'
+      );
+    });
 
     const output = items.map(item => ({
       id: item.id,
       name: item.item_data.name,
-      image: item.item_data.image_url,
+      image: imageMap[item.item_data.image_ids?.[0]] || null,
       variations: item.item_data.variations?.map(v => ({
         name: v.item_variation_data.name,
         price: v.item_variation_data.price_money?.amount / 100,
         sku: v.item_variation_data.sku,
-        available: true
       }))
     }));
 
