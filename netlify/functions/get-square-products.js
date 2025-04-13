@@ -2,15 +2,16 @@ const fetch = require('node-fetch');
 
 exports.handler = async function (event, context) {
   const SQUARE_ACCESS_TOKEN = process.env.SQUARE_TOKEN;
+  const TEES_CATEGORY_ID = 'RBLASICHDD63MPUYOCMUVWO2';
 
   try {
     const response = await fetch(
-      'https://connect.squareup.com/v2/catalog/list?types=ITEM,IMAGE,CATEGORY',
+      'https://connect.squareup.com/v2/catalog/list?types=ITEM,IMAGE',
       {
         headers: {
           Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
           'Content-Type': 'application/json',
-        },
+        }
       }
     );
 
@@ -25,12 +26,12 @@ exports.handler = async function (event, context) {
       }
     }
 
-    // Get only items from the "Tees" category
+    // Filter to ITEMS in the Tees category
     const items = allObjects.filter(
       (obj) =>
         obj.type === 'ITEM' &&
         obj.item_data &&
-        obj.item_data.category_id === RBLASICHDD63MPUYOCMUVWO2
+        obj.item_data.category_id === TEES_CATEGORY_ID
     );
 
     const output = items.map((item) => ({
