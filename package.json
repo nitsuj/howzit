@@ -1,8 +1,6 @@
 {
-  "name": "howzit-netlify-functions",
+  "name": "howzit-netlify-site",
   "version": "1.0.0",
-  "description": "Netlify functions for Howzit Brewing",
-  "main": "index.js",
   "type": "commonjs",
   "dependencies": {
     "node-fetch": "^2.6.7"
