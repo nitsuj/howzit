@@ -5,7 +5,7 @@ exports.handler = async function (event, context) {
 
   try {
     const response = await fetch(
-      'https://connect.squareup.com/v2/catalog/list?types=ITEM,IMAGE,CATEGORY',
+      'https://connect.squareup.com/v2/catalog/list?types=CATEGORY',
       {
         headers: {
           Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
@@ -17,16 +17,24 @@ exports.handler = async function (event, context) {
     const catalog = await response.json();
     const allObjects = catalog.objects;
 
-    // Build image map
-    const imageMap = {};
-    for (let obj of allObjects) {
-      if (obj.type === 'IMAGE') {
-        imageMap[obj.id] = obj.image_data.url;
-      }
-    }
+    const categories = allObjects.map(obj => ({
+      name: obj.category_data.name,
+      id: obj.id
+    }));
 
-    // Find the category ID for "Tees"
-    const teesCategory = allObjects.find(
+    return {
+      statusCode: 200,
+      body: JSON.stringify(categories, null, 2)
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to fetch categories' })
+    };
+  }
+};
+
       (obj) => obj.type === 'CATEGORY' && obj.category_data.name === 'Tees'
     );
     const teesCategoryId = teesCategory?.id;
