@@ -2,16 +2,20 @@ const fetch = require('node-fetch');
 
 exports.handler = async function (event, context) {
   const SQUARE_ACCESS_TOKEN = process.env.SQUARE_TOKEN;
+  const CATEGORY_ID = 'RBLASICHDD63MPUYOCMUVWO2'; // "Tees" category
 
   try {
-    const res = await fetch('https://connect.squareup.com/v2/catalog/list?types=ITEM,IMAGE', {
-      headers: {
-        Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      'https://connect.squareup.com/v2/catalog/list?types=ITEM,IMAGE',
+      {
+        headers: {
+          Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json',
+        }
       }
-    });
+    );
 
-    const catalog = await res.json();
+    const catalog = await response.json();
     const all = catalog.objects || [];
 
     const images = {};
@@ -21,7 +25,11 @@ exports.handler = async function (event, context) {
       }
     });
 
-    const items = all.filter(obj => obj.type === 'ITEM');
+    const items = all.filter(obj =>
+      obj.type === 'ITEM' &&
+      obj.item_data &&
+      obj.item_data.category_id === CATEGORY_ID
+    );
 
     const output = items.map(item => {
       const imageId = item.item_data.image_ids?.[0];
@@ -45,7 +53,7 @@ exports.handler = async function (event, context) {
     console.error(err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'API call failed' })
+      body: JSON.stringify({ error: 'Failed to fetch Square data' })
     };
   }
 };
