@@ -59,7 +59,7 @@
 
   <script>
     async function loadSkaterTee() {
-      const res = await fetch('/.netlify/functions/get-skater-tee');
+      const res = await fetch('https://nimble-daifuku-613b4c.netlify.app/.netlify/functions/get-skater-tee');
       const product = await res.json();
 
       const variations = product.variations;
