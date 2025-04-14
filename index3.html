@@ -318,6 +318,93 @@
     <img src="https://lh3.googleusercontent.com/p/AF1QipMU-KK2nqWIPUPJ84r54ZiR4hiV08W3_2KnqZTF=s1360-w1360-h1020" alt="Brewery Image" class="main-img">
   </header>
 
+  <!-- MERCH SECTION - INLINE DISPLAY -->
+<section id="merch" style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
+  <h2 style="color: #ff216f; font-size: 2rem; margin-bottom: 20px;">Merch</h2>
+  <div id="merch-grid" style="display: flex; flex-wrap: wrap; gap: 20px;"></div>
+</section>
+
+<script>
+  async function loadMerch() {
+    const res = await fetch('/.netlify/functions/get-skater-tee');
+    const product = await res.json();
+
+    const colorMap = {};
+    product.variations.forEach(v => {
+      const [size, color] = v.name.split(',').map(s => s.trim());
+      if (!colorMap[color]) colorMap[color] = [];
+      colorMap[color].push({
+        id: v.id,
+        size,
+        available: v.available,
+        price: v.price
+      });
+    });
+
+    const sizeOrder = ["XS", "Small", "Medium", "Large", "XL", "2XL", "3XL"];
+    const merchGrid = document.getElementById('merch-grid');
+
+    Object.entries(colorMap).forEach(([color, variations]) => {
+      const inStock = variations.filter(v => v.available);
+
+      const card = document.createElement('div');
+      card.style = 'background:#111; border:1px solid #ff216f; border-radius:12px; padding:20px; width:260px; color:#fff; font-family: Montserrat, sans-serif;';
+
+      const img = document.createElement('img');
+      img.src = product.image || 'https://via.placeholder.com/300';
+      img.alt = color;
+      img.style = 'width:100%; height:auto; border-radius:8px;';
+      card.appendChild(img);
+
+      const title = document.createElement('div');
+      title.textContent = `Skater Tee - ${color}`;
+      title.style = 'margin-top:12px; font-weight:bold; color:#ff216f;';
+      card.appendChild(title);
+
+      const sizeLabel = document.createElement('label');
+      sizeLabel.textContent = 'Choose Size';
+      sizeLabel.style = 'display:block; margin-top:10px;';
+      card.appendChild(sizeLabel);
+
+      const select = document.createElement('select');
+      select.style = 'margin-top:5px; width:100%; padding:6px; font-family:Montserrat,sans-serif; border-radius:6px; border:1px solid #ff216f;';
+      select.innerHTML = '<option value="">-- Select --</option>';
+
+      inStock
+        .sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size))
+        .forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v.id;
+          opt.textContent = v.size;
+          select.appendChild(opt);
+        });
+
+      select.addEventListener('change', async (e) => {
+        const variationId = e.target.value;
+        if (!variationId) return;
+
+        const response = await fetch('/.netlify/functions/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ variation_id: variationId, quantity: 1 })
+        });
+        const data = await response.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('Error creating checkout session');
+        }
+      });
+
+      card.appendChild(select);
+      merchGrid.appendChild(card);
+    });
+  }
+
+  loadMerch();
+</script>
+
+
   <section id="taplist">
     <h2>Tap List</h2>
     <div class="carousel-wrapper">
