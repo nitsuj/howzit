@@ -326,7 +326,7 @@
 
 <script>
   async function loadMerch() {
-    const res = await fetch('/.netlify/functions/get-skater-tee');
+    const res = await fetch('https://nimble-daifuku-613b4c.netlify.app/.netlify/functions/get-skater-tee');
     const product = await res.json();
 
     const colorMap = {};
@@ -383,7 +383,7 @@
         const variationId = e.target.value;
         if (!variationId) return;
 
-        const response = await fetch('/.netlify/functions/create-checkout', {
+        const response = await fetch('https://nimble-daifuku-613b4c.netlify.app/.netlify/functions/create-checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ variation_id: variationId, quantity: 1 })
