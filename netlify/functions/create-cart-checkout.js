@@ -1,4 +1,3 @@
-
 const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
@@ -6,7 +5,7 @@ exports.handler = async function(event, context) {
   const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
 
   try {
-    const { cart } = JSON.parse(event.body); // Expecting an array of { variation_id, quantity }
+    const { cart } = JSON.parse(event.body);
 
     if (!Array.isArray(cart) || cart.length === 0) {
       return {
@@ -15,10 +14,25 @@ exports.handler = async function(event, context) {
       };
     }
 
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+    const shippingCost = totalQuantity === 1
+      ? 990  // $9.90 for USPS Flat Rate Envelope
+      : 1710; // $17.10 for USPS Flat Rate Medium Box
+
     const lineItems = cart.map(item => ({
       quantity: item.quantity.toString(),
       catalog_object_id: item.variation_id
     }));
+
+    lineItems.push({
+      name: "Shipping",
+      quantity: "1",
+      base_price_money: {
+        amount: shippingCost,
+        currency: "USD"
+      }
+    });
 
     const response = await fetch("https://connect.squareup.com/v2/online-checkout/payment-links", {
       method: "POST",
@@ -33,7 +47,10 @@ exports.handler = async function(event, context) {
           line_items: lineItems
         },
         checkout_options: {
-          redirect_url: "https://howzitbrewing.square.site/"
+          redirect_url: "https://howzitbrewing.square.site/",
+          shipping_address_collection: {
+            allowed_countries: ["US"]
+          }
         }
       })
     });
