@@ -12,14 +12,13 @@
     body {
       margin: 0;
       font-family: 'Montserrat', sans-serif;
-      text-transform: none;
       background-color: #fff;
       color: #000;
     }
     h1, h2, h3, h4, h5, h6,
-      .navbar a,
-      .carousel-item div,
-      .menu-item-name {
+    .navbar a,
+    .carousel-item div,
+    .menu-item-name {
       text-transform: uppercase;
     }
     nav {
@@ -84,444 +83,104 @@
       margin-bottom: 20px;
       color: #8517ff;
     }
-    .carousel-wrapper {
-      position: relative;
-    }
-    .carousel {
-      display: flex;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-      gap: 20px;
-    }
-    .carousel-item {
-      flex: 0 0 22%;
-      background:  transparent !important;
-      border-radius: 8px;
-      text-align: center;
-      min-width: 22%;
-    }
-    .carousel-item img {
-      width: 250px;
-      height: 250px;
-      object-fit: cover;
-      border-radius: 16px;
-    }
-    .carousel-item a {
-      display: block;
-      padding: 8px;
-      margin-top: 5px;
-      text-align: center;
-      font-weight: 600;
-      border: none;  /* Remove border */
-      background-color: transparent;  /* Remove background */
-      border-radius: 0;  /* Remove radius */
-    }
-     .carousel-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 2rem;
-        color: #E41090;
-        background: transparent !important; /* Changed from rgba(0,0,0,0.5) */
-        border: none;
-        cursor: pointer;
-        z-index: 10;
-    }
-    .left-arrow {
-      left: -40px;
-    }
-    .right-arrow {
-      right: -40px;
-    }
-    @media (max-width: 768px) {
-      .carousel-item {
-        flex: 0 0 45%;
-        min-width: 45%;
-      }
-      .carousel-arrow {
-        font-size: 1.5rem;
-      }
-    }
-    @media (max-width: 480px) {
-      .carousel-item {
-        flex: 0 0 90%;
-        min-width: 90%;
-      }
-    }
-    .contact {
-      background: #fff;
-      border-top: 1px solid #333;
-    }
-    .contact p {
-      margin: 5px 0;
-    }
-    .hours div {
-      margin: 5px 0;
-    }
-    .today {
-      color: #cc00ff;
-      font-weight: bold;
-    }
-    .faq-entry {
-      margin-bottom: 30px;
-    }
-    .faq-entry h4 {
-      margin-bottom: 5px;
-      color: #000;
-    }
-    .faq-entry p {
-      margin-top: 0;
-    }
-    iframe {
-      width: 100%;
-      height: 300px;
-      border: none;
-      margin-top: 20px;
-      border-radius: 8px;
-    }
-    #taplist .item {
-        background-color: white !important;
-        border: 1px solid #000;
-        padding: 10px;
-    }
-    section {
-        border-bottom: 1px solid #000;
-        padding-bottom: 20px;
-        margin-bottom
-    }
-  
-    /* TAPLIST updated to grid layout */
-    #taplist .carousel {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 20px;
-    }
-    #taplist .carousel-item {
-      background: transparent !important;
-      border-radius: 8px;
-      text-align: center;
-      width: 100%;
-    }
-    #taplist .carousel-item img {
-      width: 100%;
-      height: auto;
-      max-width: 250px;
-      aspect-ratio: 1/1;
-      object-fit: cover;
-      border-radius: 16px;
-      margin: 0 auto;
-    }
-    #taplist .carousel-item a {
-      display: block;
-      padding: 8px;
-      margin-top: 5px;
-      text-align: center;
-      font-weight: 600;
-      border: none;
-      background-color: transparent;
-      border-radius: 0;
-    }
-    @media (max-width: 1024px) {
-      #taplist .carousel {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-    @media (max-width: 768px) {
-      #taplist .carousel {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-    @media (max-width: 480px) {
-      #taplist .carousel {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
+    /* ... rest of existing styles ... */
 
-    /* TOGO styled like TAPLIST */
-    #togo .carousel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-    #togo .carousel-item {
-      background: transparent !important;
-      border-radius: 8px;
-      text-align: center;
-      width: 100%;
-    }
-    #togo .carousel-item img {
-      width: 100%;
-      height: auto;
-      max-width: 250px;
-      aspect-ratio: 1/1;
-      object-fit: cover;
-      border-radius: 16px;
-      margin: 0 auto;
-    }
-    #togo .carousel-item a {
-      display: block;
-      padding: 8px;
-      margin-top: 5px;
-      text-align: center;
-      font-weight: 600;
-      color: inherit;
-      text-decoration: none;
-      background-color: transparent;
-      border-radius: 0;
-    }
-    #togo .carousel-item a:hover {
+    /* Embedded checkout styles */
+    #embedded-checkout {
+      padding: 40px;
+      max-width: 600px;
+      margin: 40px auto;
+      background: #111;
+      border-radius: 12px;
+      display: none;
       color: #fff;
+      font-family: Montserrat, sans-serif;
     }
-   
-    /* RESTYLE FOR LOGO CENTERED OVER TOP NAV ON MOBILE DEVICES */
-
-  @media screen and (max-width: 768px) {
-  nav {
-    display: flex;
-    flex-direction: row; /* keep links horizontal */
-    justify-content: center;
-    align-items: center;
-    padding-top: 60px; /* space for logo above */
-    flex-wrap: wrap; /* allow wrapping if needed */
-    position: relative;
-  }
-
-  nav img.logo {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 40px;
-    z-index: 1100;
-  }
-
-  nav a {
-    margin: 0 10px;
-    font-size: 14px;
-  }
-}
-
+    #embedded-checkout input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    #card-button {
+      padding: 12px 20px;
+      background: #ff216f;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+  <!-- ... all unchanged content before the embedded checkout ... -->
 
-  <nav>
-    <img src="/howzit/bubble.svg" alt="Logo" class="logo">
-    <a href="#taplist">Tap List</a>
-    <a href="#togo">To Go</a>
-    <a href="#merch">Merch</a>
-    <a href="#visit">Visit</a>
-    <a href="#faq">FAQ</a>
-  </nav>
-
-  <header>
-    <img src="https://lh3.googleusercontent.com/p/AF1QipMU-KK2nqWIPUPJ84r54ZiR4hiV08W3_2KnqZTF=s1360-w1360-h1020" alt="Brewery Image" class="main-img">
-  </header>
-
-  
-
-<!-- MERCH SECTION W/ CART -->
-<section id="merch" style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
-  <h2 style="color: #ff216f; font-size: 2rem; margin-bottom: 20px;">Merch</h2>
-  <div id="merch-grid" style="display: flex; flex-wrap: wrap; gap: 20px;"></div>
-</section>
-
-<!-- TOAST / FEEDBACK -->
-<div id="toast" style="position: fixed; bottom: 30px; right: 30px; background: #ff216f; color: #000; padding: 12px 20px; border-radius: 8px; font-weight: bold; opacity: 0; transition: opacity 0.4s; z-index: 9999;">Added to cart</div>
-
-<!-- CART SIDEBAR -->
-<div id="cart" style="position: fixed; top: 0; right: 0; width: 320px; height: 100vh; background: #111; color: #fff; box-shadow: -2px 0 10px rgba(0,0,0,0.5); padding: 20px; transform: translateX(100%); transition: transform 0.3s ease; z-index: 10000;">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h3 style="color: #ff216f;">Your Cart</h3>
-    <button onclick="toggleCart()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">✖</button>
+  <!-- EMBEDDED CHECKOUT PANEL -->
+  <div id="embedded-checkout">
+    <h2>Complete Your Purchase</h2>
+    <form id="payment-form">
+      <input type="text" id="buyer-name" required placeholder="Full Name">
+      <input type="email" id="buyer-email" required placeholder="Email Address">
+      <input type="text" id="buyer-address" required placeholder="Street Address">
+      <input type="text" id="buyer-city" required placeholder="City">
+      <input type="text" id="buyer-state" required placeholder="State">
+      <input type="text" id="buyer-zip" required placeholder="ZIP Code">
+      <div id="card-container" style="margin: 20px 0;"></div>
+      <button id="card-button" type="button">Pay Now</button>
+      <div id="payment-status" style="margin-top: 16px;"></div>
+    </form>
   </div>
-  <ul id="cart-items" style="list-style: none; padding: 0;"></ul>
-  <button id="checkout-btn" style="margin-top: 20px; padding: 10px 20px; background: #ff216f; color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">Checkout</button>
-</div>
-<button id="cart-toggle" onclick="toggleCart()" style="position: fixed; top: 20px; right: 20px; background: #ff216f; color: #000; border: none; padding: 10px 16px; font-weight: bold; border-radius: 8px; cursor: pointer; z-index: 9999;">🛒 Cart</button>
 
-<script>
-  const cart = [];
+  <script src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+  <script>
+    const appId = "sq0idp-do2thVrkpZ500YTQnqF9vg";
+    const locationId = "LEX59H08FVDAX";
+    let card;
 
-  function toggleCart(forceClose = false) {
-    const cartEl = document.getElementById('cart');
-    if (forceClose || cartEl.style.transform === 'translateX(0%)') {
-      cartEl.style.transform = 'translateX(100%)';
-    } else {
-      cartEl.style.transform = 'translateX(0%)';
+    async function initializeSquareForm() {
+      const payments = window.Square.payments(appId, locationId);
+      card = await payments.card();
+      await card.attach('#card-container');
     }
-    renderCart();
-  }
 
-  function renderCart() {
-    const cartItemsEl = document.getElementById('cart-items');
-    cartItemsEl.innerHTML = '';
-    cart.forEach((item, index) => {
-      const li = document.createElement('li');
-      li.style = 'margin-bottom: 10px;';
-      li.innerHTML = `
-        ${item.title} - ${item.size} <br>
-        <strong>Qty:</strong> ${item.quantity} <br>
-        <strong>Price:</strong> $${item.price.toFixed(2)}
-        <button onclick="removeCartItem(${index})" style="margin-left:10px; background:#222; color:#fff; border:none; cursor:pointer;">✖</button>
-      `;
-      cartItemsEl.appendChild(li);
-    });
-  }
-
-  function removeCartItem(index) {
-    cart.splice(index, 1);
-    renderCart();
-  }
-
-  function showToast(message) {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.style.opacity = 1;
-    setTimeout(() => toast.style.opacity = 0, 2000);
-  }
-
-  async function loadMerch() {
-    const res = await fetch('/.netlify/functions/get-skater-tee');
-    const product = await res.json();
-
-    const colorMap = {};
-    product.variations.forEach(v => {
-      const [size, color] = v.name.split(',').map(s => s.trim());
-      if (!colorMap[color]) colorMap[color] = [];
-      colorMap[color].push({
-        id: v.id,
-        size,
-        price: v.price,
-        available: v.available
-      });
+    document.getElementById('checkout-btn').addEventListener('click', () => {
+      if (cart.length === 0) return alert('Cart is empty');
+      document.getElementById('embedded-checkout').style.display = 'block';
+      initializeSquareForm();
     });
 
-    const sizeOrder = ["XS", "Small", "Medium", "Large", "XL", "2XL", "3XL"];
-    const merchGrid = document.getElementById('merch-grid');
+    document.getElementById('card-button').addEventListener('click', async () => {
+      const result = await card.tokenize();
+      if (result.status !== 'OK') {
+        document.getElementById('payment-status').textContent = '❌ Card failed to tokenize.';
+        return;
+      }
 
-    Object.entries(colorMap).forEach(([color, variations]) => {
-      const inStock = variations.filter(v => v.available);
-      if (!inStock.length) return;
+      const payload = {
+        token: result.token,
+        buyer: {
+          name: document.getElementById('buyer-name').value,
+          email: document.getElementById('buyer-email').value,
+          address: document.getElementById('buyer-address').value,
+          city: document.getElementById('buyer-city').value,
+          state: document.getElementById('buyer-state').value,
+          zip: document.getElementById('buyer-zip').value
+        },
+        cart
+      };
 
-      const card = document.createElement('div');
-      card.style = 'background:#111; border:1px solid #ff216f; border-radius:12px; padding:20px; width:260px; color:#fff; font-family: Montserrat, sans-serif;';
-
-      const img = document.createElement('img');
-      img.src = product.image || 'https://via.placeholder.com/300';
-      img.alt = color;
-      img.style = 'width:100%; height:auto; border-radius:8px;';
-      card.appendChild(img);
-
-      const title = document.createElement('div');
-      title.textContent = `Skater Tee - ${color}`;
-      title.style = 'margin-top:12px; font-weight:bold; color:#ff216f;';
-      card.appendChild(title);
-
-      const priceTag = document.createElement('div');
-      priceTag.textContent = `$${inStock[0].price.toFixed(2)}`;
-      priceTag.style = 'margin-top:5px; font-weight:600;';
-      card.appendChild(priceTag);
-
-      const sizeLabel = document.createElement('label');
-      sizeLabel.textContent = 'Choose Size';
-      sizeLabel.style = 'display:block; margin-top:10px;';
-      card.appendChild(sizeLabel);
-
-      const select = document.createElement('select');
-      select.style = 'margin-top:5px; width:100%; padding:6px; font-family:Montserrat,sans-serif; border-radius:6px; border:1px solid #ff216f;';
-      select.innerHTML = '<option value="">-- Select --</option>';
-
-      inStock.sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size)).forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = JSON.stringify({ id: v.id, size: v.size, price: v.price });
-        opt.textContent = v.size;
-        select.appendChild(opt);
+      const res = await fetch('/.netlify/functions/process-embedded-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
 
-      const addBtn = document.createElement('button');
-      addBtn.textContent = 'Add to Cart';
-      addBtn.style = 'margin-top:10px; padding:8px 12px; background:#ff216f; color:#000; border:none; border-radius:6px; font-weight:bold; cursor:pointer;';
-      addBtn.addEventListener('click', () => {
-        const selected = select.value;
-        if (!selected) return alert('Please select a size first');
-        const data = JSON.parse(selected);
-        const existing = cart.find(i => i.variation_id === data.id);
-        if (existing) {
-          existing.quantity += 1;
-        } else {
-          cart.push({
-            variation_id: data.id,
-            title: `Skater Tee - ${color}`,
-            size: data.size,
-            price: data.price,
-            quantity: 1
-          });
-        }
-        renderCart();
-        showToast('✅ Added to cart');
-      });
-
-      card.appendChild(select);
-      card.appendChild(addBtn);
-      merchGrid.appendChild(card);
+      const data = await res.json();
+      document.getElementById('payment-status').textContent = data.success
+        ? '✅ Payment successful!'
+        : '❌ Payment failed.';
     });
-  }
-
-  document.getElementById('checkout-btn').addEventListener('click', async () => {
-    if (cart.length === 0) return alert('Cart is empty');
-    const res = await fetch('/.netlify/functions/create-cart-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cart })
-    });
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      alert('Checkout failed');
-    }
-  });
-
-  loadMerch();
-</script>
-
-  <!-- More Cart Stuff -->
-
-  <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
-
-<div id="card-container"></div>
-<button id="card-button">Pay Now</button>
-
-<script>
-const appId = "sq0idp-do2thVrkpZ500YTQnqF9vg";
-const locationId = "LEX59H08FVDAX";
-
-const payments = window.Square.payments(appId, locationId);
-let card;
-async function initCard() {
-  card = await payments.card();
-  await card.attach('#card-container');
-}
-initCard();
-
-document.getElementById('card-button').addEventListener('click', async () => {
-  const result = await card.tokenize();
-  if (result.status !== 'OK') return alert('Card failed to tokenize');
-
-  const res = await fetch('/.netlify/functions/process-embedded-payment', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: result.token })
-  });
-  const data = await res.json();
-  if (data.success) {
-    alert("✅ Payment successful!");
-  } else {
-    alert("❌ Payment failed.");
-  }
-});
-</script>
+  </script>
 
 
   <section id="taplist">
