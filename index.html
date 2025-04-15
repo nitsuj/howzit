@@ -486,6 +486,44 @@
   loadMerch();
 </script>
 
+  <!-- More Cart Stuff -->
+
+  <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+
+<div id="card-container"></div>
+<button id="card-button">Pay Now</button>
+
+<script>
+const appId = "REPLACE_WITH_YOUR_SQUARE_APP_ID";
+const locationId = "REPLACE_WITH_YOUR_LOCATION_ID";
+
+const payments = window.Square.payments(appId, locationId);
+let card;
+async function initCard() {
+  card = await payments.card();
+  await card.attach('#card-container');
+}
+initCard();
+
+document.getElementById('card-button').addEventListener('click', async () => {
+  const result = await card.tokenize();
+  if (result.status !== 'OK') return alert('Card failed to tokenize');
+
+  const res = await fetch('/.netlify/functions/process-embedded-payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: result.token })
+  });
+  const data = await res.json();
+  if (data.success) {
+    alert("✅ Payment successful!");
+  } else {
+    alert("❌ Payment failed.");
+  }
+});
+</script>
+
+
   <section id="taplist">
     <h2>Tap List</h2>
     <div class="carousel-wrapper">
