@@ -319,26 +319,37 @@
   </header>
 
   
+
 <!-- MERCH SECTION W/ CART -->
 <section id="merch" style="padding: 60px 20px; max-width: 1200px; margin: 0 auto;">
   <h2 style="color: #ff216f; font-size: 2rem; margin-bottom: 20px;">Merch</h2>
   <div id="merch-grid" style="display: flex; flex-wrap: wrap; gap: 20px;"></div>
 </section>
 
+<!-- TOAST / FEEDBACK -->
+<div id="toast" style="position: fixed; bottom: 30px; right: 30px; background: #ff216f; color: #000; padding: 12px 20px; border-radius: 8px; font-weight: bold; opacity: 0; transition: opacity 0.4s; z-index: 9999;">Added to cart</div>
+
 <!-- CART SIDEBAR -->
 <div id="cart" style="position: fixed; top: 0; right: 0; width: 320px; height: 100vh; background: #111; color: #fff; box-shadow: -2px 0 10px rgba(0,0,0,0.5); padding: 20px; transform: translateX(100%); transition: transform 0.3s ease; z-index: 10000;">
-  <h3 style="color: #ff216f;">Your Cart</h3>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <h3 style="color: #ff216f;">Your Cart</h3>
+    <button onclick="toggleCart()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">✖</button>
+  </div>
   <ul id="cart-items" style="list-style: none; padding: 0;"></ul>
   <button id="checkout-btn" style="margin-top: 20px; padding: 10px 20px; background: #ff216f; color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">Checkout</button>
 </div>
-<button onclick="toggleCart()" style="position: fixed; top: 20px; right: 20px; background: #ff216f; color: #000; border: none; padding: 10px 16px; font-weight: bold; border-radius: 8px; cursor: pointer; z-index: 9999;">🛒 Cart</button>
+<button id="cart-toggle" onclick="toggleCart()" style="position: fixed; top: 20px; right: 20px; background: #ff216f; color: #000; border: none; padding: 10px 16px; font-weight: bold; border-radius: 8px; cursor: pointer; z-index: 9999;">🛒 Cart</button>
 
 <script>
   const cart = [];
 
-  function toggleCart() {
+  function toggleCart(forceClose = false) {
     const cartEl = document.getElementById('cart');
-    cartEl.style.transform = cartEl.style.transform === 'translateX(0%)' ? 'translateX(100%)' : 'translateX(0%)';
+    if (forceClose || cartEl.style.transform === 'translateX(0%)') {
+      cartEl.style.transform = 'translateX(100%)';
+    } else {
+      cartEl.style.transform = 'translateX(0%)';
+    }
     renderCart();
   }
 
@@ -350,7 +361,8 @@
       li.style = 'margin-bottom: 10px;';
       li.innerHTML = `
         ${item.title} - ${item.size} <br>
-        <strong>Qty:</strong> ${item.quantity}
+        <strong>Qty:</strong> ${item.quantity} <br>
+        <strong>Price:</strong> $${item.price.toFixed(2)}
         <button onclick="removeCartItem(${index})" style="margin-left:10px; background:#222; color:#fff; border:none; cursor:pointer;">✖</button>
       `;
       cartItemsEl.appendChild(li);
@@ -360,6 +372,13 @@
   function removeCartItem(index) {
     cart.splice(index, 1);
     renderCart();
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.opacity = 1;
+    setTimeout(() => toast.style.opacity = 0, 2000);
   }
 
   async function loadMerch() {
@@ -373,8 +392,8 @@
       colorMap[color].push({
         id: v.id,
         size,
-        available: v.available,
-        price: v.price
+        price: v.price,
+        available: v.available
       });
     });
 
@@ -383,6 +402,7 @@
 
     Object.entries(colorMap).forEach(([color, variations]) => {
       const inStock = variations.filter(v => v.available);
+      if (!inStock.length) return;
 
       const card = document.createElement('div');
       card.style = 'background:#111; border:1px solid #ff216f; border-radius:12px; padding:20px; width:260px; color:#fff; font-family: Montserrat, sans-serif;';
@@ -398,6 +418,11 @@
       title.style = 'margin-top:12px; font-weight:bold; color:#ff216f;';
       card.appendChild(title);
 
+      const priceTag = document.createElement('div');
+      priceTag.textContent = `$${inStock[0].price.toFixed(2)}`;
+      priceTag.style = 'margin-top:5px; font-weight:600;';
+      card.appendChild(priceTag);
+
       const sizeLabel = document.createElement('label');
       sizeLabel.textContent = 'Choose Size';
       sizeLabel.style = 'display:block; margin-top:10px;';
@@ -407,14 +432,12 @@
       select.style = 'margin-top:5px; width:100%; padding:6px; font-family:Montserrat,sans-serif; border-radius:6px; border:1px solid #ff216f;';
       select.innerHTML = '<option value="">-- Select --</option>';
 
-      inStock
-        .sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size))
-        .forEach(v => {
-          const opt = document.createElement('option');
-          opt.value = JSON.stringify({ id: v.id, size: v.size });
-          opt.textContent = v.size;
-          select.appendChild(opt);
-        });
+      inStock.sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size)).forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = JSON.stringify({ id: v.id, size: v.size, price: v.price });
+        opt.textContent = v.size;
+        select.appendChild(opt);
+      });
 
       const addBtn = document.createElement('button');
       addBtn.textContent = 'Add to Cart';
@@ -431,10 +454,12 @@
             variation_id: data.id,
             title: `Skater Tee - ${color}`,
             size: data.size,
+            price: data.price,
             quantity: 1
           });
         }
         renderCart();
+        showToast('✅ Added to cart');
       });
 
       card.appendChild(select);
@@ -460,7 +485,6 @@
 
   loadMerch();
 </script>
-
 
   <section id="taplist">
     <h2>Tap List</h2>
