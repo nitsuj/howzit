@@ -428,21 +428,68 @@
       });
     }
 
-    document.getElementById('checkout-btn').addEventListener('click', () => {
-      if (cart.length === 0) return alert('Cart is empty');
-      document.getElementById('embedded-checkout').style.display = 'block';
-      initializeSquareForm();
-    });
+let card;
 
-    async function initializeSquareForm() {
-      const payments = window.Square.payments("sq0idp-do2thVrkpZ500YTQnqF9vg", "LEX59H08FVDAX");
-      card = await payments.card();
-      await card.attach('#card-container');
+async function initializeSquareForm() {
+  try {
+    if (!window.Square) {
+      console.error("❌ Square Web SDK not loaded.");
+      return;
+    }
+    const payments = window.Square.payments("sq0idp-do2thVrkpZ500YTQnqF9vg", "LEX59H08FVDAX");
+    card = await payments.card();
+    await card.attach('#card-container');
+    console.log("✅ Square card input attached.");
+  } catch (err) {
+    console.error("❌ Error initializing Square form:", err);
+    document.getElementById('payment-status').textContent = "Error initializing payment form.";
+  }
+}
+
+document.getElementById('checkout-btn').addEventListener('click', () => {
+  if (cart.length === 0) return alert('Cart is empty');
+  document.getElementById('embedded-checkout').style.display = 'block';
+  initializeSquareForm();
+});
+
+document.getElementById('card-button').addEventListener('click', async () => {
+  try {
+    const result = await card.tokenize();
+    if (result.status !== 'OK') {
+      document.getElementById('payment-status').textContent = '❌ Card failed to tokenize.';
+      console.error("❌ Tokenization failed:", result);
+      return;
     }
 
-    document.getElementById('card-button').addEventListener('click', async () => {
-      const result = await card.tokenize();
-      if (result.status !== 'OK') return document.getElementById('payment-status').textContent = '❌ Card failed.';
+    const payload = {
+      token: result.token,
+      buyer: {
+        name: document.getElementById('buyer-name').value,
+        email: document.getElementById('buyer-email').value,
+        address: document.getElementById('buyer-address').value,
+        city: document.getElementById('buyer-city').value,
+        state: document.getElementById('buyer-state').value,
+        zip: document.getElementById('buyer-zip').value
+      },
+      cart
+    };
+
+    const res = await fetch('/.netlify/functions/process-embedded-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    document.getElementById('payment-status').textContent = data.success
+      ? '✅ Payment successful!'
+      : '❌ Payment failed.';
+    console.log("🔄 Payment response:", data);
+  } catch (err) {
+    console.error("❌ Error during payment:", err);
+    document.getElementById('payment-status').textContent = "Something went wrong during checkout.";
+  }
+});
 
       const payload = {
         token: result.token,
