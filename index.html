@@ -193,49 +193,38 @@
     /* TAPLIST updated to grid layout */
     
     #taplist .carousel {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-    #taplist .carousel-item {
-      width: 220px;
-      flex: 0 0 auto;
-    }
-    #taplist .carousel-item img {
-      width: 100%;
-      height: auto;
-      max-width: 250px;
-      aspect-ratio: 1/1;
-      object-fit: cover;
-      border-radius: 16px;
-      margin: 0 auto;
-    }
-    #taplist .carousel-item a {
-      display: block;
-      padding: 8px;
-      margin-top: 5px;
-      text-align: center;
-      font-weight: 600;
-      border: none;
-      background-color: transparent;
-      border-radius: 0;
-    }
-    @media (max-width: 1024px) {
-      #taplist .carousel {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-    @media (max-width: 768px) {
-      #taplist .carousel {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-    @media (max-width: 480px) {
-      #taplist .carousel {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+#taplist .carousel-item {
+  flex: 0 1 220px;
+  max-width: 220px;
+  text-align: center;
+  background: transparent !important;
+  border-radius: 8px;
+}
+
+#taplist .carousel-item img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 16px;
+  margin: 0 auto;
+}
+
+#taplist .carousel-item a {
+  display: block;
+  padding: 8px;
+  margin-top: 5px;
+  font-weight: 600;
+  text-decoration: none;
+  color: inherit;
+  background-color: transparent;
+  }
 
     /* TOGO styled like TAPLIST */
     
