@@ -426,7 +426,82 @@
     });
 
     loadMerch();
-  </script>
+
+  let card;
+
+  async function initializeSquareForm() {
+    try {
+      const payments = window.Square.payments("sq0idp-do2thVrkpZ500YTQnqF9vg", "LEX59H08FVDAX");
+      card = await payments.card();
+      await card.attach('#card-container');
+      console.log("✅ Square card form initialized");
+    } catch (err) {
+      console.error("❌ Error initializing Square form:", err);
+    }
+  }
+
+  function toggleCart(forceClose = false) {
+    const el = document.getElementById('cart');
+    el.style.transform = (forceClose || el.style.transform === 'translateX(0%)') ? 'translateX(100%)' : 'translateX(0%)';
+    renderCart();
+  }
+
+  function renderCart() {
+    const el = document.getElementById('cart-items');
+    el.innerHTML = '';
+    cart.forEach((item, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `${item.title} - ${item.size}<br>Qty: ${item.quantity} | Price: $${item.price.toFixed(2)}`;
+      el.appendChild(li);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('checkout-btn').addEventListener('click', () => {
+      console.log("🛒 Checkout clicked");
+      if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+      }
+      document.getElementById('embedded-checkout').style.display = 'block';
+      initializeSquareForm();
+    });
+
+    document.getElementById('card-button').addEventListener('click', async () => {
+      console.log("💳 Pay Now clicked");
+      const result = await card.tokenize();
+      if (result.status !== 'OK') {
+        document.getElementById('payment-status').textContent = '❌ Card failed.';
+        return;
+      }
+
+      const payload = {
+        token: result.token,
+        buyer: {
+          name: document.getElementById('buyer-name').value,
+          email: document.getElementById('buyer-email').value,
+          address: document.getElementById('buyer-address').value,
+          city: document.getElementById('buyer-city').value,
+          state: document.getElementById('buyer-state').value,
+          zip: document.getElementById('buyer-zip').value
+        },
+        cart
+      };
+
+      const res = await fetch('/.netlify/functions/process-embedded-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      document.getElementById('payment-status').textContent = data.success
+        ? '✅ Payment successful!'
+        : '❌ Payment failed.';
+    });
+  });
+</script>
+
 </body>
 </html>
 
