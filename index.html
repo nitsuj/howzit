@@ -12,14 +12,13 @@
     body {
       margin: 0;
       font-family: 'Montserrat', sans-serif;
-      text-transform: none;
       background-color: #fff;
       color: #000;
     }
     h1, h2, h3, h4, h5, h6,
-      .navbar a,
-      .carousel-item div,
-      .menu-item-name {
+    .navbar a,
+    .carousel-item div,
+    .menu-item-name {
       text-transform: uppercase;
     }
     nav {
@@ -66,168 +65,53 @@
     nav a:hover::after {
       width: 100%;
     }
-    header {
-      position: relative;
-    }
     header img.main-img {
       width: 100%;
-      height: auto;
       display: block;
     }
     section {
       padding: 60px 20px;
       max-width: 1200px;
       margin: 0 auto;
+      border-bottom: 1px solid #000;
     }
     h2 {
       font-size: 2rem;
       margin-bottom: 20px;
       color: #8517ff;
     }
-    .carousel-wrapper {
-      position: relative;
-    }
-    .carousel {
+
+    /* TAPLIST FIXED */
+    #taplist .carousel {
       display: flex;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 20px;
     }
-    .carousel-item {
-      flex: 0 0 22%;
-      background:  transparent !important;
-      border-radius: 8px;
+    #taplist .carousel-item {
+      width: 220px;
       text-align: center;
-      min-width: 22%;
+      background: transparent !important;
+      border-radius: 8px;
     }
-    .carousel-item img {
-      width: 250px;
-      height: 250px;
+    #taplist .carousel-item img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
       object-fit: cover;
       border-radius: 16px;
     }
-    .carousel-item a {
+    #taplist .carousel-item a {
       display: block;
       padding: 8px;
       margin-top: 5px;
-      text-align: center;
       font-weight: 600;
-      border: none;  /* Remove border */
-      background-color: transparent;  /* Remove background */
-      border-radius: 0;  /* Remove radius */
+      text-decoration: none;
+      color: inherit;
+      background-color: transparent;
     }
-     .carousel-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 2rem;
-        color: #E41090;
-        background: transparent !important; /* Changed from rgba(0,0,0,0.5) */
-        border: none;
-        cursor: pointer;
-        z-index: 10;
-    }
-    .left-arrow {
-      left: -40px;
-    }
-    .right-arrow {
-      right: -40px;
-    }
-    @media (max-width: 768px) {
-      .carousel-item {
-        flex: 0 0 45%;
-        min-width: 45%;
-      }
-      .carousel-arrow {
-        font-size: 1.5rem;
-      }
-    }
-    @media (max-width: 480px) {
-      .carousel-item {
-        flex: 0 0 90%;
-        min-width: 90%;
-      }
-    }
-    .contact {
-      background: #fff;
-      border-top: 1px solid #333;
-    }
-    .contact p {
-      margin: 5px 0;
-    }
-    .hours div {
-      margin: 5px 0;
-    }
-    .today {
-      color: #cc00ff;
-      font-weight: bold;
-    }
-    .faq-entry {
-      margin-bottom: 30px;
-    }
-    .faq-entry h4 {
-      margin-bottom: 5px;
-      color: #000;
-    }
-    .faq-entry p {
-      margin-top: 0;
-    }
-    iframe {
-      width: 100%;
-      height: 300px;
-      border: none;
-      margin-top: 20px;
-      border-radius: 8px;
-    }
-    #taplist .item {
-        background-color: white !important;
-        border: 1px solid #000;
-        padding: 10px;
-    }
-    section {
-        border-bottom: 1px solid #000;
-        padding-bottom: 20px;
-        margin-bottom
-    }
-  
-    /* TAPLIST updated to grid layout */
-    
-    #taplist .carousel {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-}
 
-#taplist .carousel-item {
-  flex: 0 1 220px;
-  max-width: 220px;
-  text-align: center;
-  background: transparent !important;
-  border-radius: 8px;
-}
-
-#taplist .carousel-item img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 16px;
-  margin: 0 auto;
-}
-
-#taplist .carousel-item a {
-  display: block;
-  padding: 8px;
-  margin-top: 5px;
-  font-weight: 600;
-  text-decoration: none;
-  color: inherit;
-  background-color: transparent;
-  }
-
-    /* TOGO styled like TAPLIST */
-    
+    /* TOGO */
     #togo .carousel {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -257,40 +141,28 @@
       color: inherit;
       text-decoration: none;
       background-color: transparent;
-      border-radius: 0;
     }
-    #togo .carousel-item a:hover {
-      color: #fff;
+
+    @media screen and (max-width: 768px) {
+      nav {
+        flex-direction: row;
+        justify-content: center;
+        padding-top: 60px;
+        flex-wrap: wrap;
+        position: relative;
+      }
+      nav img.logo {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 40px;
+      }
+      nav a {
+        margin: 0 10px;
+        font-size: 14px;
+      }
     }
-   
-    /* RESTYLE FOR LOGO CENTERED OVER TOP NAV ON MOBILE DEVICES */
-
-  @media screen and (max-width: 768px) {
-  nav {
-    display: flex;
-    flex-direction: row; /* keep links horizontal */
-    justify-content: center;
-    align-items: center;
-    padding-top: 60px; /* space for logo above */
-    flex-wrap: wrap; /* allow wrapping if needed */
-    position: relative;
-  }
-
-  nav img.logo {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 40px;
-    z-index: 1100;
-  }
-
-  nav a {
-    margin: 0 10px;
-    font-size: 14px;
-  }
-}
-
   </style>
 </head>
 <body>
@@ -307,130 +179,99 @@
     <img src="https://lh3.googleusercontent.com/p/AF1QipMU-KK2nqWIPUPJ84r54ZiR4hiV08W3_2KnqZTF=s1360-w1360-h1020" alt="Brewery Image" class="main-img">
   </header>
 
-
-  
   <section id="taplist">
     <h2>Tap List</h2>
     <div class="carousel-wrapper">
-  <div class="carousel" id="taplist-carousel">
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-absorbing-memories/6207395" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6207395_a3e42_hd.jpeg" alt="Absorbing Memories">
-        <div>Absorbing Memories</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-local-legend/5660501" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Local Legend">
-        <div>Local Legend</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-flat-day-ipa/5797585" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5797585_4019c_hd.jpeg" alt="Flat Day">
-        <div>Flat Day</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-tropical-legend/6118432" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6118432_44d2a_hd.jpeg" alt="Tropical Legend">
-        <div>Tropical Legend</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-run-drink-radler-repeat/6199245" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6199245_bb64b_hd.jpeg" alt="Grapefruit Radler">
-        <div>Run Drink Radler Repeat</div>
-      </a>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/inu-island-ales-weiz-guyz/6215644" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6215644_613b8_hd.jpeg" alt="Hefeweizen">
-        <div>Weiz Guys</div>
-      </a>
-    </div>
-     <div class="carousel-item">
-      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">
-        <img src="https://i.imgur.com/gakGmqU.jpeg alt="Rotating Seltzer">
-        <div>Rotating Seltzer</div>
-      </a>
-    </div>
-  </div>
+      <div class="carousel" id="taplist-carousel">
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-absorbing-memories/6207395" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6207395_a3e42_hd.jpeg" alt="Absorbing Memories">
+            <div>Absorbing Memories</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-local-legend/5660501" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Local Legend">
+            <div>Local Legend</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-flat-day-ipa/5797585" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5797585_4019c_hd.jpeg" alt="Flat Day">
+            <div>Flat Day</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-tropical-legend/6118432" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6118432_44d2a_hd.jpeg" alt="Tropical Legend">
+            <div>Tropical Legend</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-run-drink-radler-repeat/6199245" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6199245_bb64b_hd.jpeg" alt="Grapefruit Radler">
+            <div>Run Drink Radler Repeat</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/inu-island-ales-weiz-guyz/6215644" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6215644_613b8_hd.jpeg" alt="Weiz Guys">
+            <div>Weiz Guys</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">
+            <img src="https://i.imgur.com/gakGmqU.jpeg" alt="Rotating Seltzer">
+            <div>Rotating Seltzer</div>
+          </a>
+        </div>
       </div>
+    </div>
   </section>
 
-
-  
   <section id="togo">
     <h2>To Go</h2>
-    <p id="no-togo-message" style="display: none;">No to-go beers at this time.</p>
-    <div class="carousel-wrapper" id="togo-wrapper">
+    <div class="carousel-wrapper">
       <div class="carousel" id="togo-carousel">
         <div class="carousel-item">
           <a href="https://untappd.com/b/howzit-brewing-lime-in-the-sand/6143340" target="_blank">
             <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6143340_11ffa_hd.jpeg" alt="Lime in the Sand">
             <div>Lime in the Sand</div>
           </a>
-    </div>
+        </div>
       </div>
+    </div>
   </section>
 
-        
   <section id="visit" class="contact">
     <h2>Visit Us</h2>
     <p><strong>Address:</strong> 330 Kamani Street, Honolulu, HI</p>
-    <div class="hours">
-      <div id="mon">We're open seven days a week from 12pm–10pm</div>
-      
-    </div>
+    <div class="hours"><div id="mon">We're open seven days a week from 12pm–10pm</div></div>
     <iframe src="https://www.google.com/maps?q=330+Kamani+Street+Honolulu+HI&output=embed" allowfullscreen></iframe>
   </section>
 
-
   <section id="faq">
     <h2>FAQ</h2>
-    <div class="faq-entry">
-      <h4>Do you allow dogs?</h4>
-      <p>Yes, well behaved dogs are welcome on our outdoor patio.</p>
-    </div>
-    <div class="faq-entry">
-      <h4>Are kids allowed</h4>
-      <p>Kids are allowed but they must be seated by their parent AT ALL TIMES.</p>
-    </div>
-    <div class="faq-entry">
-      <h4>Do you guys serve food?</h4>
-      <p>We do not serve food but we work with a rotating selection of food trucks. Follow us on instagram for up to date information on who will be here.</p>
-    </div>
-    <div class="faq-entry">
-      <h4>Do you have parking?</h4>
-      <p>We have three spots in front of the building. There is usually street parking when construction is done for the day OR you can park in the garage at 831 Halekauwila and we will take your first hour's parking ($3) off your tab.</p>
-      <div class="faq-entry">
-      <h4>How do I get ahold of you?</h4>
-      <p>Any questions you have may be sent to us via DM on instagram.</p>
-    </div>
+    <div class="faq-entry"><h4>Do you allow dogs?</h4><p>Yes, well behaved dogs are welcome on our outdoor patio.</p></div>
+    <div class="faq-entry"><h4>Are kids allowed?</h4><p>Yes, but they must remain seated with their parents at all times.</p></div>
+    <div class="faq-entry"><h4>Do you guys serve food?</h4><p>No, but we partner with rotating food trucks. Check Instagram for updates.</p></div>
+    <div class="faq-entry"><h4>Do you have parking?</h4><p>We have 3 front spots. Street parking available or garage at 831 Halekauwila — we’ll cover first hour ($3).</p></div>
+    <div class="faq-entry"><h4>How do I get ahold of you?</h4><p>Send us a DM on Instagram.</p></div>
   </section>
 
   <script>
-    
-  // Toggle To-Go carousel based on availability
-  const toGoAvailable = true; // Set to false when no to-go beers available
-  const togoWrapper = document.getElementById('togo-wrapper');
-  const noTogoMsg = document.getElementById('no-togo-message');
+    const toGoAvailable = true;
+    const togoWrapper = document.getElementById('togo-wrapper');
+    const noTogoMsg = document.getElementById('no-togo-message');
+    if (!toGoAvailable) {
+      togoWrapper.style.display = 'none';
+      noTogoMsg.style.display = 'block';
+    }
 
-  if (!toGoAvailable) {
-    togoWrapper.style.display = 'none';
-    noTogoMsg.style.display = 'block';
-  }
-
-    // Code for logo to disappear on scroll
     window.addEventListener('scroll', function() {
-        const logo = document.querySelector('.logo');
-        if (window.scrollY > 50) {
-            logo.style.display = 'none';
-        } else {
-            logo.style.display = 'block';
-        }
+      const logo = document.querySelector('.logo');
+      logo.style.display = window.scrollY > 50 ? 'none' : 'block';
     });
-</script>
-
+  </script>
 </body>
 </html>
