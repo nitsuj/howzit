@@ -1,65 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Howzit Brewing - Craft Beer, Good Vibes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://web.squarecdn.com/v1/square.js"></script>
   <style>
-    html { scroll-behavior: smooth; }
     body {
-      margin: 0;
       font-family: 'Montserrat', sans-serif;
-      background-color: #fff;
+      margin: 0;
+      background: #fff;
       color: #000;
-    }
-    h1, h2, h3, h4, h5, h6,
-    .navbar a,
-    .carousel-item div,
-    .menu-item-name {
-      text-transform: uppercase;
     }
     nav {
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #fff;
+      background: #fff;
       padding: 20px;
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+      color: #8517ff;
+    }
+    nav a:hover {
+      color: #cea2ff;
     }
     nav img.logo {
       height: 50px;
       position: absolute;
       top: 10px;
       left: 10px;
-      z-index: 1100;
-    }
-    nav a {
-      margin: 0 15px;
-      text-decoration: none;
-      color: #8517ff;
-      font-weight: bold;
-      position: relative;
-      transition: color 0.3s;
-    }
-    nav a:hover {
-      color: #cea2ff;
-    }
-    nav a::after {
-      content: "";
-      position: absolute;
-      width: 0%;
-      height: 2px;
-      bottom: -5px;
-      left: 0;
-      background-color: #fff;
-      transition: width 0.3s;
-    }
-    nav a:hover::after {
-      width: 100%;
     }
     header img.main-img {
       width: 100%;
@@ -72,13 +49,11 @@
       border-bottom: 1px solid #000;
     }
     h2 {
+      color: #8517ff;
       font-size: 2rem;
       margin-bottom: 20px;
-      color: #8517ff;
     }
-
-    /* TAPLIST + TOGO Grid */
-    #taplist .carousel, #togo .carousel {
+    .carousel {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
@@ -92,17 +67,12 @@
       aspect-ratio: 1 / 1;
       object-fit: cover;
       border-radius: 16px;
-      margin: 0 auto;
     }
-
-    /* MERCH STYLING */
     #merch-grid {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
     }
-
-    /* CART SIDEBAR */
     #cart {
       position: fixed;
       top: 0;
@@ -130,8 +100,6 @@
       cursor: pointer;
       z-index: 9999;
     }
-
-    /* TOAST */
     #toast {
       position: fixed;
       bottom: 30px;
@@ -145,8 +113,6 @@
       transition: opacity 0.4s;
       z-index: 9999;
     }
-
-    /* EMBEDDED CHECKOUT */
     #embedded-checkout {
       padding: 40px;
       max-width: 600px;
@@ -157,29 +123,11 @@
       border-radius: 12px;
       display: none;
     }
-
-    /* Responsive nav logo */
-    @media screen and (max-width: 768px) {
-      nav {
-        flex-direction: row;
-        justify-content: center;
-        padding-top: 60px;
-        flex-wrap: wrap;
-        position: relative;
-      }
-      nav img.logo {
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        height: 40px;
-      }
-    }
   </style>
 </head>
 <body>
   <nav>
-    <img src="/howzit/bubble.svg" alt="Logo" class="logo">
+    <img src="/howzit/bubble.svg" class="logo" alt="Logo">
     <a href="#taplist">Tap List</a>
     <a href="#togo">To Go</a>
     <a href="#merch">Merch</a>
@@ -188,7 +136,7 @@
   </nav>
 
   <header>
-    <img src="https://lh3.googleusercontent.com/p/AF1QipMU-KK2nqWIPUPJ84r54ZiR4hiV08W3_2KnqZTF=s1360-w1360-h1020" alt="Brewery Image" class="main-img">
+    <img class="main-img" src="https://lh3.googleusercontent.com/p/AF1QipMU-KK2nqWIPUPJ84r54ZiR4hiV08W3_2KnqZTF=s1360-w1360-h1020" alt="Brewery Image">
   </header>
 
   <section id="merch">
@@ -207,7 +155,7 @@
     <button id="checkout-btn" style="margin-top: 20px; padding: 10px 20px; background: #ff216f; color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">Checkout</button>
   </div>
 
-  <button id="cart-toggle" onclick="toggleCart()" style="position: fixed; top: 20px; right: 20px;">🛒 Cart</button>
+  <button id="cart-toggle" onclick="toggleCart()">🛒 Cart</button>
 
   <div id="embedded-checkout">
     <h2 style="color: #ff216f;">Complete Your Purchase</h2>
@@ -343,9 +291,9 @@
     <div class="faq-entry"><h4>How do I get ahold of you?</h4><p>Any questions may be sent via DM on Instagram.</p></div>
   </section>
 
-  <script src="https://web.squarecdn.com/v1/square.js"></script>
-  <script>
+<script>
     const cart = [];
+    let card;
     const sizeOrder = ["XS", "Small", "Medium", "Large", "XL", "2XL", "3XL"];
 
     function toggleCart(forceClose = false) {
@@ -428,68 +376,24 @@
       });
     }
 
-let card;
-
-async function initializeSquareForm() {
-  try {
-    if (!window.Square) {
-      console.error("❌ Square Web SDK not loaded.");
-      return;
-    }
-    const payments = window.Square.payments("sq0idp-do2thVrkpZ500YTQnqF9vg", "LEX59H08FVDAX");
-    card = await payments.card();
-    await card.attach('#card-container');
-    console.log("✅ Square card input attached.");
-  } catch (err) {
-    console.error("❌ Error initializing Square form:", err);
-    document.getElementById('payment-status').textContent = "Error initializing payment form.";
-  }
-}
-
-document.getElementById('checkout-btn').addEventListener('click', () => {
-  if (cart.length === 0) return alert('Cart is empty');
-  document.getElementById('embedded-checkout').style.display = 'block';
-  initializeSquareForm();
-});
-
-document.getElementById('card-button').addEventListener('click', async () => {
-  try {
-    const result = await card.tokenize();
-    if (result.status !== 'OK') {
-      document.getElementById('payment-status').textContent = '❌ Card failed to tokenize.';
-      console.error("❌ Tokenization failed:", result);
-      return;
+    async function initializeSquareForm() {
+      const payments = window.Square.payments("sq0idp-do2thVrkpZ500YTQnqF9vg", "LEX59H08FVDAX");
+      card = await payments.card();
+      await card.attach('#card-container');
     }
 
-    const payload = {
-      token: result.token,
-      buyer: {
-        name: document.getElementById('buyer-name').value,
-        email: document.getElementById('buyer-email').value,
-        address: document.getElementById('buyer-address').value,
-        city: document.getElementById('buyer-city').value,
-        state: document.getElementById('buyer-state').value,
-        zip: document.getElementById('buyer-zip').value
-      },
-      cart
-    };
-
-    const res = await fetch('/.netlify/functions/process-embedded-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    document.getElementById('checkout-btn').addEventListener('click', () => {
+      if (cart.length === 0) return alert('Cart is empty');
+      document.getElementById('embedded-checkout').style.display = 'block';
+      initializeSquareForm();
     });
 
-    const data = await res.json();
-    document.getElementById('payment-status').textContent = data.success
-      ? '✅ Payment successful!'
-      : '❌ Payment failed.';
-    console.log("🔄 Payment response:", data);
-  } catch (err) {
-    console.error("❌ Error during payment:", err);
-    document.getElementById('payment-status').textContent = "Something went wrong during checkout.";
-  }
-});
+    document.getElementById('card-button').addEventListener('click', async () => {
+      const result = await card.tokenize();
+      if (result.status !== 'OK') {
+        document.getElementById('payment-status').textContent = '❌ Card failed.';
+        return;
+      }
 
       const payload = {
         token: result.token,
@@ -509,6 +413,7 @@ document.getElementById('card-button').addEventListener('click', async () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+
       const data = await res.json();
       document.getElementById('payment-status').textContent = data.success
         ? '✅ Payment successful!'
@@ -524,3 +429,4 @@ document.getElementById('card-button').addEventListener('click', async () => {
   </script>
 </body>
 </html>
+
