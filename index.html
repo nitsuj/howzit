@@ -193,10 +193,10 @@
     /* TAPLIST updated to grid layout */
     
     #taplist .carousel {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
+      justify-content: center;
     }
     #taplist .carousel-item {
       background: transparent !important;
