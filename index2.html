@@ -148,6 +148,10 @@
     </div>
   </div>
 
+  <div id="cart-notification" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #8517ff; color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000;">
+    Item added to cart!
+  </div>
+
   <script>
     const cart = [];
 
@@ -160,6 +164,17 @@
         cart.push({ name, price, quantity: 1 });
       }
       renderCart();
+
+      // Show toast notification
+      const toast = document.getElementById('cart-notification');
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 2000);
+
+      // Open the cart
+      const cartEl = document.getElementById('cart');
+      cartEl.classList.add('open');
     }
 
     function renderCart() {
