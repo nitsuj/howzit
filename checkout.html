@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checkout</title>
+  <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+</head>
+<body>
+  <form id="payment-form">
+    <div id="card-container"></div>
+    <input type="email" id="email" placeholder="Email" required />
+    <button id="card-button" type="button">Pay</button>
+  </form>
+
+  <script>
+    const appId = 'sq0idp-do2thVrkpZ500YTQnqF9vg';
+    const locationId = 'LEX59H08FVDAX';
+
+    async function initializeCard(payments) {
+      const card = await payments.card();
+      await card.attach('#card-container');
+      return card;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const payments = Square.payments(appId, locationId);
+      const card = await initializeCard(payments);
+
+      const cardButton = document.getElementById('card-button');
+      cardButton.addEventListener('click', async () => {
+        const email = document.getElementById('email').value;
+        const result = await card.tokenize();
+        if (result.status === 'OK') {
+          const response = await fetch('/.netlify/functions/process-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              nonce: result.token,
+              amount: 1000, // $10.00 in cents
+              email: email,
+            }),
+          });
+          const data = await response.json();
+          if (data.success) {
+            alert('Payment successful!');
+          } else {
+            alert('Payment failed: ' + data.error);
+          }
+        } else {
+          alert('Tokenization failed');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
