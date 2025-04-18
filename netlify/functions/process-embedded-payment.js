@@ -1,93 +1,220 @@
-const fetch = require('node-fetch');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Howzit Brewing - Craft Beer, Good Vibes</title>
+  <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #fff;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #8517ff;
+      font-weight: bold;
+    }
+    section {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-size: 1.8rem;
+      color: #8517ff;
+      margin-bottom: 20px;
+    }
+    .carousel-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .carousel-item img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .carousel-item button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #8517ff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #cart {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 320px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    #cart.open {
+      display: block;
+    }
+    #cart h3 {
+      margin-top: 0;
+    }
+    #cart-items {
+      list-style: none;
+      padding: 0;
+    }
+    #cart-items li {
+      margin-bottom: 10px;
+    }
+    #payment-form {
+      margin-top: 20px;
+    }
+    #payment-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #payment-form button {
+      width: 100%;
+      padding: 10px;
+      background-color: #8517ff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #payment-status {
+      margin-top: 10px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
 
-exports.handler = async function (event) {
+  <nav>
+    <a href="#shop">Shop</a>
+  </nav>
+
+  <section id="shop">
+    <h2>Shop</h2>
+    <div class="carousel-item">
+      <img src="https://via.placeholder.com/200" alt="Fake Item">
+      <div>Fake Item</div>
+      <div>$10.00</div>
+      <button onclick="addToCart('Fake Item', 10.00)">Add to Cart</button>
+    </div>
+  </section>
+
+  <button id="cart-toggle" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">🛒 Cart</button>
+
+  <div id="cart">
+    <h3>Shopping Cart</h3>
+    <ul id="cart-items"></ul>
+    <div id="payment-form">
+      <div id="payment-form">
+        <input type="text" id="shipping-name" placeholder="Full Name" required>
+        <input type="email" id="shipping-email" placeholder="Email Address" required>
+        <input type="text" id="shipping-address" placeholder="Street Address" required>
+        <input type="text" id="shipping-city" placeholder="City" required>
+        <input type="text" id="shipping-state" placeholder="State" required>
+        <input type="text" id="shipping-zip" placeholder="ZIP Code" required>
+        <button id="checkout-button" onclick="processPayment()">Checkout</button>
+        </div>
+        <div id="payment-status"></div>
+    </div>
+  </div>
+
+  <script>
+    const cart = [];
+
+    function addToCart(name, price) {
+      const existingItem = cart.find(item => item.name === name);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      renderCart();
+    }
+
+    function renderCart() {
+      const cartItemsEl = document.getElementById('cart-items');
+      cartItemsEl.innerHTML = '';
+      cart.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
+          <button onclick="removeCartItem(${index})">Remove</button>`;
+        cartItemsEl.appendChild(li);
+      });
+    }
+
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartEl = document.getElementById('cart');
+
+    cartToggle.addEventListener('click', () => {
+      cartEl.classList.toggle('open');
+    });
+
+    let card;
+
+    async function processPayment() {
+  const buyer = {
+    name: document.getElementById('shipping-name').value,
+    email: document.getElementById('shipping-email').value,
+    address: document.getElementById('shipping-address').value,
+    city: document.getElementById('shipping-city').value,
+    state: document.getElementById('shipping-state').value,
+    zip: document.getElementById('shipping-zip').value,
+  };
+
   try {
-    if (event.httpMethod !== 'POST') {
-      return {
-        statusCode: 405,
-        body: JSON.stringify({ success: false, error: 'Method Not Allowed' }),
-      };
-    }
-
-    const { cart, buyer } = JSON.parse(event.body);
-
-    if (!cart || !buyer) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ success: false, error: 'Missing required fields' }),
-      };
-    }
-
-    const SQUARE_TOKEN = process.env.SQUARE_TOKEN;
-    const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
-
-    if (!SQUARE_TOKEN || !SQUARE_LOCATION_ID) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ success: false, error: 'Square credentials are not configured' }),
-      };
-    }
-
-    // Calculate total amount
-    const totalAmount = cart.reduce((sum, item) => {
-      return sum + item.price * item.quantity;
-    }, 0);
-
-    // Create a checkout link
-    const response = await fetch(`https://connect.squareup.com/v2/online-checkout/payment-links`, {
+    const response = await fetch('/.netlify/functions/process-embedded-payment', {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${SQUARE_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        idempotency_key: `checkout-${Date.now()}`,
-        order: {
-          location_id: SQUARE_LOCATION_ID,
-          line_items: cart.map(item => ({
-            name: item.name,
-            quantity: item.quantity.toString(),
-            base_price_money: {
-              amount: Math.round(item.price * 100), // Convert to cents
-              currency: 'USD',
-            },
-          })),
-        },
-        checkout_options: {
-          redirect_url: 'https://nimble-daifuku-613b4c.netlify.app/thank-you.html', // Replace with your thank-you page URL
-        },
-        customer: {
-          email_address: buyer.email,
-          given_name: buyer.name,
-          address: {
-            address_line_1: buyer.address,
-            locality: buyer.city,
-            administrative_district_level_1: buyer.state,
-            postal_code: buyer.zip,
-            country: 'US',
-          },
-        },
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart, buyer }),
     });
 
     const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        body: JSON.stringify({ success: false, error: data.errors || 'Failed to create checkout link' }),
-      };
+    if (data.success) {
+      // Redirect to the hosted checkout page
+      window.location.href = data.checkout_url;
+    } else {
+      alert(`Failed to create checkout: ${JSON.stringify(data.error)}`);
     }
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true, checkout_url: data.payment_link.url }),
-    };
   } catch (error) {
-    console.error('Error creating checkout link:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ success: false, error: error.message }),
-    };
+    console.error('Error during checkout:', error);
+    alert('An error occurred during checkout.');
   }
-};
+}
+  </script>
+</body>
+</html>
