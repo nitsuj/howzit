@@ -17,12 +17,6 @@
       background-color: #fff;
       color: #000;
     }
-    h1, h2, h3, h4, h5, h6,
-    .navbar a,
-    .carousel-item div,
-    .menu-item-name {
-      text-transform: uppercase;
-    }
     nav {
       display: flex;
       justify-content: center;
@@ -34,86 +28,6 @@
       z-index: 1000;
       box-shadow: 0 2px 4px rgba(255,255,255,0.1);
     }
-    nav img.logo {
-      height: 50px;
-      margin-right: auto;
-      margin-left: 20px;
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1100;
-    }
-    nav a {
-      margin: 0 15px;
-      text-decoration: none;
-      color: #8517ff;
-      font-weight: bold;
-      position: relative;
-      transition: color 0.3s;
-    }
-    nav a:hover {
-      color: #cea2ff;
-    }
-    nav a::after {
-      content: "";
-      position: absolute;
-      width: 0%;
-      height: 2px;
-      bottom: -5px;
-      left: 0;
-      background-color: #fff;
-      transition: width 0.3s;
-    }
-    nav a:hover::after {
-      width: 100%;
-    }
-    header img.main-img {
-      width: 100%;
-      display: block;
-    }
-    section {
-      padding: 60px 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      border-bottom: 1px solid #000;
-    }
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-      color: #8517ff;
-    }
-
-    /* Tap List Section */
-    #taplist .carousel {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-    #taplist .carousel-item {
-      width: 220px;
-      text-align: center;
-      background: transparent !important;
-      border-radius: 8px;
-    }
-    #taplist .carousel-item img {
-      width: 100%;
-      height: auto;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      border-radius: 16px;
-    }
-    #taplist .carousel-item a {
-      display: block;
-      padding: 8px;
-      margin-top: 5px;
-      font-weight: 600;
-      text-decoration: none;
-      color: inherit;
-      background-color: transparent;
-    }
-
-    /* Shopping Cart Styles */
     #cart {
       display: none;
       position: fixed;
@@ -131,38 +45,21 @@
     #cart.open {
       right: 0;
     }
-    #cart h3 {
-      margin-top: 0;
+    #payment-form {
+      margin-top: 20px;
     }
-    #cart-items {
-      list-style: none;
-      padding: 0;
-    }
-    #cart-items li {
-      margin-bottom: 10px;
+    #payment-status {
+      margin-top: 10px;
+      color: red;
     }
   </style>
 </head>
 <body>
 
   <nav>
-    <img src="bubble.svg" alt="Logo" class="logo">
     <a href="#taplist">Tap List</a>
-    <a href="#togo">To Go</a>
-    <a href="#visit">Visit</a>
-    <a href="#faq">FAQ</a>
+    <a href="#shop">Shop</a>
   </nav>
-
-  <header>
-    <img src="taplist.png" alt="Howzit Brewing" class="main-img">
-  </header>
-
-  <section id="taplist">
-    <h2>Tap List</h2>
-    <div class="carousel-wrapper">
-      <!-- Tap List Items -->
-    </div>
-  </section>
 
   <section id="shop">
     <h2>Shop</h2>
@@ -178,18 +75,41 @@
 
   <button id="cart-toggle" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">🛒 Cart</button>
 
-  <div id="cart-message" style="position: fixed; top: 20px; right: 20px; background: #8517ff; color: #fff; padding: 10px 20px; border-radius: 8px; display: none; z-index: 1200;">Added to Cart!</div>
-
   <div id="cart">
     <h3>Shopping Cart</h3>
     <ul id="cart-items"></ul>
     <button id="checkout-btn" style="display: none;">Checkout</button>
-  </div>
 
-  <div id="payment-form">
-    <div id="card-container"></div>
-    <button id="card-button" style="margin-top: 20px;">Pay Now</button>
-    <div id="payment-status" style="margin-top: 16px;"></div>
+    <!-- Payment Form -->
+    <div id="payment-form">
+      <div id="card-container"></div>
+      <div>
+        <label for="shipping-name">Name</label>
+        <input type="text" id="shipping-name" placeholder="Full Name" required>
+      </div>
+      <div>
+        <label for="shipping-email">Email</label>
+        <input type="email" id="shipping-email" placeholder="Email Address" required>
+      </div>
+      <div>
+        <label for="shipping-address">Address</label>
+        <input type="text" id="shipping-address" placeholder="Street Address" required>
+      </div>
+      <div>
+        <label for="shipping-city">City</label>
+        <input type="text" id="shipping-city" placeholder="City" required>
+      </div>
+      <div>
+        <label for="shipping-state">State</label>
+        <input type="text" id="shipping-state" placeholder="State" required>
+      </div>
+      <div>
+        <label for="shipping-zip">ZIP Code</label>
+        <input type="text" id="shipping-zip" placeholder="ZIP Code" required>
+      </div>
+      <button id="card-button" style="margin-top: 20px;">Pay Now</button>
+      <div id="payment-status"></div>
+    </div>
   </div>
 
   <script>
@@ -203,12 +123,6 @@
         cart.push({ name, price, quantity: 1 });
       }
       renderCart();
-
-      const cartMessage = document.getElementById('cart-message');
-      cartMessage.style.display = 'block';
-      setTimeout(() => {
-        cartMessage.style.display = 'none';
-      }, 2000);
     }
 
     function renderCart() {
@@ -245,52 +159,52 @@
 
     let card;
 
-async function initializeSquarePaymentForm() {
-  const payments = window.Square.payments('sandbox-sq0idb-2qu4_rVodkuwd3rCFK_oxg', 'L3GGEHCGF4A6Q');
+    async function initializeSquarePaymentForm() {
+      const payments = window.Square.payments('sandbox-sq0idb-2qu4_rVodkuwd3rCFK_oxg', 'L3GGEHCGF4A6Q');
 
-  card = await payments.card();
-  await card.attach('#card-container');
+      card = await payments.card();
+      await card.attach('#card-container');
 
-  document.getElementById('card-button').addEventListener('click', async () => {
-    const result = await card.tokenize();
-    if (result.status === 'OK') {
-      processPayment(result.token);
-    } else {
-      document.getElementById('payment-status').textContent = 'Payment failed. Please try again.';
+      document.getElementById('card-button').addEventListener('click', async () => {
+        const result = await card.tokenize();
+        if (result.status === 'OK') {
+          processPayment(result.token);
+        } else {
+          document.getElementById('payment-status').textContent = 'Payment failed. Please try again.';
+        }
+      });
     }
-  });
-}
 
-initializeSquarePaymentForm();
+    initializeSquarePaymentForm();
 
-async function processPayment(token) {
-  const buyer = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    address: '123 Main St',
-    city: 'Anytown',
-    state: 'CA',
-    zip: '12345',
-  };
+    async function processPayment(token) {
+      const buyer = {
+        name: document.getElementById('shipping-name').value,
+        email: document.getElementById('shipping-email').value,
+        address: document.getElementById('shipping-address').value,
+        city: document.getElementById('shipping-city').value,
+        state: document.getElementById('shipping-state').value,
+        zip: document.getElementById('shipping-zip').value,
+      };
 
-  try {
-    const response = await fetch('/.netlify/functions/process-embedded-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, cart, buyer }),
-    });
+      try {
+        const response = await fetch('/.netlify/functions/process-embedded-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, cart, buyer }),
+        });
 
-    const data = await response.json();
-    if (data.success) {
-      alert('Payment successful!');
-    } else {
-      alert(`Payment failed: ${JSON.stringify(data.error)}`);
+        const data = await response.json();
+        if (data.success) {
+          alert('Payment successful!');
+        } else {
+          alert(`Payment failed: ${JSON.stringify(data.error)}`);
+        }
+      } catch (error) {
+        console.error('Error during checkout:', error);
+        alert('An error occurred during checkout.');
+      }
     }
-  } catch (error) {
-    console.error('Error during checkout:', error);
-    alert('An error occurred during checkout.');
-  }
-}
   </script>
 </body>
 </html>
