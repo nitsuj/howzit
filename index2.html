@@ -1,42 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Howzit Brewing - Craft Beer, Good Vibes</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://web.squarecdn.com/v1/square.js"></script>
+  <title>Howzit Brewing - Craft Beer, Good Vibes</title>
   <style>
+    html {
+      scroll-behavior: smooth;
+    }
     body {
-      font-family: 'Montserrat', sans-serif;
       margin: 0;
-      background: #fff;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #fff;
       color: #000;
+    }
+    h1, h2, h3, h4, h5, h6,
+    .navbar a,
+    .carousel-item div,
+    .menu-item-name {
+      text-transform: uppercase;
     }
     nav {
       display: flex;
       justify-content: center;
       align-items: center;
-      background: #fff;
+      background-color: #fff;
       padding: 20px;
       position: sticky;
       top: 0;
       z-index: 1000;
+      box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+    }
+    nav img.logo {
+      height: 50px;
+      margin-right: auto;
+      margin-left: 20px;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1100;
     }
     nav a {
       margin: 0 15px;
       text-decoration: none;
-      font-weight: bold;
       color: #8517ff;
+      font-weight: bold;
+      position: relative;
+      transition: color 0.3s;
     }
     nav a:hover {
       color: #cea2ff;
     }
-    nav img.logo {
-      height: 50px;
+    nav a::after {
+      content: "";
       position: absolute;
-      top: 10px;
-      left: 10px;
+      width: 0%;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background-color: #fff;
+      transition: width 0.3s;
+    }
+    nav a:hover::after {
+      width: 100%;
     }
     header img.main-img {
       width: 100%;
@@ -49,232 +76,179 @@
       border-bottom: 1px solid #000;
     }
     h2 {
-      color: #8517ff;
       font-size: 2rem;
       margin-bottom: 20px;
+      color: #8517ff;
     }
-    .carousel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+    /* TAPLIST FIXED */
+    #taplist .carousel {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 20px;
     }
-    .carousel-item {
+    #taplist .carousel-item {
+      width: 220px;
       text-align: center;
+      background: transparent !important;
+      border-radius: 8px;
     }
-    .carousel-item img {
+    #taplist .carousel-item img {
       width: 100%;
-      max-width: 250px;
+      height: auto;
       aspect-ratio: 1 / 1;
       object-fit: cover;
       border-radius: 16px;
     }
-    #merch-grid {
-      display: flex;
-      flex-wrap: wrap;
+    #taplist .carousel-item a {
+      display: block;
+      padding: 8px;
+      margin-top: 5px;
+      font-weight: 600;
+      text-decoration: none;
+      color: inherit;
+      background-color: transparent;
+    }
+
+    /* TOGO */
+    #togo .carousel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 20px;
     }
-    #cart {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 320px;
-      height: 100vh;
-      background: #111;
-      color: #fff;
-      box-shadow: -2px 0 10px rgba(0,0,0,0.5);
-      padding: 20px;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      z-index: 10000;
-    }
-    #cart-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #ff216f;
-      color: #000;
-      border: none;
-      padding: 10px 16px;
-      font-weight: bold;
+    #togo .carousel-item {
+      background: transparent !important;
       border-radius: 8px;
-      cursor: pointer;
-      z-index: 9999;
+      text-align: center;
+      width: 100%;
     }
-    #toast {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background: #ff216f;
-      color: #000;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      opacity: 0;
-      transition: opacity 0.4s;
-      z-index: 9999;
+    #togo .carousel-item img {
+      width: 100%;
+      height: auto;
+      max-width: 250px;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      border-radius: 16px;
+      margin: 0 auto;
     }
-    #embedded-checkout {
-      padding: 40px;
-      max-width: 600px;
-      margin: 40px auto;
-      font-family: Montserrat, sans-serif;
-      color: #fff;
-      background: #111;
-      border-radius: 12px;
-      display: none;
+    #togo .carousel-item a {
+      display: block;
+      padding: 8px;
+      margin-top: 5px;
+      text-align: center;
+      font-weight: 600;
+      color: inherit;
+      text-decoration: none;
+      background-color: transparent;
+    }
+
+    @media screen and (max-width: 768px) {
+      nav {
+        flex-direction: row;
+        justify-content: center;
+        padding-top: 60px;
+        flex-wrap: wrap;
+        position: relative;
+      }
+      nav img.logo {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 40px;
+      }
+      nav a {
+        margin: 0 10px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
 <body>
+
   <nav>
-    <img src="/howzit/bubble.svg" class="logo" alt="Logo">
+    <img src="bubble.svg" alt="Logo" class="logo">
     <a href="#taplist">Tap List</a>
     <a href="#togo">To Go</a>
-    <a href="#merch">Merch</a>
     <a href="#visit">Visit</a>
     <a href="#faq">FAQ</a>
   </nav>
 
   <header>
-    <img class="main-img" src="https://lh3.googleusercontent.com/p/AF1QipMU-KK2nqWIPUPJ84r54ZiR4hiV08W3_2KnqZTF=s1360-w1360-h1020" alt="Brewery Image">
+    <img src="taplist.png" alt="Howzit Brewing" class="main-img">
   </header>
 
-  <section id="merch">
-    <h2>Merch</h2>
-    <div id="merch-grid"></div>
-  </section>
-
-  <div id="toast">Added to cart</div>
-
-  <div id="cart">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3 style="color: #ff216f;">Your Cart</h3>
-      <button onclick="toggleCart(true)" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">✖</button>
-    </div>
-    <ul id="cart-items" style="list-style: none; padding: 0;"></ul>
-    <button id="checkout-btn" style="margin-top: 20px; padding: 10px 20px; background: #ff216f; color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">Checkout</button>
-  </div>
-
-  <button id="cart-toggle" onclick="toggleCart()">🛒 Cart</button>
-
-  <div id="embedded-checkout">
-    <h2 style="color: #ff216f;">Complete Your Purchase</h2>
-    <form id="payment-form">
-      <input type="text" id="buyer-name" required placeholder="Full Name"><br>
-      <input type="email" id="buyer-email" required placeholder="Email"><br>
-      <input type="text" id="buyer-address" required placeholder="Street Address"><br>
-      <input type="text" id="buyer-city" required placeholder="City"><br>
-      <input type="text" id="buyer-state" required placeholder="State"><br>
-      <input type="text" id="buyer-zip" required placeholder="ZIP Code"><br>
-      <div id="card-container" style="margin-top:20px;"></div>
-      <button id="card-button" type="button" style="margin-top: 20px;">Pay Now</button>
-      <div id="payment-status" style="margin-top: 16px;"></div>
-    </form>
-  </div>
-
-/* CODE FOR TAPLIST */
-  
-   <section id="taplist">
+  <section id="taplist">
     <h2>Tap List</h2>
     <div class="carousel-wrapper">
-  <div class="carousel" id="taplist-carousel">
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-absorbing-memories/6207395" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6207395_a3e42_hd.jpeg" alt="Absorbing Memories">
-        <div>Absorbing Memories</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-local-legend/5660501" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Local Legend">
-        <div>Local Legend</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-flat-day-ipa/5797585" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Flat Day">
-        <div>Flat Day</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-tropical-legend/6118432" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6118432_44d2a_hd.jpeg" alt="Tropical Legend">
-        <div>Tropical Legend</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-chance-encounter/6155607" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6118432_44d2a_hd.jpeg" alt="Chance Encounter">
-        <div>Chance Encounter</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-run-drink-radler-repeat/6199245" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6199245_bb64b_hd.jpeg" alt="Grapefruit Radler">
-        <div>Run Drink Radler Repeat</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-run-drink-radler-repeat/6199245" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6199245_bb64b_hd.jpeg" alt="Ube Coconut Stout">
-        <div>Anniversary Stout: Year 1</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/howzit-brewing-reflecting-on-simplicity-helles-lager/6178595" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6178595_21808_hd.jpeg" alt="Helles Lager">
-        <div>Reflecting on Simplicity</div>
-      </a>
-    </div>
-    <div class="carousel-item">
-      <a href="https://untappd.com/b/inu-island-ales-weiz-guyz/6215644" target="_blank">
-        <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6215644_613b8_hd.jpeg" alt="Hefeweizen">
-        <div>Weiz Guys</div>
-      </a>
-    </div>
-     <div class="carousel-item">
-      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">
-        <img src="https://i.imgur.com/gakGmqU.jpeg alt="Rotating Seltzer">
-        <div>Rotating Seltzer</div>
-      </a>
-    </div>
-  </div>
+      <div class="carousel" id="taplist-carousel">
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-absorbing-memories/6207395" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6207395_a3e42_hd.jpeg" alt="Absorbing Memories">
+            <div>Absorbing Memories</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-local-legend/5660501" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Local Legend">
+            <div>Local Legend</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-flat-day-ipa/5797585" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5797585_4019c_hd.jpeg" alt="Flat Day">
+            <div>Flat Day</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-chance-encounter/6155607" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5797585_4019c_hd.jpeg" alt="Chance Encounter">
+            <div>Chance Encounter</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-run-drink-radler-repeat/6199245" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6199245_bb64b_hd.jpeg" alt="Grapefruit Radler">
+            <div>Run Drink Radler Repeat</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/howzit-brewing-chronic-2025/6231506" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5797585_4019c_hd.jpeg" alt="Chronic 2025">
+            <div>Chronic 2025</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://untappd.com/b/inu-island-ales-weiz-guyz/6215644" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6215644_613b8_hd.jpeg" alt="Weiz Guys">
+            <div>Weiz Guys</div>
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">
+            <img src="https://i.imgur.com/gakGmqU.jpeg" alt="Rotating Seltzer">
+            <div>Rotating Seltzer</div>
+          </a>
+        </div>
       </div>
+    </div>
   </section>
-
-/* CODE FOR TO GO ITEMS */
 
   <section id="togo">
     <h2>To Go</h2>
-    <p id="no-togo-message" style="display: none;">No to-go beers at this time.</p>
-    <div class="carousel-wrapper" id="togo-wrapper">
+    <div class="carousel-wrapper">
       <div class="carousel" id="togo-carousel">
         <div class="carousel-item">
-          <a href="https://untappd.com" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Can One">
-            <div>Can One</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://untappd.com" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Can Two">
-            <div>Can Two</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://untappd.com" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Can Three">
-            <div>Can Three</div>
+          <a href="https://untappd.com/b/howzit-brewing-lime-in-the-sand/6143340" target="_blank">
+            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6143340_11ffa_hd.jpeg" alt="Lime in the Sand">
+            <div>Lime in the Sand</div>
           </a>
         </div>
       </div>
     </div>
   </section>
 
-        
-      </div>
-    </div>
-  </section>
   <section id="visit" class="contact">
     <h2>Visit Us</h2>
     <p><strong>Address:</strong> 330 Kamani Street, Honolulu, HI</p>
@@ -285,222 +259,28 @@
   <section id="faq">
     <h2>FAQ</h2>
     <div class="faq-entry"><h4>Do you allow dogs?</h4><p>Yes, well behaved dogs are welcome on our outdoor patio.</p></div>
-    <div class="faq-entry"><h4>Are kids allowed</h4><p>Kids are allowed but they must be seated by their parent AT ALL TIMES.</p></div>
-    <div class="faq-entry"><h4>Do you guys serve food?</h4><p>We do not serve food but we work with a rotating selection of food trucks.</p></div>
-    <div class="faq-entry"><h4>Do you have parking?</h4><p>We have three spots in front of the building...</p></div>
-    <div class="faq-entry"><h4>How do I get ahold of you?</h4><p>Any questions may be sent via DM on Instagram.</p></div>
+    <div class="faq-entry"><h4>Are kids allowed?</h4><p>Yes, but they must remain seated with their parents at all times.</p></div>
+    <div class="faq-entry"><h4>Do you guys serve food?</h4><p>No, but we partner with rotating food trucks. Check Instagram for updates.</p></div>
+    <div class="faq-entry"><h4>Do you have parking?</h4><p>We have 3 front spots. Street parking available or garage at 831 Halekauwila — we’ll cover first hour ($3).</p></div>
+    <div class="faq-entry"><h4>How do I get ahold of you?</h4><p>Send us a DM on <a href="https://www.instagram.com/howzitbrewing">Instagram.</a></p></div>
   </section>
 
-<script>
-    const cart = [];
-    let card;
-    const sizeOrder = ["XS", "Small", "Medium", "Large", "XL", "2XL", "3XL"];
-
-    function toggleCart(forceClose = false) {
-      const el = document.getElementById('cart');
-      el.style.transform = (forceClose || el.style.transform === 'translateX(0%)') ? 'translateX(100%)' : 'translateX(0%)';
-      renderCart();
+  <script>
+    const toGoAvailable = true;
+    const togoWrapper = document.getElementById('togo-wrapper');
+    const noTogoMsg = document.getElementById('no-togo-message');
+    if (!toGoAvailable) {
+      togoWrapper.style.display = 'none';
+      noTogoMsg.style.display = 'block';
     }
-
-    function renderCart() {
-      const el = document.getElementById('cart-items');
-      el.innerHTML = '';
-      cart.forEach((item, i) => {
-        const li = document.createElement('li');
-        li.innerHTML = `${item.title} - ${item.size} <br><strong>Qty:</strong> ${item.quantity} <br><strong>Price:</strong> $${item.price.toFixed(2)}
-        <button onclick="removeCartItem(${i})" style="margin-left:10px;">✖</button>`;
-        el.appendChild(li);
-      });
-    }
-
-    function removeCartItem(i) {
-      cart.splice(i, 1);
-      renderCart();
-    }
-
-    function showToast(msg) {
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.style.opacity = 1;
-      setTimeout(() => el.style.opacity = 0, 2000);
-    }
-
-    async function loadMerch() {
-      const res = await fetch('/.netlify/functions/get-skater-tee');
-      const product = await res.json();
-      const colorMap = {};
-      product.variations.forEach(v => {
-        const [size, color] = v.name.split(',').map(s => s.trim());
-        if (!colorMap[color]) colorMap[color] = [];
-        colorMap[color].push({ id: v.id, size, price: v.price, available: v.available });
-      });
-
-      const merchGrid = document.getElementById('merch-grid');
-      Object.entries(colorMap).forEach(([color, vars]) => {
-        const inStock = vars.filter(v => v.available);
-        if (!inStock.length) return;
-
-        const card = document.createElement('div');
-        card.style = 'background:#111; border:1px solid #ff216f; border-radius:12px; padding:20px; width:260px; color:#fff;';
-        card.innerHTML = `
-          <img src="${product.image}" style="width:100%; border-radius:8px;" />
-          <div style="margin-top:12px; font-weight:bold; color:#ff216f;">Skater Tee - ${color}</div>
-          <div style="margin-top:5px;">$${inStock[0].price.toFixed(2)}</div>
-        `;
-
-        const select = document.createElement('select');
-        select.style = 'margin-top:10px; width:100%; padding:6px;';
-        select.innerHTML = '<option value="">-- Select Size --</option>';
-        inStock.sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size)).forEach(v => {
-          const opt = document.createElement('option');
-          opt.value = JSON.stringify({ id: v.id, size: v.size, price: v.price });
-          opt.textContent = v.size;
-          select.appendChild(opt);
-        });
-
-        const btn = document.createElement('button');
-        btn.textContent = 'Add to Cart';
-        btn.style = 'margin-top:10px; padding:8px 12px; background:#ff216f; color:#000; font-weight:bold; border:none; border-radius:6px;';
-        btn.onclick = () => {
-          if (!select.value) return alert('Please select a size');
-          const data = JSON.parse(select.value);
-          const existing = cart.find(i => i.variation_id === data.id);
-          if (existing) existing.quantity += 1;
-          else cart.push({ variation_id: data.id, title: `Skater Tee - ${color}`, size: data.size, price: data.price, quantity: 1 });
-          renderCart(); showToast('✅ Added to cart');
-        };
-
-        card.appendChild(select);
-        card.appendChild(btn);
-        merchGrid.appendChild(card);
-      });
-    }
-
-    async function initializeSquareForm() {
-      const payments = window.Square.payments("sq0idp-do2thVrkpZ500YTQnqF9vg", "LEX59H08FVDAX");
-      card = await payments.card();
-      await card.attach('#card-container');
-    }
-
-    document.getElementById('checkout-btn').addEventListener('click', () => {
-      if (cart.length === 0) return alert('Cart is empty');
-      document.getElementById('embedded-checkout').style.display = 'block';
-      initializeSquareForm();
-    });
-
-    document.getElementById('card-button').addEventListener('click', async () => {
-      const result = await card.tokenize();
-      if (result.status !== 'OK') {
-        document.getElementById('payment-status').textContent = '❌ Card failed.';
-        return;
-      }
-
-      const payload = {
-        token: result.token,
-        buyer: {
-          name: document.getElementById('buyer-name').value,
-          email: document.getElementById('buyer-email').value,
-          address: document.getElementById('buyer-address').value,
-          city: document.getElementById('buyer-city').value,
-          state: document.getElementById('buyer-state').value,
-          zip: document.getElementById('buyer-zip').value
-        },
-        cart
-      };
-
-      const res = await fetch('/.netlify/functions/process-embedded-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-      document.getElementById('payment-status').textContent = data.success
-        ? '✅ Payment successful!'
-        : '❌ Payment failed.';
-    });
 
     window.addEventListener('scroll', function() {
       const logo = document.querySelector('.logo');
       logo.style.display = window.scrollY > 50 ? 'none' : 'block';
     });
-
-    loadMerch();
-
-  let card;
-
-  async function initializeSquareForm() {
-    try {
-      const payments = window.Square.payments("sq0idp-do2thVrkpZ500YTQnqF9vg", "LEX59H08FVDAX");
-      card = await payments.card();
-      await card.attach('#card-container');
-      console.log("✅ Square card form initialized");
-    } catch (err) {
-      console.error("❌ Error initializing Square form:", err);
-    }
-  }
-
-  function toggleCart(forceClose = false) {
-    const el = document.getElementById('cart');
-    el.style.transform = (forceClose || el.style.transform === 'translateX(0%)') ? 'translateX(100%)' : 'translateX(0%)';
-    renderCart();
-  }
-
-  function renderCart() {
-    const el = document.getElementById('cart-items');
-    el.innerHTML = '';
-    cart.forEach((item, i) => {
-      const li = document.createElement('li');
-      li.innerHTML = `${item.title} - ${item.size}<br>Qty: ${item.quantity} | Price: $${item.price.toFixed(2)}`;
-      el.appendChild(li);
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('checkout-btn').addEventListener('click', () => {
-      console.log("🛒 Checkout clicked");
-      if (cart.length === 0) {
-        alert("Cart is empty");
-        return;
-      }
-      document.getElementById('embedded-checkout').style.display = 'block';
-      initializeSquareForm();
-    });
-
-    document.getElementById('card-button').addEventListener('click', async () => {
-      console.log("💳 Pay Now clicked");
-      const result = await card.tokenize();
-      if (result.status !== 'OK') {
-        document.getElementById('payment-status').textContent = '❌ Card failed.';
-        return;
-      }
-
-      const payload = {
-        token: result.token,
-        buyer: {
-          name: document.getElementById('buyer-name').value,
-          email: document.getElementById('buyer-email').value,
-          address: document.getElementById('buyer-address').value,
-          city: document.getElementById('buyer-city').value,
-          state: document.getElementById('buyer-state').value,
-          zip: document.getElementById('buyer-zip').value
-        },
-        cart
-      };
-
-      const res = await fetch('/.netlify/functions/process-embedded-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-      document.getElementById('payment-status').textContent = data.success
-        ? '✅ Payment successful!'
-        : '❌ Payment failed.';
-    });
-  });
-</script>
+  </script>
+</body>
+</html>
 
 </body>
 </html>
