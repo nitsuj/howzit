@@ -240,11 +240,13 @@
         return;
       }
 
+      console.log(`Shipping cost calculated: $${shippingCost}`); // Debugging
+
       try {
         const response = await fetch('/.netlify/functions/process-embedded-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cart, buyer, shippingCost }),
+          body: JSON.stringify({ cart, buyer, shippingCost }), // Ensure shippingCost is included
         });
 
         const data = await response.json();
