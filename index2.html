@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <title>Howzit Brewing - Craft Beer, Good Vibes</title>
+  <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
   <style>
     /* Global Styles */
     html {
@@ -185,6 +186,12 @@
     <button id="checkout-btn" style="display: none;">Checkout</button>
   </div>
 
+  <div id="payment-form">
+    <div id="card-container"></div>
+    <button id="card-button" style="margin-top: 20px;">Pay Now</button>
+    <div id="payment-status" style="margin-top: 16px;"></div>
+  </div>
+
   <script>
     const cart = [];
 
@@ -236,35 +243,54 @@
       }
     });
 
-    document.getElementById('checkout-btn').addEventListener('click', async () => {
-      const token = 'FAKE_TOKEN_FOR_TESTING'; // Replace with actual token from Square payment form
-      const buyer = {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        address: '123 Main St',
-        city: 'Anytown',
-        state: 'CA',
-        zip: '12345',
-      };
+    let card;
 
-      try {
-        const response = await fetch('/.netlify/functions/process-embedded-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, cart, buyer }),
-        });
+async function initializeSquarePaymentForm() {
+  const payments = window.Square.payments('sq0idp-do2thVrkpZ500YTQnqF9vg', 'LEX59H08FVDAX');
 
-        const data = await response.json();
-        if (data.success) {
-          alert('Payment successful!');
-        } else {
-          alert(`Payment failed: ${data.error}`);
-        }
-      } catch (error) {
-        console.error('Error during checkout:', error);
-        alert('An error occurred during checkout.');
-      }
+  card = await payments.card();
+  await card.attach('#card-container');
+
+  document.getElementById('card-button').addEventListener('click', async () => {
+    const result = await card.tokenize();
+    if (result.status === 'OK') {
+      processPayment(result.token);
+    } else {
+      document.getElementById('payment-status').textContent = 'Payment failed. Please try again.';
+    }
+  });
+}
+
+initializeSquarePaymentForm();
+
+async function processPayment(token) {
+  const buyer = {
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    address: '123 Main St',
+    city: 'Anytown',
+    state: 'CA',
+    zip: '12345',
+  };
+
+  try {
+    const response = await fetch('/.netlify/functions/process-embedded-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, cart, buyer }),
     });
+
+    const data = await response.json();
+    if (data.success) {
+      alert('Payment successful!');
+    } else {
+      alert(`Payment failed: ${JSON.stringify(data.error)}`);
+    }
+  } catch (error) {
+    console.error('Error during checkout:', error);
+    alert('An error occurred during checkout.');
+  }
+}
   </script>
 </body>
 </html>
