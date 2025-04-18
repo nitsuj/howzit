@@ -186,24 +186,6 @@
 
     let card;
 
-    async function initializeSquarePaymentForm() {
-      const payments = window.Square.payments('sandbox-sq0idb-2qu4_rVodkuwd3rCFK_oxg', 'L3GGEHCGF4A6Q');
-
-      card = await payments.card();
-      await card.attach('#card-container');
-
-      document.getElementById('card-button').addEventListener('click', async () => {
-        const result = await card.tokenize();
-        if (result.status === 'OK') {
-          processPayment(result.token);
-        } else {
-          document.getElementById('payment-status').textContent = 'Payment failed. Please try again.';
-        }
-      });
-    }
-
-    initializeSquarePaymentForm();
-
     async function processPayment() {
   const buyer = {
     name: document.getElementById('shipping-name').value,
