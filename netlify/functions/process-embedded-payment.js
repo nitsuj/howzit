@@ -54,7 +54,7 @@ exports.handler = async function (event) {
           })),
         },
         checkout_options: {
-          redirect_url: 'https://your-site.com/thank-you', // Replace with your thank-you page URL
+          redirect_url: 'https://nimble-daifuku-613b4c.netlify.app/thank-you.html', // Replace with your thank-you page URL
         },
         customer: {
           email_address: buyer.email,
