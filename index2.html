@@ -228,11 +228,24 @@ function renderCart() {
     zip: document.getElementById('shipping-zip').value,
   };
 
+  // Calculate shipping cost
+  let totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  let shippingCost = 0;
+
+  if (totalQuantity === 1) {
+    shippingCost = 8.95; // Flat rate envelope
+  } else if (totalQuantity >= 2 && totalQuantity <= 4) {
+    shippingCost = 14.35; // Flat rate medium box
+  } else if (totalQuantity >= 5) {
+    alert('Please contact us for shipping costs.');
+    return;
+  }
+
   try {
     const response = await fetch('/.netlify/functions/process-embedded-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cart, buyer }),
+      body: JSON.stringify({ cart, buyer, shippingCost }),
     });
 
     const data = await response.json();
