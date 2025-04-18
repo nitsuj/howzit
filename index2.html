@@ -163,6 +163,35 @@
         font-size: 14px;
       }
     }
+
+    /* Shopping Cart Styles */
+    #cart {
+      display: none; /* Initially hidden */
+      position: fixed;
+      top: 0;
+      right: -320px; /* Start off-screen */
+      width: 320px;
+      height: 100vh;
+      background: #111;
+      color: #fff;
+      padding: 20px;
+      z-index: 1000;
+      overflow-y: auto;
+      transition: right 0.3s ease; /* Smooth slide-in/out */
+    }
+    #cart.open {
+      right: 0; /* Slide in */
+    }
+    #cart h3 {
+      margin-top: 0;
+    }
+    #cart-items {
+      list-style: none;
+      padding: 0;
+    }
+    #cart-items li {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -182,106 +211,82 @@
   <section id="taplist">
     <h2>Tap List</h2>
     <div class="carousel-wrapper">
-      <div class="carousel" id="taplist-carousel">
-        <div class="carousel-item">
-          <a href="https://untappd.com/b/howzit-brewing-absorbing-memories/6207395" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6207395_a3e42_hd.jpeg" alt="Absorbing Memories">
-            <div>Absorbing Memories</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://untappd.com/b/howzit-brewing-local-legend/5660501" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg" alt="Local Legend">
-            <div>Local Legend</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://untappd.com/b/howzit-brewing-flat-day-ipa/5797585" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5797585_4019c_hd.jpeg" alt="Flat Day">
-            <div>Flat Day</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://untappd.com/b/howzit-brewing-chance-encounter/6155607" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5797585_4019c_hd.jpeg" alt="Chance Encounter">
-            <div>Chance Encounter</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://untappd.com/b/howzit-brewing-run-drink-radler-repeat/6199245" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6199245_bb64b_hd.jpeg" alt="Grapefruit Radler">
-            <div>Run Drink Radler Repeat</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://untappd.com/b/howzit-brewing-chronic-2025/6231506" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-5797585_4019c_hd.jpeg" alt="Chronic 2025">
-            <div>Chronic 2025</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://untappd.com/b/inu-island-ales-weiz-guyz/6215644" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6215644_613b8_hd.jpeg" alt="Weiz Guys">
-            <div>Weiz Guys</div>
-          </a>
-        </div>
-        <div class="carousel-item">
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">
-            <img src="https://i.imgur.com/gakGmqU.jpeg" alt="Rotating Seltzer">
-            <div>Rotating Seltzer</div>
-          </a>
-        </div>
-      </div>
+      <!-- Tap List Items -->
     </div>
   </section>
 
-  <section id="togo">
-    <h2>To Go</h2>
+  <section id="shop">
+    <h2>Shop</h2>
     <div class="carousel-wrapper">
-      <div class="carousel" id="togo-carousel">
-        <div class="carousel-item">
-          <a href="https://untappd.com/b/howzit-brewing-lime-in-the-sand/6143340" target="_blank">
-            <img src="https://assets.untappd.com/site/beer_logos_hd/beer-6143340_11ffa_hd.jpeg" alt="Lime in the Sand">
-            <div>Lime in the Sand</div>
-          </a>
-        </div>
+      <div class="carousel-item">
+        <img src="https://via.placeholder.com/250" alt="Fake Item">
+        <div>Fake Item</div>
+        <div>$10.00</div>
+        <button onclick="addToCart('Fake Item', 10.00)">Add to Cart</button>
       </div>
     </div>
   </section>
 
-  <section id="visit" class="contact">
-    <h2>Visit Us</h2>
-    <p><strong>Address:</strong> 330 Kamani Street, Honolulu, HI</p>
-    <div class="hours"><div id="mon">We're open seven days a week from 12pm–10pm</div></div>
-    <iframe src="https://www.google.com/maps?q=330+Kamani+Street+Honolulu+HI&output=embed" allowfullscreen></iframe>
-  </section>
+  <button id="cart-toggle" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">🛒 Cart</button>
 
-  <section id="faq">
-    <h2>FAQ</h2>
-    <div class="faq-entry"><h4>Do you allow dogs?</h4><p>Yes, well behaved dogs are welcome on our outdoor patio.</p></div>
-    <div class="faq-entry"><h4>Are kids allowed?</h4><p>Yes, but they must remain seated with their parents at all times.</p></div>
-    <div class="faq-entry"><h4>Do you guys serve food?</h4><p>No, but we partner with rotating food trucks. Check Instagram for updates.</p></div>
-    <div class="faq-entry"><h4>Do you have parking?</h4><p>We have 3 front spots. Street parking available or garage at 831 Halekauwila — we’ll cover first hour ($3).</p></div>
-    <div class="faq-entry"><h4>How do I get ahold of you?</h4><p>Send us a DM on <a href="https://www.instagram.com/howzitbrewing">Instagram.</a></p></div>
-  </section>
+  <div id="cart-message" style="position: fixed; top: 20px; right: 20px; background: #8517ff; color: #fff; padding: 10px 20px; border-radius: 8px; display: none; z-index: 1200;">Added to Cart!</div>
+
+  <div id="cart">
+    <h3>Shopping Cart</h3>
+    <ul id="cart-items"></ul>
+    <button id="checkout-btn" style="display: none;">Checkout</button>
+  </div>
 
   <script>
-    const toGoAvailable = true;
-    const togoWrapper = document.getElementById('togo-wrapper');
-    const noTogoMsg = document.getElementById('no-togo-message');
-    if (!toGoAvailable) {
-      togoWrapper.style.display = 'none';
-      noTogoMsg.style.display = 'block';
+    const cart = [];
+
+    function addToCart(name, price) {
+      const existingItem = cart.find(item => item.name === name);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      renderCart();
+
+      const cartMessage = document.getElementById('cart-message');
+      cartMessage.style.display = 'block';
+      setTimeout(() => {
+        cartMessage.style.display = 'none';
+      }, 2000);
     }
 
-    window.addEventListener('scroll', function() {
-      const logo = document.querySelector('.logo');
-      logo.style.display = window.scrollY > 50 ? 'none' : 'block';
+    function renderCart() {
+      const cartItemsEl = document.getElementById('cart-items');
+      cartItemsEl.innerHTML = '';
+      cart.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
+          <button onclick="removeCartItem(${index})">Remove</button>`;
+        cartItemsEl.appendChild(li);
+      });
+
+      const checkoutBtn = document.getElementById('checkout-btn');
+      checkoutBtn.style.display = cart.length > 0 ? 'block' : 'none';
+    }
+
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    const cartToggle = document.getElementById('cart-toggle');
+    const cartEl = document.getElementById('cart');
+
+    cartToggle.addEventListener('click', () => {
+      if (cartEl.classList.contains('open')) {
+        cartEl.classList.remove('open');
+        setTimeout(() => (cartEl.style.display = 'none'), 300);
+      } else {
+        cartEl.style.display = 'block';
+        setTimeout(() => cartEl.classList.add('open'), 10);
+      }
     });
   </script>
 </body>
 </html>
-
-</body>
-</html>
-
