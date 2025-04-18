@@ -18,8 +18,9 @@ exports.handler = async function (event) {
       };
     }
 
-    const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN; // Use the original variable name
+    const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN;
     const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
+    const SQUARE_ENV = process.env.SQUARE_ENV || 'sandbox'; // Default to sandbox if not set
 
     if (!SQUARE_ACCESS_TOKEN || !SQUARE_LOCATION_ID) {
       return {
@@ -27,6 +28,12 @@ exports.handler = async function (event) {
         body: JSON.stringify({ success: false, error: 'Square credentials are not configured' }),
       };
     }
+
+    // Determine the Square API base URL based on the environment
+    const SQUARE_API_BASE_URL =
+      SQUARE_ENV === 'production'
+        ? 'https://connect.squareup.com'
+        : 'https://connect.squareupsandbox.com';
 
     // Validate cart items
     if (!Array.isArray(cart) || cart.length === 0) {
@@ -59,10 +66,10 @@ exports.handler = async function (event) {
     }
 
     // Create a checkout link
-    const response = await fetch(`https://connect.squareup.com/v2/online-checkout/payment-links`, {
+    const response = await fetch(`${SQUARE_API_BASE_URL}/v2/online-checkout/payment-links`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`, // Use the correct variable here
+        Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -87,29 +94,6 @@ exports.handler = async function (event) {
         },
       }),
     });
-
-    // Debugging: Log the payload being sent to Square
-    console.log('Payload sent to Square:', JSON.stringify({
-      idempotency_key: `checkout-${Date.now()}`,
-      order: {
-        location_id: SQUARE_LOCATION_ID,
-        line_items: lineItems,
-      },
-      checkout_options: {
-        redirect_url: 'https://nimble-daifuku-613b4c.netlify.app/thank-you',
-      },
-      customer: {
-        email_address: buyer.email,
-        given_name: buyer.name,
-        address: {
-          address_line_1: buyer.address,
-          locality: buyer.city,
-          administrative_district_level_1: buyer.state,
-          postal_code: buyer.zip,
-          country: 'US',
-        },
-      },
-    }, null, 2));
 
     const data = await response.json();
 
