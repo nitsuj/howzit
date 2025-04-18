@@ -18,10 +18,10 @@ exports.handler = async function (event) {
       };
     }
 
-    const SQUARE_TOKEN = process.env.SQUARE_TOKEN;
+    const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN; // Use the original variable name
     const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
 
-    if (!SQUARE_TOKEN || !SQUARE_LOCATION_ID) {
+    if (!SQUARE_ACCESS_TOKEN || !SQUARE_LOCATION_ID) {
       return {
         statusCode: 500,
         body: JSON.stringify({ success: false, error: 'Square credentials are not configured' }),
@@ -62,7 +62,7 @@ exports.handler = async function (event) {
     const response = await fetch(`https://connect.squareup.com/v2/online-checkout/payment-links`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${SQUARE_TOKEN}`,
+        Authorization: `Bearer ${SQUARE_ACCESS_TOKEN}`, // Use the correct variable here
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
