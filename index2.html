@@ -138,16 +138,14 @@
       Shipping: $0.00
     </div>
     <div id="payment-form">
-      <div id="payment-form">
-        <input type="text" id="shipping-name" placeholder="Full Name" required>
-        <input type="email" id="shipping-email" placeholder="Email Address" required>
-        <input type="text" id="shipping-address" placeholder="Street Address" required>
-        <input type="text" id="shipping-city" placeholder="City" required>
-        <input type="text" id="shipping-state" placeholder="State" required>
-        <input type="text" id="shipping-zip" placeholder="ZIP Code" required>
-        <button id="checkout-button" onclick="processPayment()">Checkout</button>
-        </div>
-        <div id="payment-status"></div>
+      <input type="text" id="shipping-name" placeholder="Full Name" required>
+      <input type="email" id="shipping-email" placeholder="Email Address" required>
+      <input type="text" id="shipping-address" placeholder="Street Address" required>
+      <input type="text" id="shipping-city" placeholder="City" required>
+      <input type="text" id="shipping-state" placeholder="State" required>
+      <input type="text" id="shipping-zip" placeholder="ZIP Code" required>
+      <button id="checkout-button" onclick="processPayment()">Checkout</button>
+      <div id="payment-status"></div>
     </div>
   </div>
 
@@ -155,111 +153,85 @@
     const cart = [];
 
     function addToCart(name, price) {
-  const existingItem = cart.find(item => item.name === name);
-  if (existingItem) {
-    existingItem.quantity += 1;
-  } else {
-    cart.push({ name, price, quantity: 1 });
-  }
-  renderCart();
+      const existingItem = cart.find(item => item.name === name);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      renderCart();
+    }
 
-  // Show notification
-  const notification = document.getElementById('cart-notification');
-  notification.style.display = 'block';
-  setTimeout(() => {
-    notification.style.display = 'none';
-  }, 2000); // Hide after 2 seconds
-}
+    function renderCart() {
+      const cartItemsEl = document.getElementById('cart-items');
+      cartItemsEl.innerHTML = '';
+      let totalQuantity = 0;
 
-function renderCart() {
-  const cartItemsEl = document.getElementById('cart-items');
-  cartItemsEl.innerHTML = '';
-  let totalQuantity = 0;
+      cart.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
+          <button onclick="removeCartItem(${index})">Remove</button>`;
+        cartItemsEl.appendChild(li);
+        totalQuantity += item.quantity;
+      });
 
-  cart.forEach((item, index) => {
-    const li = document.createElement('li');
-    li.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
-      <button onclick="removeCartItem(${index})">Remove</button>`;
-    cartItemsEl.appendChild(li);
-    totalQuantity += item.quantity;
-  });
-
-  // Calculate shipping cost
-  const shippingCostEl = document.getElementById('shipping-cost');
-  let shippingCost = 0;
-
-  if (totalQuantity === 1) {
-    shippingCost = 8.95; // Flat rate envelope
-  } else if (totalQuantity >= 2 && totalQuantity <= 4) {
-    shippingCost = 14.35; // Flat rate medium box
-  } else if (totalQuantity >= 5) {
-    shippingCost = 'Contact us for shipping'; // Custom handling
-  }
-
-  // Update shipping cost display
-  if (typeof shippingCost === 'number') {
-    shippingCostEl.textContent = `Shipping: $${shippingCost.toFixed(2)}`;
-  } else {
-    shippingCostEl.textContent = `Shipping: ${shippingCost}`;
-  }
-}
+      const shippingCostEl = document.getElementById('shipping-cost');
+      if (totalQuantity === 1) {
+        shippingCostEl.textContent = 'Shipping: $8.95';
+      } else if (totalQuantity >= 2 && totalQuantity <= 4) {
+        shippingCostEl.textContent = 'Shipping: $14.35';
+      } else if (totalQuantity >= 5) {
+        shippingCostEl.textContent = 'Shipping: Contact us for shipping';
+      } else {
+        shippingCostEl.textContent = 'Shipping: $0.00';
+      }
+    }
 
     function removeCartItem(index) {
       cart.splice(index, 1);
       renderCart();
     }
 
-    const cartToggle = document.getElementById('cart-toggle');
-    const cartEl = document.getElementById('cart');
-
-    cartToggle.addEventListener('click', () => {
-      cartEl.classList.toggle('open');
-    });
-
-    let card;
-
     async function processPayment() {
-  const buyer = {
-    name: document.getElementById('shipping-name').value,
-    email: document.getElementById('shipping-email').value,
-    address: document.getElementById('shipping-address').value,
-    city: document.getElementById('shipping-city').value,
-    state: document.getElementById('shipping-state').value,
-    zip: document.getElementById('shipping-zip').value,
-  };
+      const buyer = {
+        name: document.getElementById('shipping-name').value,
+        email: document.getElementById('shipping-email').value,
+        address: document.getElementById('shipping-address').value,
+        city: document.getElementById('shipping-city').value,
+        state: document.getElementById('shipping-state').value,
+        zip: document.getElementById('shipping-zip').value,
+      };
 
-  // Calculate shipping cost
-  let totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-  let shippingCost = 0;
+      let totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+      let shippingCost = 0;
 
-  if (totalQuantity === 1) {
-    shippingCost = 8.95; // Flat rate envelope
-  } else if (totalQuantity >= 2 && totalQuantity <= 4) {
-    shippingCost = 14.35; // Flat rate medium box
-  } else if (totalQuantity >= 5) {
-    alert('Please contact us for shipping costs.');
-    return;
-  }
+      if (totalQuantity === 1) {
+        shippingCost = 8.95; // Flat rate envelope
+      } else if (totalQuantity >= 2 && totalQuantity <= 4) {
+        shippingCost = 14.35; // Flat rate medium box
+      } else if (totalQuantity >= 5) {
+        alert('Please contact us for shipping costs.');
+        return;
+      }
 
-  try {
-    const response = await fetch('/.netlify/functions/process-embedded-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cart, buyer, shippingCost }),
-    });
+      try {
+        const response = await fetch('/.netlify/functions/process-embedded-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cart, buyer, shippingCost }),
+        });
 
-    const data = await response.json();
-    if (data.success) {
-      // Redirect to the hosted checkout page
-      window.location.href = data.checkout_url;
-    } else {
-      alert(`Failed to create checkout: ${JSON.stringify(data.error)}`);
+        const data = await response.json();
+        if (data.success) {
+          window.location.href = data.checkout_url;
+        } else {
+          alert(`Failed to create checkout: ${JSON.stringify(data.error)}`);
+        }
+      } catch (error) {
+        console.error('Error during checkout:', error);
+        alert('An error occurred during checkout.');
+      }
     }
-  } catch (error) {
-    console.error('Error during checkout:', error);
-    alert('An error occurred during checkout.');
-  }
-}
   </script>
 
   <div id="cart-notification" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #8517ff; color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000;">
