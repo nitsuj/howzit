@@ -163,11 +163,17 @@
     }
 
     function renderCart() {
+      console.log('renderCart called'); // Debugging
       const cartItemsEl = document.getElementById('cart-items');
+      if (!cartItemsEl) {
+        console.error('Cart items element not found');
+        return;
+      }
       cartItemsEl.innerHTML = '';
       let totalQuantity = 0;
 
       cart.forEach((item, index) => {
+        console.log(`Rendering item: ${item.name}, Quantity: ${item.quantity}`); // Debugging
         const li = document.createElement('li');
         li.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
           <button onclick="removeCartItem(${index})">Remove</button>`;
