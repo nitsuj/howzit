@@ -87,7 +87,7 @@ exports.handler = async function (event) {
         },
       }),
     });
-    
+
     // Debugging: Log the payload being sent to Square
     console.log('Payload sent to Square:', JSON.stringify({
       idempotency_key: `checkout-${Date.now()}`,
@@ -110,9 +110,9 @@ exports.handler = async function (event) {
         },
       },
     }, null, 2));
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       console.error('Square API Error:', data);
       return {
@@ -120,8 +120,16 @@ exports.handler = async function (event) {
         body: JSON.stringify({ success: false, error: data.errors || 'Failed to create checkout link' }),
       };
     }
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true, checkout_url: data.payment_link.url }),
     };
+  } catch (error) {
+    console.error('Error creating checkout link:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ success: false, error: error.message }),
+    };
+  }
+};
