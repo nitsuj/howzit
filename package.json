@@ -4,5 +4,6 @@
   "type": "commonjs",
   "dependencies": {
     "node-fetch": "^2.6.7"
+    "square": "^32.0.0"
   }
 }
