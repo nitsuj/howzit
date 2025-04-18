@@ -8,14 +8,11 @@
   <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
   <style>
     /* Global Styles */
-    html {
-      scroll-behavior: smooth;
-    }
     body {
       margin: 0;
       font-family: 'Montserrat', sans-serif;
-      background-color: #fff;
-      color: #000;
+      background-color: #f9f9f9;
+      color: #333;
     }
     nav {
       display: flex;
@@ -26,27 +23,89 @@
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #8517ff;
+      font-weight: bold;
+    }
+    section {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-size: 1.8rem;
+      color: #8517ff;
+      margin-bottom: 20px;
+    }
+    .carousel-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .carousel-item img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .carousel-item button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #8517ff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
     #cart {
       display: none;
       position: fixed;
       top: 0;
-      right: -320px;
+      right: 0;
       width: 320px;
       height: 100vh;
-      background: #111;
-      color: #fff;
+      background: #fff;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
       padding: 20px;
       z-index: 1000;
       overflow-y: auto;
-      transition: right 0.3s ease;
     }
     #cart.open {
-      right: 0;
+      display: block;
+    }
+    #cart h3 {
+      margin-top: 0;
+    }
+    #cart-items {
+      list-style: none;
+      padding: 0;
+    }
+    #cart-items li {
+      margin-bottom: 10px;
     }
     #payment-form {
       margin-top: 20px;
+    }
+    #payment-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #payment-form button {
+      width: 100%;
+      padding: 10px;
+      background-color: #8517ff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
     #payment-status {
       margin-top: 10px;
@@ -57,19 +116,16 @@
 <body>
 
   <nav>
-    <a href="#taplist">Tap List</a>
     <a href="#shop">Shop</a>
   </nav>
 
   <section id="shop">
     <h2>Shop</h2>
-    <div class="carousel-wrapper">
-      <div class="carousel-item">
-        <img src="https://via.placeholder.com/250" alt="Fake Item">
-        <div>Fake Item</div>
-        <div>$10.00</div>
-        <button onclick="addToCart('Fake Item', 10.00)">Add to Cart</button>
-      </div>
+    <div class="carousel-item">
+      <img src="https://via.placeholder.com/200" alt="Fake Item">
+      <div>Fake Item</div>
+      <div>$10.00</div>
+      <button onclick="addToCart('Fake Item', 10.00)">Add to Cart</button>
     </div>
   </section>
 
@@ -78,37 +134,17 @@
   <div id="cart">
     <h3>Shopping Cart</h3>
     <ul id="cart-items"></ul>
-    <button id="checkout-btn" style="display: none;">Checkout</button>
-
-    <!-- Payment Form -->
     <div id="payment-form">
-      <div id="card-container"></div>
-      <div>
-        <label for="shipping-name">Name</label>
+      <div id="payment-form">
         <input type="text" id="shipping-name" placeholder="Full Name" required>
-      </div>
-      <div>
-        <label for="shipping-email">Email</label>
         <input type="email" id="shipping-email" placeholder="Email Address" required>
-      </div>
-      <div>
-        <label for="shipping-address">Address</label>
         <input type="text" id="shipping-address" placeholder="Street Address" required>
-      </div>
-      <div>
-        <label for="shipping-city">City</label>
         <input type="text" id="shipping-city" placeholder="City" required>
-      </div>
-      <div>
-        <label for="shipping-state">State</label>
         <input type="text" id="shipping-state" placeholder="State" required>
-      </div>
-      <div>
-        <label for="shipping-zip">ZIP Code</label>
         <input type="text" id="shipping-zip" placeholder="ZIP Code" required>
-      </div>
-      <button id="card-button" style="margin-top: 20px;">Pay Now</button>
-      <div id="payment-status"></div>
+        <button id="checkout-button" onclick="processPayment()">Checkout</button>
+        </div>
+        <div id="payment-status"></div>
     </div>
   </div>
 
@@ -134,9 +170,6 @@
           <button onclick="removeCartItem(${index})">Remove</button>`;
         cartItemsEl.appendChild(li);
       });
-
-      const checkoutBtn = document.getElementById('checkout-btn');
-      checkoutBtn.style.display = cart.length > 0 ? 'block' : 'none';
     }
 
     function removeCartItem(index) {
@@ -148,13 +181,7 @@
     const cartEl = document.getElementById('cart');
 
     cartToggle.addEventListener('click', () => {
-      if (cartEl.classList.contains('open')) {
-        cartEl.classList.remove('open');
-        setTimeout(() => (cartEl.style.display = 'none'), 300);
-      } else {
-        cartEl.style.display = 'block';
-        setTimeout(() => cartEl.classList.add('open'), 10);
-      }
+      cartEl.classList.toggle('open');
     });
 
     let card;
@@ -177,34 +204,35 @@
 
     initializeSquarePaymentForm();
 
-    async function processPayment(token) {
-      const buyer = {
-        name: document.getElementById('shipping-name').value,
-        email: document.getElementById('shipping-email').value,
-        address: document.getElementById('shipping-address').value,
-        city: document.getElementById('shipping-city').value,
-        state: document.getElementById('shipping-state').value,
-        zip: document.getElementById('shipping-zip').value,
-      };
+    async function processPayment() {
+  const buyer = {
+    name: document.getElementById('shipping-name').value,
+    email: document.getElementById('shipping-email').value,
+    address: document.getElementById('shipping-address').value,
+    city: document.getElementById('shipping-city').value,
+    state: document.getElementById('shipping-state').value,
+    zip: document.getElementById('shipping-zip').value,
+  };
 
-      try {
-        const response = await fetch('/.netlify/functions/process-embedded-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, cart, buyer }),
-        });
+  try {
+    const response = await fetch('/.netlify/functions/process-embedded-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart, buyer }),
+    });
 
-        const data = await response.json();
-        if (data.success) {
-          alert('Payment successful!');
-        } else {
-          alert(`Payment failed: ${JSON.stringify(data.error)}`);
-        }
-      } catch (error) {
-        console.error('Error during checkout:', error);
-        alert('An error occurred during checkout.');
-      }
+    const data = await response.json();
+    if (data.success) {
+      // Redirect to the hosted checkout page
+      window.location.href = data.checkout_url;
+    } else {
+      alert(`Failed to create checkout: ${JSON.stringify(data.error)}`);
     }
+  } catch (error) {
+    console.error('Error during checkout:', error);
+    alert('An error occurred during checkout.');
+  }
+}
   </script>
 </body>
 </html>
