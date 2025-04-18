@@ -49,13 +49,25 @@ exports.handler = async function (event) {
       }
       return {
         name: item.name,
-        quantity: item.quantity.toString(), // Ensure quantity is a string
+        quantity: item.quantity.toString(),
         base_price_money: {
           amount: Math.round(item.price * 100), // Convert to cents
           currency: 'USD',
         },
       };
     });
+    
+    // Add shipping cost as a line item
+    if (shippingCost) {
+      lineItems.push({
+        name: 'Shipping',
+        quantity: '1',
+        base_price_money: {
+          amount: Math.round(shippingCost * 100), // Convert to cents
+          currency: 'USD',
+        },
+      });
+    }
 
     // Validate buyer information
     if (!buyer.name || !buyer.email || !buyer.address || !buyer.city || !buyer.state || !buyer.zip) {
