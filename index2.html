@@ -15,12 +15,6 @@
       background-color: #fff;
       color: #000;
     }
-    h1, h2, h3, h4, h5, h6,
-    .navbar a,
-    .carousel-item div,
-    .menu-item-name {
-      text-transform: uppercase;
-    }
     nav {
       display: flex;
       justify-content: center;
@@ -52,23 +46,6 @@
     nav a:hover {
       color: #cea2ff;
     }
-    nav a::after {
-      content: "";
-      position: absolute;
-      width: 0%;
-      height: 2px;
-      bottom: -5px;
-      left: 0;
-      background-color: #fff;
-      transition: width 0.3s;
-    }
-    nav a:hover::after {
-      width: 100%;
-    }
-    header img.main-img {
-      width: 100%;
-      display: block;
-    }
     section {
       padding: 60px 20px;
       max-width: 1200px;
@@ -80,96 +57,11 @@
       margin-bottom: 20px;
       color: #8517ff;
     }
-
-    /* TAPLIST FIXED */
-    #taplist .carousel {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-    }
-    #taplist .carousel-item {
-      width: 220px;
-      text-align: center;
-      background: transparent !important;
-      border-radius: 8px;
-    }
-    #taplist .carousel-item img {
-      width: 100%;
-      height: auto;
-      aspect-ratio: 1 / 1;
-      object-fit: cover;
-      border-radius: 16px;
-    }
-    #taplist .carousel-item a {
-      display: block;
-      padding: 8px;
-      margin-top: 5px;
-      font-weight: 600;
-      text-decoration: none;
-      color: inherit;
-      background-color: transparent;
-    }
-
-    /* TOGO */
-    #togo .carousel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-    #togo .carousel-item {
-      background: transparent !important;
-      border-radius: 8px;
-      text-align: center;
-      width: 100%;
-    }
-    #togo .carousel-item img {
-      width: 100%;
-      height: auto;
-      max-width: 250px;
-      aspect-ratio: 1/1;
-      object-fit: cover;
-      border-radius: 16px;
-      margin: 0 auto;
-    }
-    #togo .carousel-item a {
-      display: block;
-      padding: 8px;
-      margin-top: 5px;
-      text-align: center;
-      font-weight: 600;
-      color: inherit;
-      text-decoration: none;
-      background-color: transparent;
-    }
-
-    @media screen and (max-width: 768px) {
-      nav {
-        flex-direction: row;
-        justify-content: center;
-        padding-top: 60px;
-        flex-wrap: wrap;
-        position: relative;
-      }
-      nav img.logo {
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        height: 40px;
-      }
-      nav a {
-        margin: 0 10px;
-        font-size: 14px;
-      }
-    }
-
-    /* Shopping Cart Styles */
     #cart {
-      display: none; /* Initially hidden */
+      display: none;
       position: fixed;
       top: 0;
-      right: -320px; /* Start off-screen */
+      right: -320px;
       width: 320px;
       height: 100vh;
       background: #111;
@@ -177,10 +69,10 @@
       padding: 20px;
       z-index: 1000;
       overflow-y: auto;
-      transition: right 0.3s ease; /* Smooth slide-in/out */
+      transition: right 0.3s ease;
     }
     #cart.open {
-      right: 0; /* Slide in */
+      right: 0;
     }
     #cart h3 {
       margin-top: 0;
@@ -203,17 +95,6 @@
     <a href="#visit">Visit</a>
     <a href="#faq">FAQ</a>
   </nav>
-
-  <header>
-    <img src="taplist.png" alt="Howzit Brewing" class="main-img">
-  </header>
-
-  <section id="taplist">
-    <h2>Tap List</h2>
-    <div class="carousel-wrapper">
-      <!-- Tap List Items -->
-    </div>
-  </section>
 
   <section id="shop">
     <h2>Shop</h2>
@@ -285,6 +166,36 @@
       } else {
         cartEl.style.display = 'block';
         setTimeout(() => cartEl.classList.add('open'), 10);
+      }
+    });
+
+    document.getElementById('checkout-btn').addEventListener('click', async () => {
+      const token = 'FAKE_TOKEN_FOR_TESTING'; // Replace with actual token from Square payment form
+      const buyer = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        address: '123 Main St',
+        city: 'Anytown',
+        state: 'CA',
+        zip: '12345',
+      };
+
+      try {
+        const response = await fetch('/.netlify/functions/process-embedded-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, cart, buyer }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert('Payment successful!');
+        } else {
+          alert(`Payment failed: ${data.error}`);
+        }
+      } catch (error) {
+        console.error('Error during checkout:', error);
+        alert('An error occurred during checkout.');
       }
     });
   </script>
