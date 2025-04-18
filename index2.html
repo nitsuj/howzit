@@ -134,6 +134,9 @@
   <div id="cart">
     <h3>Shopping Cart</h3>
     <ul id="cart-items"></ul>
+    <div id="shipping-cost" style="margin-top: 20px; font-weight: bold;">
+      Shipping: $0.00
+    </div>
     <div id="payment-form">
       <div id="payment-form">
         <input type="text" id="shipping-name" placeholder="Full Name" required>
@@ -168,16 +171,38 @@
   }, 2000); // Hide after 2 seconds
 }
 
-    function renderCart() {
-      const cartItemsEl = document.getElementById('cart-items');
-      cartItemsEl.innerHTML = '';
-      cart.forEach((item, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
-          <button onclick="removeCartItem(${index})">Remove</button>`;
-        cartItemsEl.appendChild(li);
-      });
-    }
+function renderCart() {
+  const cartItemsEl = document.getElementById('cart-items');
+  cartItemsEl.innerHTML = '';
+  let totalQuantity = 0;
+
+  cart.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
+      <button onclick="removeCartItem(${index})">Remove</button>`;
+    cartItemsEl.appendChild(li);
+    totalQuantity += item.quantity;
+  });
+
+  // Calculate shipping cost
+  const shippingCostEl = document.getElementById('shipping-cost');
+  let shippingCost = 0;
+
+  if (totalQuantity === 1) {
+    shippingCost = 8.95; // Flat rate envelope
+  } else if (totalQuantity >= 2 && totalQuantity <= 4) {
+    shippingCost = 14.35; // Flat rate medium box
+  } else if (totalQuantity >= 5) {
+    shippingCost = 'Contact us for shipping'; // Custom handling
+  }
+
+  // Update shipping cost display
+  if (typeof shippingCost === 'number') {
+    shippingCostEl.textContent = `Shipping: $${shippingCost.toFixed(2)}`;
+  } else {
+    shippingCostEl.textContent = `Shipping: ${shippingCost}`;
+  }
+}
 
     function removeCartItem(index) {
       cart.splice(index, 1);
