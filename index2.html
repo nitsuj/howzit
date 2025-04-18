@@ -246,7 +246,7 @@
     let card;
 
 async function initializeSquarePaymentForm() {
-  const payments = window.Square.payments('sandbox-sq0idb-2qu4_rVodkuwd3rCFK_oxg', 'LEX59H08FVDAX');
+  const payments = window.Square.payments('sandbox-sq0idb-2qu4_rVodkuwd3rCFK_oxg', 'L3GGEHCGF4A6Q');
 
   card = await payments.card();
   await card.attach('#card-container');
