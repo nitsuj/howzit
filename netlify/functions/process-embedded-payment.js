@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async function (event) {
   try {
+    // Ensure the request is a POST request
     if (event.httpMethod !== 'POST') {
       return {
         statusCode: 405,
@@ -9,15 +10,32 @@ exports.handler = async function (event) {
       };
     }
 
-    const { cart, buyer } = JSON.parse(event.body);
+    // Parse the request body
+    const { cart, buyer, shippingCost } = JSON.parse(event.body);
 
-    if (!cart || !buyer) {
+    // Validate required fields
+    if (!cart || !Array.isArray(cart) || cart.length === 0) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ success: false, error: 'Missing required fields' }),
+        body: JSON.stringify({ success: false, error: 'Cart is empty or invalid' }),
       };
     }
 
+    if (!buyer || !buyer.name || !buyer.email || !buyer.address || !buyer.city || !buyer.state || !buyer.zip) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ success: false, error: 'Missing or invalid buyer information' }),
+      };
+    }
+
+    if (shippingCost === undefined) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ success: false, error: 'Missing shipping cost' }),
+      };
+    }
+
+    // Validate Square credentials
     const SQUARE_ACCESS_TOKEN = process.env.SQUARE_ACCESS_TOKEN;
     const SQUARE_LOCATION_ID = process.env.SQUARE_LOCATION_ID;
     const SQUARE_ENV = process.env.SQUARE_ENV || 'sandbox'; // Default to sandbox if not set
@@ -35,14 +53,7 @@ exports.handler = async function (event) {
         ? 'https://connect.squareup.com'
         : 'https://connect.squareupsandbox.com';
 
-    // Validate cart items
-    if (!Array.isArray(cart) || cart.length === 0) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ success: false, error: 'Cart is empty or invalid' }),
-      };
-    }
-
+    // Map cart items to Square line items
     const lineItems = cart.map(item => {
       if (!item.name || !item.price || !item.quantity) {
         throw new Error('Invalid cart item format');
@@ -56,7 +67,7 @@ exports.handler = async function (event) {
         },
       };
     });
-    
+
     // Add shipping cost as a line item
     if (shippingCost) {
       lineItems.push({
@@ -67,14 +78,6 @@ exports.handler = async function (event) {
           currency: 'USD',
         },
       });
-    }
-
-    // Validate buyer information
-    if (!buyer.name || !buyer.email || !buyer.address || !buyer.city || !buyer.state || !buyer.zip) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ success: false, error: 'Missing or invalid buyer information' }),
-      };
     }
 
     // Create a checkout link
@@ -117,6 +120,7 @@ exports.handler = async function (event) {
       };
     }
 
+    // Return the checkout URL
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true, checkout_url: data.payment_link.url }),
