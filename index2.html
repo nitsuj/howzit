@@ -95,68 +95,67 @@
     const cart = [];
 
     async function fetchSkaterTee() {
-      try {
-        const response = await fetch('/.netlify/functions/get-skater-tee');
-        if (!response.ok) {
-          throw new Error('Failed to fetch Skater Tee');
-        }
-
-        const product = await response.json();
-        const productListEl = document.getElementById('product-list');
-
-        // Group variations by color
-        const variationsByColor = product.variations.reduce((acc, variation) => {
-          const color = variation.color; // Ensure we group by color
-          if (!acc[color]) {
-            acc[color] = [];
-          }
-          acc[color].push(variation);
-          return acc;
-        }, {});
-
-        // Render each color as its own entry
-        Object.keys(variationsByColor).forEach(color => {
-          const colorGroup = document.createElement('div');
-          colorGroup.className = 'product';
-
-          colorGroup.innerHTML = `
-            <img src="${product.image}" alt="${product.name} - ${color}" />
-            <h3>${product.name} - ${color}</h3>
-          `;
-
-          const sizeDropdown = document.createElement('select');
-          sizeDropdown.className = 'size-dropdown';
-
-          variationsByColor[color].forEach(variation => {
-            const option = document.createElement('option');
-            option.value = variation.id;
-            option.textContent = `${variation.size} - $${variation.price.toFixed(2)} ${
-              variation.available ? '' : '(Out of Stock)'
-            }`;
-            option.disabled = !variation.available;
-            sizeDropdown.appendChild(option);
-          });
-
-          const addToCartButton = document.createElement('button');
-          addToCartButton.textContent = 'Add to Cart';
-          addToCartButton.onclick = () => {
-            const selectedVariationId = sizeDropdown.value;
-            const selectedVariation = variationsByColor[color].find(
-              v => v.id === selectedVariationId
-            );
-            if (selectedVariation) {
-              addToCart(product.name, selectedVariation.price, selectedVariation.size, color);
-            }
-          };
-
-          colorGroup.appendChild(sizeDropdown);
-          colorGroup.appendChild(addToCartButton);
-          productListEl.appendChild(colorGroup);
-        });
-      } catch (error) {
-        console.error('Error loading Skater Tee:', error);
-      }
+  try {
+    const response = await fetch('/.netlify/functions/get-skater-tee');
+    if (!response.ok) {
+      throw new Error('Failed to fetch Skater Tee');
     }
+
+    const product = await response.json();
+    const productListEl = document.getElementById('product-list');
+
+    // Group variations by color
+    const variationsByColor = product.variations.reduce((acc, variation) => {
+      if (!acc[variation.color]) {
+        acc[variation.color] = [];
+      }
+      acc[variation.color].push(variation);
+      return acc;
+    }, {});
+
+    // Render each color as its own entry
+    Object.keys(variationsByColor).forEach(color => {
+      const colorGroup = document.createElement('div');
+      colorGroup.className = 'product';
+
+      colorGroup.innerHTML = `
+        <img src="${product.image}" alt="${product.name} - ${color}" />
+        <h3>${product.name} - ${color}</h3>
+      `;
+
+      const sizeDropdown = document.createElement('select');
+      sizeDropdown.className = 'size-dropdown';
+
+      variationsByColor[color].forEach(variation => {
+        const option = document.createElement('option');
+        option.value = variation.id;
+        option.textContent = `${variation.size} - $${variation.price.toFixed(2)} ${
+          variation.available ? '' : '(Out of Stock)'
+        }`;
+        option.disabled = !variation.available;
+        sizeDropdown.appendChild(option);
+      });
+
+      const addToCartButton = document.createElement('button');
+      addToCartButton.textContent = 'Add to Cart';
+      addToCartButton.onclick = () => {
+        const selectedVariationId = sizeDropdown.value;
+        const selectedVariation = variationsByColor[color].find(
+          v => v.id === selectedVariationId
+        );
+        if (selectedVariation) {
+          addToCart(product.name, selectedVariation.price, selectedVariation.size, color);
+        }
+      };
+
+      colorGroup.appendChild(sizeDropdown);
+      colorGroup.appendChild(addToCartButton);
+      productListEl.appendChild(colorGroup);
+    });
+  } catch (error) {
+    console.error('Error loading Skater Tee:', error);
+  }
+}
 
     function addToCart(name, price, size, color) {
       console.log(`Adding to cart: ${name}, Color: ${color}, Size: ${size}, $${price}`);
