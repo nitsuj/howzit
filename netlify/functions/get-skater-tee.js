@@ -1,8 +1,8 @@
 const fetch = require('node-fetch');
 
-exports.handler = async function (event, context) {
+exports.handler = async function (event) {
   const SQUARE_ACCESS_TOKEN = process.env.SQUARE_TOKEN;
-  const ITEM_ID = 'IRBP5IVMIC44HDQXWBFD2PY5'; // Replace with your specific item ID
+  const ITEM_ID = 'YOUR_ITEM_ID_HERE'; // Replace with your specific item ID
 
   try {
     // Fetch catalog data
@@ -19,14 +19,6 @@ exports.handler = async function (event, context) {
     const catalog = await catalogRes.json();
     const objects = catalog.objects || [];
 
-    // Map images
-    const images = {};
-    objects.forEach(obj => {
-      if (obj.type === 'IMAGE') {
-        images[obj.id] = obj.image_data.url;
-      }
-    });
-
     // Find the specific item
     const item = objects.find(obj => obj.type === 'ITEM' && obj.id === ITEM_ID);
     if (!item) {
@@ -36,11 +28,24 @@ exports.handler = async function (event, context) {
       };
     }
 
-    const imageId = item.item_data.image_ids?.[0];
     const variations = item.item_data.variations || [];
 
+    // Parse variations to extract color and size
+    const parsedVariations = variations.map(variation => {
+      const [size, color] = variation.item_variation_data.name.split(',').map(s => s.trim());
+      return {
+        id: variation.id,
+        name: variation.item_variation_data.name,
+        price: variation.item_variation_data.price_money?.amount / 100,
+        available: true, // Assume available unless inventory data says otherwise
+        stock: 0, // Default stock to 0, will update later
+        color,
+        size,
+      };
+    });
+
     // Fetch inventory counts for variations
-    const variationIds = variations.map(v => v.id);
+    const variationIds = parsedVariations.map(v => v.id);
     const inventoryRes = await fetch(
       'https://connect.squareup.com/v2/inventory/counts/batch-retrieve',
       {
@@ -56,38 +61,29 @@ exports.handler = async function (event, context) {
     const inventoryData = await inventoryRes.json();
     const counts = inventoryData.counts || [];
 
-    // Map inventory counts
+    // Map inventory counts to variations
     const inventoryMap = {};
     counts.forEach(entry => {
       inventoryMap[entry.catalog_object_id] = parseInt(entry.quantity, 10);
     });
 
-    // Build the output
-    const output = {
-      id: item.id,
-      name: item.item_data.name,
-      image: images[imageId] || null,
-      variations: variations.map(v => ({
-        id: v.id,
-        name: v.item_variation_data.name,
-        price: v.item_variation_data.price_money?.amount / 100,
-        available: (inventoryMap[v.id] || 0) > 0,
-        stock: inventoryMap[v.id] || 0,
-        color: v.item_variation_data.name.split(' ')[0], // Assuming color is the first word
-        size: v.item_variation_data.name.split(' ')[1], // Assuming size is the second word
-      })),
-    };
+    const output = parsedVariations.map(variation => ({
+      ...variation,
+      stock: inventoryMap[variation.id] || 0,
+      available: (inventoryMap[variation.id] || 0) > 0,
+    }));
 
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: JSON.stringify(output, null, 2),
+      body: JSON.stringify({
+        id: item.id,
+        name: item.item_data.name,
+        image: item.item_data.image_ids?.[0] || null, // Replace with actual image logic
+        variations: output,
+      }),
     };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error('Error fetching Skater Tee:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Failed to fetch item or inventory' }),
