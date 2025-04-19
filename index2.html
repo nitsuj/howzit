@@ -81,17 +81,17 @@
     #cart {
       position: fixed;
       top: 0;
-      right: 0;
+      right: -320px;
       width: 300px;
       height: 100vh;
       background: #fff;
       box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
       padding: 20px;
-      display: none;
+      transition: right 0.3s ease-in-out;
       z-index: 1000;
     }
     #cart.open {
-      display: block;
+      right: 0;
     }
     #cart h3 {
       margin-top: 0;
@@ -118,6 +118,17 @@
     #cart-toggle:hover {
       background: #6a13cc;
     }
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #8517ff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      display: none;
+      z-index: 1100;
+    }
   </style>
 </head>
 <body>
@@ -138,6 +149,8 @@
     <ul id="cart-items"></ul>
     <button onclick="checkout()">Checkout</button>
   </div>
+
+  <div id="toast">Item added to cart!</div>
 
   <script>
     const cart = [];
@@ -216,6 +229,7 @@
         cart.push({ name, price, size, color, quantity: 1 });
       }
       renderCart();
+      showToast();
     }
 
     function renderCart() {
@@ -238,6 +252,14 @@
 
     function checkout() {
       alert('Checkout functionality coming soon!');
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 2000);
     }
 
     document.getElementById('cart-toggle').addEventListener('click', () => {
