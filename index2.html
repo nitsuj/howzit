@@ -40,26 +40,38 @@
       color: #8517ff;
       margin-bottom: 20px;
     }
-    .carousel-item {
+    .product {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-bottom: 20px;
-    }
-    .carousel-item img {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
       width: 200px;
-      height: 200px;
-      object-fit: cover;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .product img {
+      width: 100%;
+      height: auto;
       border-radius: 8px;
     }
-    .carousel-item button {
-      margin-top: 10px;
-      padding: 10px 20px;
+    .product h3 {
+      font-size: 1.2rem;
+      margin: 10px 0;
+    }
+    .product button {
       background-color: #8517ff;
-      color: #fff;
+      color: white;
       border: none;
-      border-radius: 5px;
+      padding: 8px 12px;
+      margin: 5px 0;
+      border-radius: 4px;
       cursor: pointer;
+    }
+    .product button:hover {
+      background-color: #6a13cc;
     }
     #cart {
       display: none;
@@ -120,12 +132,7 @@
 
   <section id="shop">
     <h2>Shop</h2>
-    <div class="carousel-item">
-      <img src="https://via.placeholder.com/200" alt="Fake Item">
-      <div>Fake Item</div>
-      <div>$10.00</div>
-      <button onclick="addToCart('Fake Item', 10.00)">Add to Cart</button>
-    </div>
+    <div id="product-list"></div>
   </section>
 
   <button id="cart-toggle" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">🛒 Cart</button>
@@ -154,6 +161,43 @@
 
   <script>
     const cart = [];
+
+    async function fetchProducts() {
+      try {
+        const response = await fetch('/.netlify/functions/get-square-products');
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+
+        const products = await response.json();
+        const productListEl = document.getElementById('product-list');
+
+        products.forEach(product => {
+          const productEl = document.createElement('div');
+          productEl.className = 'product';
+
+          productEl.innerHTML = `
+            <img src="${product.image}" alt="${product.name}" />
+            <h3>${product.name}</h3>
+            <div>
+              ${product.variations
+                .map(
+                  variation => `
+                    <button onclick="addToCart('${product.name}', ${variation.price})">
+                      ${variation.name} - $${variation.price.toFixed(2)}
+                    </button>
+                  `
+                )
+                .join('')}
+            </div>
+          `;
+
+          productListEl.appendChild(productEl);
+        });
+      } catch (error) {
+        console.error('Error loading products:', error);
+      }
+    }
 
     function addToCart(name, price) {
       console.log(`Adding to cart: ${name}, $${price}`);
@@ -246,7 +290,7 @@
         const response = await fetch('/.netlify/functions/process-embedded-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cart, buyer, shippingCost }), // Ensure shippingCost is included
+          body: JSON.stringify({ cart, buyer, shippingCost }),
         });
 
         const data = await response.json();
@@ -260,6 +304,9 @@
         alert('An error occurred during checkout.');
       }
     }
+
+    // Fetch products on page load
+    fetchProducts();
   </script>
 
 </body>
