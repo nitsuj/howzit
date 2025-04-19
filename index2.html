@@ -1,313 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-  <title>Howzit Brewing - Craft Beer, Good Vibes</title>
-  <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-    }
-    nav {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: #fff;
-      padding: 20px;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    nav a {
-      margin: 0 15px;
-      text-decoration: none;
-      color: #8517ff;
-      font-weight: bold;
-    }
-    section {
-      padding: 40px 20px;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    h2 {
-      font-size: 1.8rem;
-      color: #8517ff;
-      margin-bottom: 20px;
-    }
-    .product {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      width: 200px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .product img {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
-    }
-    .product h3 {
-      font-size: 1.2rem;
-      margin: 10px 0;
-    }
-    .product button {
-      background-color: #8517ff;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      margin: 5px 0;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .product button:hover {
-      background-color: #6a13cc;
-    }
-    #cart {
-      display: none;
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 320px;
-      height: 100vh;
-      background: #fff;
-      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      z-index: 1000;
-      overflow-y: auto;
-    }
-    #cart.open {
-      display: block;
-    }
-    #cart h3 {
-      margin-top: 0;
-    }
-    #cart-items {
-      list-style: none;
-      padding: 0;
-    }
-    #cart-items li {
-      margin-bottom: 10px;
-    }
-    #payment-form {
-      margin-top: 20px;
-    }
-    #payment-form input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    #payment-form button {
-      width: 100%;
-      padding: 10px;
-      background-color: #8517ff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #payment-status {
-      margin-top: 10px;
-      color: red;
-    }
-  </style>
-</head>
-<body>
+<section id="shop">
+  <h2>Shop</h2>
+  <div id="product-list"></div>
+</section>
 
-  <nav>
-    <a href="#shop">Shop</a>
-  </nav>
+<script>
+  async function fetchSkaterTee() {
+    try {
+      const response = await fetch('/.netlify/functions/get-skater-tee');
+      if (!response.ok) {
+        throw new Error('Failed to fetch Skater Tee');
+      }
 
-  <section id="shop">
-    <h2>Shop</h2>
-    <div id="product-list"></div>
-  </section>
+      const product = await response.json();
+      const productListEl = document.getElementById('product-list');
 
-  <button id="cart-toggle" style="position: fixed; top: 20px; right: 20px; z-index: 1100;">🛒 Cart</button>
-
-  <div id="cart">
-    <h3>Shopping Cart</h3>
-    <ul id="cart-items"></ul>
-    <div id="shipping-cost" style="margin-top: 20px; font-weight: bold;">
-      Shipping: $0.00
-    </div>
-    <div id="payment-form">
-      <input type="text" id="shipping-name" placeholder="Full Name" required>
-      <input type="email" id="shipping-email" placeholder="Email Address" required>
-      <input type="text" id="shipping-address" placeholder="Street Address" required>
-      <input type="text" id="shipping-city" placeholder="City" required>
-      <input type="text" id="shipping-state" placeholder="State" required>
-      <input type="text" id="shipping-zip" placeholder="ZIP Code" required>
-      <button id="checkout-button" onclick="processPayment()">Checkout</button>
-      <div id="payment-status"></div>
-    </div>
-  </div>
-
-  <div id="cart-notification" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #8517ff; color: white; padding: 10px 20px; border-radius: 5px; z-index: 1000;">
-    Item added to cart!
-  </div>
-
-  <script>
-    const cart = [];
-
-    async function fetchProducts() {
-      try {
-        const response = await fetch('/.netlify/functions/get-square-products');
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
+      // Group variations by color
+      const variationsByColor = product.variations.reduce((acc, variation) => {
+        if (!acc[variation.color]) {
+          acc[variation.color] = [];
         }
+        acc[variation.color].push(variation);
+        return acc;
+      }, {});
 
-        const products = await response.json();
-        const productListEl = document.getElementById('product-list');
+      // Render product
+      const productEl = document.createElement('div');
+      productEl.className = 'product';
 
-        products.forEach(product => {
-          const productEl = document.createElement('div');
-          productEl.className = 'product';
+      productEl.innerHTML = `
+        <img src="${product.image}" alt="${product.name}" />
+        <h3>${product.name}</h3>
+      `;
 
-          productEl.innerHTML = `
-            <img src="${product.image}" alt="${product.name}" />
-            <h3>${product.name}</h3>
-            <div>
-              ${product.variations
-                .map(
-                  variation => `
-                    <button onclick="addToCart('${product.name}', ${variation.price})">
-                      ${variation.name} - $${variation.price.toFixed(2)}
-                    </button>
-                  `
-                )
-                .join('')}
-            </div>
-          `;
+      Object.keys(variationsByColor).forEach(color => {
+        const colorGroup = document.createElement('div');
+        colorGroup.className = 'color-group';
+        colorGroup.innerHTML = `<h4>${color}</h4>`;
 
-          productListEl.appendChild(productEl);
+        const sizeDropdown = document.createElement('select');
+        sizeDropdown.className = 'size-dropdown';
+
+        variationsByColor[color].forEach(variation => {
+          const option = document.createElement('option');
+          option.value = variation.id;
+          option.textContent = `${variation.size} - $${variation.price.toFixed(2)} ${
+            variation.available ? '' : '(Out of Stock)'
+          }`;
+          option.disabled = !variation.available;
+          sizeDropdown.appendChild(option);
         });
-      } catch (error) {
-        console.error('Error loading products:', error);
-      }
-    }
 
-    function addToCart(name, price) {
-      console.log(`Adding to cart: ${name}, $${price}`);
-      const existingItem = cart.find(item => item.name === name);
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cart.push({ name, price, quantity: 1 });
-      }
-      renderCart();
+        const addToCartButton = document.createElement('button');
+        addToCartButton.textContent = 'Add to Cart';
+        addToCartButton.onclick = () => {
+          const selectedVariationId = sizeDropdown.value;
+          const selectedVariation = product.variations.find(v => v.id === selectedVariationId);
+          if (selectedVariation) {
+            addToCart(product.name, selectedVariation.price, selectedVariation.size);
+          }
+        };
 
-      // Show toast notification
-      const toast = document.getElementById('cart-notification');
-      toast.style.display = 'block';
-      setTimeout(() => {
-        toast.style.display = 'none';
-      }, 2000);
-
-      // Open the cart
-      const cartEl = document.getElementById('cart');
-      cartEl.classList.add('open');
-    }
-
-    function renderCart() {
-      console.log('renderCart called'); // Debugging
-      const cartItemsEl = document.getElementById('cart-items');
-      if (!cartItemsEl) {
-        console.error('Cart items element not found');
-        return;
-      }
-      cartItemsEl.innerHTML = '';
-      let totalQuantity = 0;
-
-      cart.forEach((item, index) => {
-        console.log(`Rendering item: ${item.name}, Quantity: ${item.quantity}`); // Debugging
-        const li = document.createElement('li');
-        li.innerHTML = `${item.name} - $${item.price.toFixed(2)} x ${item.quantity}
-          <button onclick="removeCartItem(${index})">Remove</button>`;
-        cartItemsEl.appendChild(li);
-        totalQuantity += item.quantity;
+        colorGroup.appendChild(sizeDropdown);
+        colorGroup.appendChild(addToCartButton);
+        productEl.appendChild(colorGroup);
       });
 
-      const shippingCostEl = document.getElementById('shipping-cost');
-      if (totalQuantity === 1) {
-        shippingCostEl.textContent = 'Shipping: $8.95';
-      } else if (totalQuantity >= 2 && totalQuantity <= 4) {
-        shippingCostEl.textContent = 'Shipping: $14.35';
-      } else if (totalQuantity >= 5) {
-        shippingCostEl.textContent = 'Shipping: Contact us for shipping';
-      } else {
-        shippingCostEl.textContent = 'Shipping: $0.00';
-      }
+      productListEl.appendChild(productEl);
+    } catch (error) {
+      console.error('Error loading Skater Tee:', error);
     }
+  }
 
-    function removeCartItem(index) {
-      cart.splice(index, 1);
-      renderCart();
+  function addToCart(name, price, size) {
+    console.log(`Adding to cart: ${name}, Size: ${size}, $${price}`);
+    const existingItem = cart.find(item => item.name === name && item.size === size);
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.push({ name, price, size, quantity: 1 });
     }
+    renderCart();
+  }
 
-    document.getElementById('cart-toggle').addEventListener('click', () => {
-      const cartEl = document.getElementById('cart');
-      cartEl.classList.toggle('open');
-    });
-
-    async function processPayment() {
-      const buyer = {
-        name: document.getElementById('shipping-name').value,
-        email: document.getElementById('shipping-email').value,
-        address: document.getElementById('shipping-address').value,
-        city: document.getElementById('shipping-city').value,
-        state: document.getElementById('shipping-state').value,
-        zip: document.getElementById('shipping-zip').value,
-      };
-
-      let totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-      let shippingCost = 0;
-
-      if (totalQuantity === 1) {
-        shippingCost = 8.95;
-      } else if (totalQuantity >= 2 && totalQuantity <= 4) {
-        shippingCost = 14.35;
-      } else if (totalQuantity >= 5) {
-        alert('Please contact us for shipping costs.');
-        return;
-      }
-
-      console.log(`Shipping cost calculated: $${shippingCost}`); // Debugging
-
-      try {
-        const response = await fetch('/.netlify/functions/process-embedded-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cart, buyer, shippingCost }),
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          window.location.href = data.checkout_url;
-        } else {
-          alert(`Failed to create checkout: ${JSON.stringify(data.error)}`);
-        }
-      } catch (error) {
-        console.error('Error during checkout:', error);
-        alert('An error occurred during checkout.');
-      }
-    }
-
-    // Fetch products on page load
-    fetchProducts();
-  </script>
-
-</body>
-</html>
+  fetchSkaterTee();
+</script>
