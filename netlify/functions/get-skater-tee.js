@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 exports.handler = async function (event) {
   const SQUARE_ACCESS_TOKEN = process.env.SQUARE_TOKEN;
-  const ITEM_ID = 'YOUR_ITEM_ID_HERE'; // Replace with your specific item ID
+  const ITEM_ID = 'IRBP5IVMIC44HDQXWBFD2PY5'; // Replace with your specific item ID
 
   try {
     // Fetch catalog data
