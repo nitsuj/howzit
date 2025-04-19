@@ -106,10 +106,11 @@
 
         // Group variations by color
         const variationsByColor = product.variations.reduce((acc, variation) => {
-          if (!acc[variation.color]) {
-            acc[variation.color] = [];
+          const color = variation.color; // Ensure we group by color
+          if (!acc[color]) {
+            acc[color] = [];
           }
-          acc[variation.color].push(variation);
+          acc[color].push(variation);
           return acc;
         }, {});
 
