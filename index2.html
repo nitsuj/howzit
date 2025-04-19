@@ -138,7 +138,7 @@
   </nav>
 
   <section id="shop">
-    <h2>Skater Tee</h2>
+    <h2>Shop</h2>
     <div id="product-list"></div>
   </section>
 
@@ -174,15 +174,19 @@
           return acc;
         }, {});
 
-        // Render each color as its own entry
+        // Render product
+        const productEl = document.createElement('div');
+        productEl.className = 'product';
+
+        productEl.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" />
+          <h3>${product.name}</h3>
+        `;
+
         Object.keys(variationsByColor).forEach(color => {
           const colorGroup = document.createElement('div');
-          colorGroup.className = 'product';
-
-          colorGroup.innerHTML = `
-            <img src="${product.image}" alt="${product.name} - ${color}" />
-            <h3>${product.name} - ${color}</h3>
-          `;
+          colorGroup.className = 'color-group';
+          colorGroup.innerHTML = `<h4>${color}</h4>`;
 
           const sizeDropdown = document.createElement('select');
           sizeDropdown.className = 'size-dropdown';
@@ -201,9 +205,7 @@
           addToCartButton.textContent = 'Add to Cart';
           addToCartButton.onclick = () => {
             const selectedVariationId = sizeDropdown.value;
-            const selectedVariation = variationsByColor[color].find(
-              v => v.id === selectedVariationId
-            );
+            const selectedVariation = product.variations.find(v => v.id === selectedVariationId);
             if (selectedVariation) {
               addToCart(product.name, selectedVariation.price, selectedVariation.size, color);
             }
@@ -211,8 +213,10 @@
 
           colorGroup.appendChild(sizeDropdown);
           colorGroup.appendChild(addToCartButton);
-          productListEl.appendChild(colorGroup);
+          productEl.appendChild(colorGroup);
         });
+
+        productListEl.appendChild(productEl);
       } catch (error) {
         console.error('Error loading Skater Tee:', error);
       }
@@ -230,6 +234,7 @@
       }
       renderCart();
       showToast();
+      document.getElementById('cart').classList.add('open'); // Ensure cart slides out
     }
 
     function renderCart() {
