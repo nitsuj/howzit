@@ -113,33 +113,31 @@
 
     /* TOGO */
     #togo .carousel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 20px;
     }
     #togo .carousel-item {
+      width: 220px;
+      text-align: center;
       background: transparent !important;
       border-radius: 8px;
-      text-align: center;
-      width: 100%;
     }
     #togo .carousel-item img {
       width: 100%;
       height: auto;
-      max-width: 250px;
-      aspect-ratio: 1/1;
+      aspect-ratio: 1 / 1;
       object-fit: cover;
       border-radius: 16px;
-      margin: 0 auto;
     }
     #togo .carousel-item a {
       display: block;
       padding: 8px;
       margin-top: 5px;
-      text-align: center;
       font-weight: 600;
-      color: inherit;
       text-decoration: none;
+      color: inherit;
       background-color: transparent;
     }
 
