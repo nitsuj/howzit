@@ -1,1 +1,27 @@
+{
+  "taplist": [
+    {
+      "name": "Absorbing Memories",
+      "url": "https://untappd.com/b/howzit-brewing-absorbing-memories/6207395",
+      "image": "https://assets.untappd.com/site/beer_logos_hd/beer-6207395_a3e42_hd.jpeg"
+    },
+    {
+      "name": "Local Legend",
+      "url": "https://untappd.com/b/howzit-brewing-local-legend/5660501",
+      "image": "https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg"
+    }
+  ],
+  "togo": [
+    {
+      "name": "Lime in the Sand",
+      "url": "https://untappd.com/b/howzit-brewing-lime-in-the-sand/6143340",
+      "image": "https://assets.untappd.com/site/beer_logos_hd/beer-6143340_11ffa_hd.jpeg"
+    },
+    {
+      "name": "Local Legend",
+      "url": "https://untappd.com/b/howzit-brewing-local-legend/5660501",
+      "image": "https://assets.untappd.com/site/beer_logos_hd/beer-5660501_bfc89_hd.jpeg"
+    }
+  ]
+}
 
