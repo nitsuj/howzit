@@ -2,12 +2,11 @@
   directory = "netlify/functions"
 
 # Netlify serves the public Google Sheet tabs through same-origin proxy routes.
-# The live page currently requests /data/*.csv, so those paths are forced to
-# Google instead of the stale CSV files committed for the old GitHub Pages setup.
+# Taplist goes through a tiny function so team-facing column names can be forgiving.
 
 [[redirects]]
   from = "/data/taplist.csv"
-  to = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=0&single=true&output=csv"
+  to = "/.netlify/functions/taplist"
   status = 200
   force = true
 
@@ -17,10 +16,9 @@
   status = 200
   force = true
 
-# Keep the original proxy paths available too.
 [[redirects]]
   from = "/sheet/taplist.csv"
-  to = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=0&single=true&output=csv"
+  to = "/.netlify/functions/taplist"
   status = 200
   force = true
 
