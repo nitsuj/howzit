@@ -120,7 +120,7 @@
   }
 
   function formatDate(d) {
-    return `${dayShort[d.getUTCDay()]} · ${monthShort[d.getUTCMonth()]} ${d.getUTCDate()}`;
+    return `${dayShort[d.getUTCDay()]} - ${monthShort[d.getUTCMonth()]} ${d.getUTCDate()}`;
   }
 
   function normalizeEvents(rows) {
@@ -168,7 +168,6 @@
       .event-card:nth-child(4n+2){background:var(--pink);}.event-card:nth-child(4n+3){background:var(--aqua);}.event-card:nth-child(4n+4){background:var(--cream);}
       .event-date{font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:.82rem;letter-spacing:.06em;}
       .event-card h3{margin:12px 0 8px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;line-height:.98;letter-spacing:-.035em;font-size:clamp(1.6rem,2.8vw,2.55rem);}
-      .event-time{font-weight:900;text-transform:uppercase;font-size:.92rem;}
       .event-card p{margin:10px 0 0;font-size:.92rem;line-height:1.35;}
       .event-recurs{margin-top:auto;padding-top:18px;font-weight:900;text-transform:uppercase;font-size:.72rem;letter-spacing:.04em;}
       @media(max-width:1000px){.event-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
@@ -184,10 +183,11 @@
     section.className = 'section';
     section.id = 'events';
     section.innerHTML = `
-      <div class="section-head"><h2 class="display section-title">Events</h2></div>
+      <div class="section-head"><h2 class="display section-title">Upcoming</h2></div>
       <div class="event-grid">${events.map((e) => {
         const recurring = e.recurring ? `<div class="event-recurs">Every ${esc(e.recurringDay)}</div>` : '';
-        return `<article class="event-card"><div class="event-date">${esc(formatDate(e.eventDate))}</div><h3>${esc(e.event)}</h3>${e.time ? `<div class="event-time">${esc(e.time)}</div>` : ''}${e.description ? `<p>${esc(e.description)}</p>` : ''}${recurring}</article>`;
+        const meta = `${formatDate(e.eventDate)}${e.time ? ` - ${e.time}` : ''}`;
+        return `<article class="event-card"><div class="event-date">${esc(meta)}</div><h3>${esc(e.event)}</h3>${e.description ? `<p>${esc(e.description)}</p>` : ''}${recurring}</article>`;
       }).join('')}</div>`;
 
     const taplist = document.getElementById('taplist');
