@@ -164,17 +164,15 @@
       #events{background:var(--yellow);}
       #events .section-title{color:var(--coral);}
       .event-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;max-width:1300px;margin:auto;}
-      .event-card{display:flex;flex-direction:column;min-height:235px;border:var(--border);border-radius:24px;padding:20px;background:var(--white);box-shadow:5px 5px 0 var(--ink);text-decoration:none;overflow:hidden;position:relative;}
+      .event-card{display:flex;flex-direction:column;min-height:220px;border:var(--border);border-radius:24px;padding:20px;background:var(--white);box-shadow:5px 5px 0 var(--ink);}
       .event-card:nth-child(4n+2){background:var(--pink);}.event-card:nth-child(4n+3){background:var(--aqua);}.event-card:nth-child(4n+4){background:var(--cream);}
-      .event-card:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink);}
       .event-date{font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:.82rem;letter-spacing:.06em;}
       .event-card h3{margin:12px 0 8px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;line-height:.98;letter-spacing:-.035em;font-size:clamp(1.6rem,2.8vw,2.55rem);}
       .event-time{font-weight:900;text-transform:uppercase;font-size:.92rem;}
       .event-card p{margin:10px 0 0;font-size:.92rem;line-height:1.35;}
       .event-recurs{margin-top:auto;padding-top:18px;font-weight:900;text-transform:uppercase;font-size:.72rem;letter-spacing:.04em;}
-      .event-image{width:calc(100% + 40px);height:135px;object-fit:cover;margin:-20px -20px 16px;border-bottom:var(--border);}
       @media(max-width:1000px){.event-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
-      @media(max-width:700px){#events{padding:34px 14px 42px}.event-grid{grid-template-columns:1fr;gap:10px}.event-card{min-height:0;padding:16px;border-radius:18px;box-shadow:3px 3px 0 var(--ink)}.event-card:hover{transform:none;box-shadow:3px 3px 0 var(--ink)}.event-card h3{font-size:1.55rem}.event-image{width:calc(100% + 32px);margin:-16px -16px 14px;height:150px}.event-recurs{padding-top:12px}}
+      @media(max-width:700px){#events{padding:34px 14px 42px}.event-grid{grid-template-columns:1fr;gap:10px}.event-card{min-height:0;padding:16px;border-radius:18px;box-shadow:3px 3px 0 var(--ink)}.event-card h3{font-size:1.55rem}.event-recurs{padding-top:12px}}
     `;
     document.head.appendChild(style);
   }
@@ -188,11 +186,8 @@
     section.innerHTML = `
       <div class="section-head"><h2 class="display section-title">Events</h2></div>
       <div class="event-grid">${events.map((e) => {
-        const tag = e.link ? 'a' : 'article';
-        const link = e.link ? ` href="${esc(e.link)}" target="_blank" rel="noreferrer"` : '';
-        const image = e.image_url ? `<img class="event-image" src="${esc(e.image_url)}" alt="" loading="lazy" onerror="this.remove()">` : '';
         const recurring = e.recurring ? `<div class="event-recurs">Every ${esc(e.recurringDay)}</div>` : '';
-        return `<${tag} class="event-card"${link}>${image}<div class="event-date">${esc(formatDate(e.eventDate))}</div><h3>${esc(e.event)}</h3>${e.time ? `<div class="event-time">${esc(e.time)}</div>` : ''}${e.description ? `<p>${esc(e.description)}</p>` : ''}${recurring}</${tag}>`;
+        return `<article class="event-card"><div class="event-date">${esc(formatDate(e.eventDate))}</div><h3>${esc(e.event)}</h3>${e.time ? `<div class="event-time">${esc(e.time)}</div>` : ''}${e.description ? `<p>${esc(e.description)}</p>` : ''}${recurring}</article>`;
       }).join('')}</div>`;
 
     const taplist = document.getElementById('taplist');
