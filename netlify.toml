@@ -1,3 +1,7 @@
+[build]
+  command = "node scripts/inject-events.js"
+  publish = "."
+
 [functions]
   directory = "netlify/functions"
 
