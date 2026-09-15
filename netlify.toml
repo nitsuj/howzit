@@ -1,2 +1,23 @@
 [functions]
   directory = "netlify/functions"
+
+# Google Sheets are published publicly, but browser-to-Google requests are
+# blocked by CORS/CORB. These 200 rewrites make Netlify fetch them server-side
+# and expose them to the page on the site's own origin.
+
+[[redirects]]
+  from = "/sheet/taplist.csv"
+  to = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=0&single=true&output=csv"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sheet/hero.csv"
+  to = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=1406518917&single=true&output=csv"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/sheet/*"
+  [headers.values]
+    Cache-Control = "no-store, max-age=0"
