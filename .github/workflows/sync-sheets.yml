@@ -1,0 +1,42 @@
+name: Sync published Google Sheets
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out site
+        uses: actions/checkout@v4
+
+      - name: Fetch published sheet data
+        env:
+          TAPLIST_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=0&single=true&output=csv
+          HERO_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=1406518917&single=true&output=csv
+        run: |
+          mkdir -p data
+          curl --fail --location --retry 3 --silent --show-error "$TAPLIST_URL" -o data/taplist.csv.tmp
+          curl --fail --location --retry 3 --silent --show-error "$HERO_URL" -o data/hero.csv.tmp
+          mv data/taplist.csv.tmp data/taplist.csv
+          mv data/hero.csv.tmp data/hero.csv
+
+      - name: Commit changes if needed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/taplist.csv data/hero.csv
+          if git diff --cached --quiet; then
+            echo "No sheet changes."
+            exit 0
+          fi
+          git commit -m "Sync website data from Google Sheets [skip ci]"
+          git push
