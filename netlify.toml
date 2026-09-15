@@ -21,6 +21,12 @@
   force = true
 
 [[redirects]]
+  from = "/data/events.csv"
+  to = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=327976611&single=true&output=csv"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/sheet/taplist.csv"
   to = "/.netlify/functions/taplist"
   status = 200
@@ -29,6 +35,12 @@
 [[redirects]]
   from = "/sheet/hero.csv"
   to = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=1406518917&single=true&output=csv"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sheet/events.csv"
+  to = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEukzGVD6WDGAlK8qHFchTCs9oMs9LKbwkXRSzJBDa_vjMCxLWJhPKJvNTbQakGVPn9uZO5_Zi4wpd/pub?gid=327976611&single=true&output=csv"
   status = 200
   force = true
 
