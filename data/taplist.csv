@@ -1,4 +1,4 @@
-tap,beer,style,abv,description,image_url,untappd_url,to_go
+tap,beer,style,abv,description,image_url,untappd_url,cans
 1,Howzit Dunkel,Dunkel,5.3,A German style dunkel brewed for our Oktoberfest,https://assets.untappd.com/site/beer_logos/beer-6844082_119e8_sm.jpeg,https://untappd.com/b/howzit-brewing-howzit-dunkel/6844082,TRUE
 2,Local Legend,Hazy IPA,6.4,Our flagship hazy IPA,https://assets.untappd.com/site/beer_logos/beer-5660501_bfc89_sm.jpeg,https://untappd.com/b/howzit-brewing-local-legend/5660501,TRUE
 3,Kalapaweizen,Hefeweizen,4.8,German style wheat beer,https://assets.untappd.com/site/beer_logos/beer-6833723_c1006_sm.jpeg,https://untappd.com/b/howzit-brewing-kalapaweizen/6833723,TRUE
