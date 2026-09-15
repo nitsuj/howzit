@@ -129,102 +129,183 @@
       .tap-card { min-height:112px;grid-template-columns:72px minmax(0,1fr);gap:12px;padding:10px 11px 10px 10px;border-radius:18px;box-shadow:3px 3px 0 var(--ink); }
       .tap-card:hover { transform:none;box-shadow:3px 3px 0 var(--ink); }
       .beer-art { width:72px;border-radius:12px;font-size:1.7rem; }
-      .tap-card h3 { margin-bottom:5px;font-size:clamp(1.05rem,5.2vw,1.35rem);line-height:1; }
-      .beer-meta { gap:5px;font-size:.76rem;line-height:1.2; }
-      .can-badge { padding:2px 7px;font-size:.62rem;box-shadow:1px 1px 0 var(--ink); }
-      .tap-number,.beer-desc { display:none; }
-      footer { padding:22px 16px 26px;display:block;text-align:center;font-size:.88rem; }
+      .tap-card h3 { margin-bottom:5px;font-size:clamp(1.05rem,5.2vw,1.35rem);line-height:.98; }
+      .beer-meta { gap:6px;font-size:.73rem; }
+      .can-badge { padding:2px 6px 2px;font-size:.58rem;box-shadow:1px 1px 0 var(--ink); }
+      .beer-desc { margin-top:6px;font-size:.78rem;line-height:1.3; }
+      .tap-number { display:none; }
+      footer { padding:28px 16px;display:block;text-align:center; }
+      footer .footer-copy { margin-top:8px; }
     }
   </style>
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="#top" aria-label="Howzit Brewing home"><span class="bubble-mark" aria-hidden="true"></span></a>
-    <nav aria-label="Primary navigation">
-      <a href="#taplist">Tap list</a>
+    <nav aria-label="Primary">
+      <a href="#taplist">Tap List</a>
       <a href="#visit">Visit</a>
-      <a class="nav-cta" href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">Instagram ↗</a>
+      <a class="nav-cta" href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">Instagram</a>
     </nav>
   </header>
+
   <main id="top">
-    <section class="mobile-quick" aria-label="Howzit Brewing hours and location">
+    <section class="mobile-quick" aria-label="Quick visit info">
       <div class="mobile-quick-inner">
-        <div class="eyebrow">Howzit Brewing • Kakaʻako</div>
-        <h1 class="mobile-hours">12–10</h1>
-        <div class="mobile-daily">Open seven days a week</div>
-        <div class="mobile-address"><strong>330 Kamani Street</strong>Honolulu, HI 96813</div>
+        <div class="eyebrow">Honolulu, Hawaiʻi</div>
+        <p class="mobile-hours">12–10</p>
+        <p class="mobile-daily">Open daily</p>
+        <p class="mobile-address"><strong>330 Kamani Street</strong>Honolulu, HI</p>
         <div class="mobile-actions">
-          <a class="button" href="https://www.google.com/maps/search/?api=1&query=330+Kamani+Street+Honolulu+HI" target="_blank" rel="noreferrer">Directions ↗</a>
-          <a class="button alt" href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">Instagram ↗</a>
+          <a class="button" href="https://www.google.com/maps/search/?api=1&query=330+Kamani+Street+Honolulu+HI" target="_blank" rel="noreferrer">Directions</a>
+          <a class="button alt" href="#taplist">Tap List</a>
         </div>
       </div>
     </section>
+
     <section class="hero">
       <div class="hero-copy">
-        <div class="eyebrow">Honolulu, Hawaiʻi • Kakaʻako</div>
-        <h1 class="display">Craft beer.<br>Good vibes.</h1>
-        <div class="hero-kicker"><span>330 Kamani St</span><span>Open daily 12–10</span></div>
+        <div class="eyebrow">Honolulu, Hawaiʻi</div>
+        <h1 class="display">Craft Beer.<br>Good Vibes.</h1>
+        <div class="hero-kicker">
+          <span>330 Kamani Street</span>
+          <span>Open daily 12–10</span>
+        </div>
       </div>
-      <div class="hero-media" aria-label="Howzit Brewing photo carousel">
-        <div class="hero-dots" id="hero-dots" aria-label="Choose photo"></div>
-        <div class="polaroid-stack">
-          <div class="polaroid-ghost one" aria-hidden="true"></div><div class="polaroid-ghost two" aria-hidden="true"></div>
-          <div class="polaroid"><div class="polaroid-photo" id="hero-photo"><div class="polaroid-placeholder" aria-hidden="true"></div></div></div>
+      <div class="hero-media">
+        <div class="hero-dots" id="hero-dots" aria-label="Photo navigation"></div>
+        <div class="polaroid-stack" aria-label="Howzit Brewing photos">
+          <div class="polaroid-ghost one"></div>
+          <div class="polaroid-ghost two"></div>
+          <div class="polaroid">
+            <div class="polaroid-photo" id="hero-photo">
+              <div class="polaroid-placeholder" id="hero-placeholder">Howzit<br>Polaroids</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-    <div class="marquee" aria-label="Howzit happenings"><div class="marquee-track">
-      <span>Fresh beer</span><span>Thursday run club</span><span>Sunday trivia</span><span>Rotating food trucks</span><span>Honolulu made</span>
-      <span>Fresh beer</span><span>Thursday run club</span><span>Sunday trivia</span><span>Rotating food trucks</span><span>Honolulu made</span>
-    </div></div>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Honolulu brewed</span><span>12–10 daily</span><span>Thursday run club</span><span>Sunday trivia</span><span>Craft beer. Good vibes.</span>
+        <span>Honolulu brewed</span><span>12–10 daily</span><span>Thursday run club</span><span>Sunday trivia</span><span>Craft beer. Good vibes.</span>
+      </div>
+    </div>
+
     <section class="section" id="taplist">
-      <div class="section-head"><h2 class="section-title display">Tap list</h2></div>
-      <div class="tap-grid loading" id="tap-grid" aria-live="polite"><div class="tap-empty">Loading today’s taps…</div></div>
+      <div class="section-head">
+        <h2 class="display section-title">Tap List</h2>
+      </div>
+      <div class="tap-grid loading" id="tap-grid" aria-live="polite">
+        <div class="tap-empty">Loading today’s taps…</div>
+      </div>
     </section>
+
     <section id="visit">
       <div class="visit-copy">
-        <h2 class="section-title display">Visit</h2>
+        <div class="eyebrow">Come hang</div>
+        <h2 class="display section-title">Visit</h2>
         <div class="visit-stack">
-          <div class="visit-block"><strong>330 Kamani Street</strong>Honolulu, HI 96813</div>
-          <div class="visit-block"><strong>12 PM — 10 PM</strong>Seven days a week</div>
+          <div class="visit-block"><strong>330 Kamani Street</strong>Honolulu, HI</div>
+          <div class="visit-block"><strong>12 PM – 10 PM</strong>Seven days a week</div>
         </div>
         <div class="visit-actions">
-          <a class="button" href="https://www.google.com/maps/search/?api=1&query=330+Kamani+Street+Honolulu+HI" target="_blank" rel="noreferrer">Directions ↗</a>
-          <a class="button alt" href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">What’s happening ↗</a>
+          <a class="button" href="https://www.google.com/maps/search/?api=1&query=330+Kamani+Street+Honolulu+HI" target="_blank" rel="noreferrer">Get directions</a>
+          <a class="button alt" href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">Instagram</a>
         </div>
       </div>
-      <div class="visit-art" aria-hidden="true"><div class="visit-sun"></div><div class="visit-wave"></div></div>
+      <div class="visit-art" aria-hidden="true">
+        <div class="visit-sun"></div>
+        <div class="visit-wave"></div>
+      </div>
     </section>
   </main>
-  <footer><div><strong>Craft beer. Good vibes.</strong><br><a href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">@howzitbrewing</a></div></footer>
-<script>
-  const TAPLIST_ENDPOINT='/sheet/taplist.csv';
-  const HERO_ENDPOINT='/sheet/hero.csv';
-  const truthy=v=>['1','true','yes','y','x'].includes(String(v??'').trim().toLowerCase());
-  const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-  const initials=n=>(n||'?').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
-  function artHTML(b){const img=b.image_url?`<img src="${esc(b.image_url)}" alt="${esc(b.beer)} label" loading="lazy" onerror="this.style.display='none'">`:'';return `<div class="beer-art"><span class="fallback">${esc(initials(b.beer))}</span>${img}</div>`;}
+
+  <footer>
+    <div><strong>Howzit Brewing</strong><br>330 Kamani Street · Honolulu, Hawaiʻi</div>
+    <div class="footer-copy"><a href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">@howzitbrewing</a></div>
+  </footer>
+
+  <script>
+  const TAPLIST_ENDPOINT = '/data/taplist.csv';
+  const HERO_ENDPOINT = '/data/hero.csv';
+
+  function parseCSV(text){
+    const rows=[]; let row=[],field='',quoted=false;
+    for(let i=0;i<text.length;i++){
+      const c=text[i],n=text[i+1];
+      if(c==='"'&&quoted&&n==='"'){field+='"';i++;continue;}
+      if(c==='"'){quoted=!quoted;continue;}
+      if(c===','&&!quoted){row.push(field);field='';continue;}
+      if((c==='\n'||c==='\r')&&!quoted){
+        if(c==='\r'&&n==='\n') i++;
+        row.push(field);field='';
+        if(row.some(v=>v.trim()!=='')) rows.push(row);
+        row=[];continue;
+      }
+      field+=c;
+    }
+    row.push(field); if(row.some(v=>v.trim()!=='')) rows.push(row);
+    if(!rows.length) return [];
+    const headers=rows.shift().map(h=>h.trim().toLowerCase());
+    return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]??'').trim()])));
+  }
+
+  async function getCSV(url){
+    const sep=url.includes('?')?'&':'?';
+    const res=await fetch(`${url}${sep}v=${Date.now()}`,{cache:'no-store'});
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    return parseCSV(await res.text());
+  }
+
+  function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+  function truthy(v){return /^(true|yes|y|1)$/i.test(String(v||'').trim());}
+  function initials(name=''){return name.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase()||'HB';}
+
   function renderTaplist(beers){
     const grid=document.getElementById('tap-grid');
-    if(beers===null){grid.innerHTML='<div class="tap-empty">Tap list is temporarily unavailable. Check back in a minute 🤙</div>';grid.classList.remove('loading');return;}
-    const active=beers.filter(b=>String(b.beer||'').trim()).sort((a,b)=>Number(a.tap||999)-Number(b.tap||999));
-    if(!active.length){grid.innerHTML='<div class="tap-empty">Nothing listed right now. Check back soon 🤙</div>';grid.classList.remove('loading');return;}
-    grid.innerHTML=active.map((b,i)=>{const tag=b.untappd_url?'a':'article';const href=b.untappd_url?` href="${esc(b.untappd_url)}" target="_blank" rel="noreferrer"`:'';const meta=[b.style,b.abv?`${b.abv}% ABV`:''].filter(Boolean).join(' • ');const cans=truthy(b.to_go)?'<span class="can-badge">Cans Available</span>':'';return `<${tag} class="tap-card"${href}>${artHTML(b)}<div><h3>${esc(b.beer)}</h3><div class="beer-meta"><span>${esc(meta)}</span>${cans}</div>${b.description?`<p class="beer-desc">${esc(b.description)}</p>`:''}</div><div class="tap-number">${esc(b.tap||String(i+1).padStart(2,'0'))}</div></${tag}>`;}).join('');
     grid.classList.remove('loading');
+    beers=beers.filter(b=>b.beer).sort((a,b)=>(Number(a.tap)||999)-(Number(b.tap)||999));
+    if(!beers.length){grid.innerHTML='<div class="tap-empty">Tap list coming right up.</div>';return;}
+    grid.innerHTML=beers.map(b=>{
+      const card=b.untappd_url?'a':'div';
+      const link=b.untappd_url?` href="${esc(b.untappd_url)}" target="_blank" rel="noreferrer"`:'';
+      const img=b.image_url?`<img src="${esc(b.image_url)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'';
+      const cans=truthy(b.to_go)?'<span class="can-badge">CANS AVAILABLE</span>':'';
+      return `<${card} class="tap-card"${link}>
+        <div class="beer-art"><span class="fallback">${esc(initials(b.beer))}</span>${img}</div>
+        <div><h3>${esc(b.beer)}</h3><div class="beer-meta"><span>${esc(b.style)}</span>${b.abv?`<span>· ${esc(b.abv)}% ABV</span>`:''}${cans}</div>${b.description?`<p class="beer-desc">${esc(b.description)}</p>`:''}</div>
+        <div class="tap-number">${esc(b.tap)}</div>
+      </${card}>`;
+    }).join('');
   }
-  let heroTimer=null;
+
+  let heroTimer;
   function renderHero(rows){
-    if(rows===null)return;const data=rows.filter(r=>String(r.image_url||'').trim());const photo=document.getElementById('hero-photo'),dots=document.getElementById('hero-dots');
-    if(!data.length){photo.innerHTML='<div class="polaroid-placeholder" aria-hidden="true"></div>';dots.innerHTML='';return;}
-    photo.innerHTML=data.map((r,i)=>`<img class="${i===0?'active':''}" data-index="${i}" src="${esc(r.image_url)}" alt="${esc(r.alt||'Howzit Brewing')}" onerror="this.style.display='none'">`).join('');
-    dots.innerHTML=data.map((_,i)=>`<button class="hero-dot ${i===0?'active':''}" type="button" aria-label="Show photo ${i+1}" data-index="${i}"></button>`).join('');
-    let current=0;const activate=i=>{current=(i+data.length)%data.length;photo.querySelectorAll('img').forEach((el,n)=>el.classList.toggle('active',n===current));dots.querySelectorAll('button').forEach((el,n)=>el.classList.toggle('active',n===current));};
-    const restart=()=>{clearInterval(heroTimer);heroTimer=setInterval(()=>activate(current+1),5200);};dots.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{activate(Number(btn.dataset.index));restart();}));activate(0);restart();
+    if(window.matchMedia('(max-width:700px)').matches) return;
+    const photos=rows.filter(r=>r.image_url);
+    if(!photos.length) return;
+    const photo=document.getElementById('hero-photo'),placeholder=document.getElementById('hero-placeholder'),dots=document.getElementById('hero-dots');
+    placeholder.style.display='none';
+    photo.querySelectorAll('img').forEach(i=>i.remove());
+    dots.innerHTML='';
+    photos.forEach((p,i)=>{
+      const img=document.createElement('img');img.src=p.image_url;img.alt=p.alt||'Howzit Brewing';img.loading=i?'lazy':'eager';if(!i)img.classList.add('active');photo.appendChild(img);
+      const dot=document.createElement('button');dot.className='hero-dot'+(!i?' active':'');dot.type='button';dot.setAttribute('aria-label',`Show photo ${i+1}`);dot.addEventListener('click',()=>show(i));dots.appendChild(dot);
+    });
+    let current=0;
+    function show(i){current=i;[...photo.querySelectorAll('img')].forEach((im,j)=>im.classList.toggle('active',j===i));[...dots.children].forEach((d,j)=>d.classList.toggle('active',j===i));restart();}
+    function restart(){clearInterval(heroTimer);if(photos.length>1)heroTimer=setInterval(()=>show((current+1)%photos.length),5500);}
+    restart();
   }
-  function csvToObjects(text){const rows=[];let row=[],field='',quoted=false;for(let i=0;i<text.length;i++){const ch=text[i];if(quoted){if(ch==='"'&&text[i+1]==='"'){field+='"';i++;}else if(ch==='"'){quoted=false;}else field+=ch;}else{if(ch==='"')quoted=true;else if(ch===','){row.push(field);field='';}else if(ch==='\n'){row.push(field);rows.push(row);row=[];field='';}else if(ch!=='\r')field+=ch;}}if(field!==''||row.length){row.push(field);rows.push(row);}if(!rows.length)return[];const headers=rows.shift().map(h=>h.trim().toLowerCase());return rows.filter(r=>r.some(v=>String(v).trim()!=='')).map(r=>Object.fromEntries(headers.map((h,i)=>[h,String(r[i]??'').trim()])));}
-  async function getCSV(endpoint){try{const joiner=endpoint.includes('?')?'&':'?';const response=await fetch(`${endpoint}${joiner}v=${Date.now()}`,{cache:'no-store'});if(!response.ok)throw new Error(`HTTP ${response.status}`);const text=await response.text();if(/^\s*</.test(text))throw new Error('Expected CSV but received HTML');return csvToObjects(text);}catch(err){console.error('Howzit sheet load failed:',endpoint,err);return null;}}
-  const MOBILE_VIEW=window.matchMedia('(max-width:700px)').matches;
-  if(MOBILE_VIEW){getCSV(TAPLIST_ENDPOINT).then(renderTaplist);}else{Promise.all([getCSV(TAPLIST_ENDPOINT),getCSV(HERO_ENDPOINT)]).then(([beers,hero])=>{renderTaplist(beers);renderHero(hero);});}
-</script>
+
+  const mobile=window.matchMedia('(max-width:700px)').matches;
+  if(mobile){
+    getCSV(TAPLIST_ENDPOINT).then(renderTaplist).catch(err=>{console.error('Howzit sheet load failed:',TAPLIST_ENDPOINT,err);document.getElementById('tap-grid').innerHTML='<div class="tap-empty">Tap list is temporarily unavailable.</div>';});
+  }else{
+    Promise.all([getCSV(TAPLIST_ENDPOINT),getCSV(HERO_ENDPOINT)]).then(([beers,hero])=>{renderTaplist(beers);renderHero(hero);}).catch(err=>{console.error('Howzit sheet load failed:',err);getCSV(TAPLIST_ENDPOINT).then(renderTaplist).catch(()=>{document.getElementById('tap-grid').innerHTML='<div class="tap-empty">Tap list is temporarily unavailable.</div>';});});
+  }
+  </script>
 </body>
 </html>
