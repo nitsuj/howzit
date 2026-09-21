@@ -72,7 +72,8 @@
     .section-title { font-size:clamp(2.8rem,7vw,6rem);color:var(--ink);margin:0;flex:0 0 auto; }
     #taplist { background:var(--aqua); }
     #taplist .section-title { color:var(--purple); }
-    .tap-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:1300px;margin:auto; }
+    .tap-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:1300px;margin:auto;align-items:start; }
+    .tap-column { display:grid;gap:16px;align-content:start; }
     .tap-card { position:relative;min-height:182px;display:grid;grid-template-columns:112px 1fr auto;gap:20px;align-items:center;background:var(--white);border:var(--border);border-radius:24px;padding:16px 20px 16px 14px;box-shadow:5px 5px 0 var(--ink);text-decoration:none;transition:transform .16s ease,box-shadow .16s ease; }
     .tap-card:hover { transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink); }
     .tap-card:nth-child(4n+1) .beer-art { background:var(--yellow); }
@@ -126,6 +127,7 @@
       #taplist .section-head { margin-bottom:18px; }
       #taplist .section-title { margin:0 0 5px;font-size:clamp(2.8rem,14vw,4.4rem);line-height:.9; }
       .tap-grid { grid-template-columns:1fr;gap:10px; }
+      .tap-column { gap:10px; }
       .tap-card { min-height:112px;grid-template-columns:72px minmax(0,1fr);gap:12px;padding:10px 11px 10px 10px;border-radius:18px;box-shadow:3px 3px 0 var(--ink); }
       .tap-card:hover { transform:none;box-shadow:3px 3px 0 var(--ink); }
       .beer-art { width:72px;border-radius:12px;font-size:1.7rem; }
@@ -268,7 +270,7 @@
     grid.classList.remove('loading');
     beers=beers.filter(b=>b.beer).sort((a,b)=>(Number(a.tap)||999)-(Number(b.tap)||999));
     if(!beers.length){grid.innerHTML='<div class="tap-empty">Tap list coming right up.</div>';return;}
-    grid.innerHTML=beers.map(b=>{
+    const renderCard=b=>{
       const card=b.untappd_url?'a':'div';
       const link=b.untappd_url?` href="${esc(b.untappd_url)}" target="_blank" rel="noreferrer"`:'';
       const img=b.image_url?`<img src="${esc(b.image_url)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'';
@@ -278,7 +280,10 @@
         <div><h3>${esc(b.beer)}</h3><div class="beer-meta"><span>${esc(b.style)}</span>${b.abv?`<span>· ${esc(b.abv)}% ABV</span>`:''}${cans}</div>${b.description?`<p class="beer-desc">${esc(b.description)}</p>`:''}</div>
         <div class="tap-number">${esc(b.tap)}</div>
       </${card}>`;
-    }).join('');
+    };
+    const left=beers.filter(b=>(Number(b.tap)||999)<=5);
+    const right=beers.filter(b=>(Number(b.tap)||999)>5);
+    grid.innerHTML=`<div class="tap-column">${left.map(renderCard).join('')}</div><div class="tap-column">${right.map(renderCard).join('')}</div>`;
   }
 
   let heroTimer;
