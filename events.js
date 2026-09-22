@@ -7,6 +7,18 @@
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[c]));
 
+  function formatEventDescription(value = '') {
+    const text = String(value);
+    const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/gi;
+    let html = '', lastIndex = 0, match;
+    while ((match = linkPattern.exec(text)) !== null) {
+      html += esc(text.slice(lastIndex, match.index));
+      html += '<a href="' + esc(match[2]) + '" target="_blank" rel="noreferrer">' + esc(match[1]) + '</a>';
+      lastIndex = match.index + match[0].length;
+    }
+    return html + esc(text.slice(lastIndex));
+  }
+
   function parseCSV(text) {
     const rows = [];
     let row = [], field = '', quoted = false;
@@ -169,6 +181,7 @@
       .event-date{font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:.82rem;letter-spacing:.06em;}
       .event-card h3{margin:12px 0 8px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;line-height:.98;letter-spacing:-.035em;font-size:clamp(1.6rem,2.8vw,2.55rem);}
       .event-card p{margin:10px 0 0;font-size:.92rem;line-height:1.35;}
+      .event-card p a{font-weight:900;text-decoration-thickness:2px;text-underline-offset:2px;}
       .event-recurs{margin-top:auto;padding-top:18px;font-weight:900;text-transform:uppercase;font-size:.72rem;letter-spacing:.04em;}
       @media(max-width:1000px){.event-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
       @media(max-width:700px){#events{padding:34px 14px 42px}.event-grid{grid-template-columns:1fr;gap:10px}.event-card{min-height:0;padding:16px;border-radius:18px;box-shadow:3px 3px 0 var(--ink)}.event-card h3{font-size:1.55rem}.event-recurs{padding-top:12px}}
@@ -187,7 +200,7 @@
       <div class="event-grid">${events.map((e) => {
         const recurring = e.recurring ? `<div class="event-recurs">Every ${esc(e.recurringDay)}</div>` : '';
         const meta = `${formatDate(e.eventDate)}${e.time ? ` - ${e.time}` : ''}`;
-        return `<article class="event-card"><div class="event-date">${esc(meta)}</div><h3>${esc(e.event)}</h3>${e.description ? `<p>${esc(e.description)}</p>` : ''}${recurring}</article>`;
+        return `<article class="event-card"><div class="event-date">${esc(meta)}</div><h3>${esc(e.event)}</h3>${e.description ? `<p>${formatEventDescription(e.description)}</p>` : ''}${recurring}</article>`;
       }).join('')}</div>`;
 
     const taplist = document.getElementById('taplist');
