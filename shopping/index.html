@@ -30,7 +30,7 @@
     button,a { -webkit-tap-highlight-color:transparent; }
     .display { margin:0;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:-.05em;line-height:.91; }
     .eyebrow { font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.78rem; }
-    .bubble-mark { display:block;background:currentColor;-webkit-mask:url("/bubble.svg") center/contain no-repeat;mask:url("bubble.svg") center/contain no-repeat;aspect-ratio:983/533; }
+    .bubble-mark { display:block;background:currentColor;-webkit-mask:url("/bubble.svg") center/contain no-repeat;mask:url("/bubble.svg") center/contain no-repeat;aspect-ratio:983/533; }
     .topbar { position:sticky;top:0;z-index:30;min-height:78px;display:flex;align-items:center;gap:28px;padding:10px 24px;border-bottom:var(--border);background:rgba(255,248,232,.96);backdrop-filter:blur(8px); }
     .brand { margin-right:auto;display:block;width:154px;color:var(--coral); }
     .brand .bubble-mark { width:100%; }
@@ -115,6 +115,7 @@
     .merch-options { display:flex;flex-wrap:wrap;gap:9px; }
     .merch-option { border:2px solid var(--ink);border-radius:999px;padding:8px 12px;background:var(--white);font-weight:900;box-shadow:2px 2px 0 var(--ink);cursor:pointer; }
     .merch-option.active { background:var(--aqua);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink); }
+    .merch-option:disabled { opacity:.35;cursor:not-allowed;box-shadow:none;text-decoration:line-through; }
     .merch-color { display:inline-flex;align-items:center;gap:7px; }
     .merch-swatch { width:17px;height:17px;border:2px solid var(--ink);border-radius:50%;display:inline-block; }
     .merch-swatch.black { background:#171717; }.merch-swatch.yellow { background:#f2df4a; }.merch-swatch.mint { background:#91d8bd; }.merch-swatch.gray { background:#aaa; }
@@ -132,7 +133,7 @@
       .brand { width:108px; }
       .topbar nav { margin-left:auto;gap:7px; }
       .topbar nav a { display:none !important; }
-      .topbar nav a[href="#taplist"] { display:inline-flex !important;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:999px;padding:7px 10px;background:var(--white);box-shadow:2px 2px 0 var(--ink);font-size:.7rem;line-height:1;text-decoration:none; }
+      .topbar nav a[href="#taplist"],.topbar nav a[href="#merch"] { display:inline-flex !important;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:999px;padding:7px 10px;background:var(--white);box-shadow:2px 2px 0 var(--ink);font-size:.7rem;line-height:1;text-decoration:none; }
       .mobile-quick { display:block;padding:26px 16px 30px;background:var(--yellow);border-bottom:var(--border); }
       .mobile-quick-inner { max-width:560px;margin:0 auto; }
       .mobile-quick .eyebrow { margin-bottom:7px; }
@@ -240,12 +241,12 @@
       </div>
       <div class="merch-shell">
         <div class="merch-photo">
-          <img src="https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400" alt="Temporary generic T-shirt photo">
-          <div class="merch-photo-note">Temporary photo</div>
+          <img id="merch-image" src="https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400" alt="Temporary generic T-shirt photo">
+          <div class="merch-photo-note" id="merch-photo-note">Temporary photo</div>
         </div>
         <div class="merch-detail">
           <h3>THE TEE</h3>
-          <p class="merch-price">$32</p>
+          <p class="merch-price" id="merch-price">$32</p>
           <p>Our everyday Howzit tee. Choose from Black, Yellow, Mint or Heather Gray in sizes S through 2XL.</p>
 
           <span class="merch-label">Color</span>
@@ -266,8 +267,8 @@
           </div>
 
           <div class="merch-selection" id="merch-selection">Black · M · $32</div>
-          <button class="button merch-buy" type="button" id="merch-buy">Add to Cart — $32</button>
-          <p class="merch-status" id="merch-status"></p>
+          <button class="button merch-buy" type="button" id="merch-buy" disabled>Add to Cart — $32</button>
+          <p class="merch-status" id="merch-status">Loading live inventory...</p>
         </div>
       </div>
     </section>
@@ -383,33 +384,132 @@
 
   <script>
     (() => {
+      const PRODUCT_ENDPOINT = '/.netlify/functions/merch-product';
+      const fallbackImage = 'https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400';
+
+      let product = null;
       let color = 'Black';
       let size = 'M';
+
       const selection = document.getElementById('merch-selection');
       const status = document.getElementById('merch-status');
-      function refresh() {
-        selection.textContent = color + ' · ' + size + ' · $32';
-        status.textContent = '';
+      const buy = document.getElementById('merch-buy');
+      const priceEl = document.getElementById('merch-price');
+      const imageEl = document.getElementById('merch-image');
+      const imageNote = document.getElementById('merch-photo-note');
+
+      function money(cents) {
+        const value = Number(cents || 0) / 100;
+        return '$' + (Number.isInteger(value) ? value.toFixed(0) : value.toFixed(2));
       }
+
+      function variationFor(c, z) {
+        return product && product.variations
+          ? product.variations.find((v) => v.color === c && v.size === z)
+          : null;
+      }
+
+      function markActive(groupId, value) {
+        document.querySelectorAll('#' + groupId + ' .merch-option').forEach((button) => {
+          button.classList.toggle('active', button.dataset.value === value);
+        });
+      }
+
+      function setImage(variation) {
+        const liveImage = (variation && variation.image) || (product && product.image);
+        imageEl.src = liveImage || fallbackImage;
+        imageEl.alt = liveImage ? ('Howzit Tee - ' + color) : 'Temporary generic T-shirt photo';
+        imageNote.style.display = liveImage ? 'none' : 'block';
+      }
+
+      function refreshSizes() {
+        const sizeButtons = [...document.querySelectorAll('#merch-sizes .merch-option')];
+        sizeButtons.forEach((button) => {
+          const variation = variationFor(color, button.dataset.value);
+          button.disabled = !(variation && variation.available);
+        });
+
+        const current = variationFor(color, size);
+        if (!(current && current.available)) {
+          const firstAvailable = sizeButtons.find((button) => !button.disabled);
+          if (firstAvailable) size = firstAvailable.dataset.value;
+        }
+        markActive('merch-sizes', size);
+      }
+
+      function refresh() {
+        if (!product) return;
+        refreshSizes();
+
+        const variation = variationFor(color, size);
+        const priceCents = (variation && variation.priceCents) || product.priceCents || 3200;
+        const price = money(priceCents);
+
+        selection.textContent = color + ' / ' + size + ' / ' + price;
+        priceEl.textContent = price;
+        buy.textContent = 'Add to Cart - ' + price;
+        buy.disabled = !(variation && variation.available && variation.id);
+        setImage(variation);
+
+        if (variation && variation.ambiguous) {
+          status.textContent = 'That option needs cleanup in Square before it can be sold online.';
+        } else if (variation && variation.missing) {
+          status.textContent = 'That option is not set up in Square yet.';
+        } else if (variation && !variation.available) {
+          status.textContent = 'Sold out online.';
+        } else {
+          status.textContent = '';
+        }
+      }
+
       document.querySelectorAll('#merch-colors .merch-option').forEach((button) => {
         button.addEventListener('click', () => {
-          document.querySelectorAll('#merch-colors .merch-option').forEach((b) => b.classList.remove('active'));
-          button.classList.add('active');
           color = button.dataset.value;
+          markActive('merch-colors', color);
           refresh();
         });
       });
+
       document.querySelectorAll('#merch-sizes .merch-option').forEach((button) => {
         button.addEventListener('click', () => {
-          document.querySelectorAll('#merch-sizes .merch-option').forEach((b) => b.classList.remove('active'));
-          button.classList.add('active');
+          if (button.disabled) return;
           size = button.dataset.value;
+          markActive('merch-sizes', size);
           refresh();
         });
       });
-      document.getElementById('merch-buy').addEventListener('click', () => {
-        status.textContent = 'Preview only — Square checkout is not connected on this page yet.';
+
+      buy.addEventListener('click', () => {
+        status.textContent = 'Square checkout wiring is the final step; no charge can occur from this preview yet.';
       });
+
+      async function loadProduct() {
+        try {
+          const response = await fetch(PRODUCT_ENDPOINT + '?v=' + Date.now(), { cache: 'no-store' });
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error || 'Inventory unavailable');
+          product = data;
+
+          const firstAvailable = product.variations.find((v) => v.available && v.id);
+          if (firstAvailable) {
+            color = firstAvailable.color;
+            size = firstAvailable.size;
+          }
+
+          markActive('merch-colors', color);
+          refresh();
+
+          if (!firstAvailable) {
+            status.textContent = 'No tee variations are currently ready for online sale.';
+          }
+        } catch (error) {
+          console.error('Merch inventory load failed', error);
+          status.textContent = 'Live Square inventory is unavailable right now.';
+          buy.disabled = true;
+        }
+      }
+
+      loadProduct();
     })();
   </script>
   <script src="/events.js" defer></script>
