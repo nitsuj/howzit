@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#f7ee69" />
+  <title>Howzit Brewing — Merch Mock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#111111;--cream:#fff8e8;--yellow:#f7ee69;--aqua:#69d8d1;--coral:#ff654f;
+      --pink:#f2a8d5;--purple:#7555e8;--white:#fffdf8;--border:3px solid var(--ink);--shadow:7px 7px 0 var(--ink);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;color:var(--ink);background:var(--cream);font-family:"DM Sans",system-ui,sans-serif;font-size:17px;line-height:1.45}
+    a{color:inherit}
+    button{font:inherit;color:inherit}
+    img{max-width:100%;display:block}
+    .display{margin:0;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:-.05em;line-height:.91}
+    .eyebrow{font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.78rem}
+    .bubble-mark{display:block;background:currentColor;-webkit-mask:url("/bubble.svg") center/contain no-repeat;mask:url("/bubble.svg") center/contain no-repeat;aspect-ratio:983/533}
+    .topbar{position:sticky;top:0;z-index:30;min-height:78px;display:flex;align-items:center;gap:28px;padding:10px 24px;border-bottom:var(--border);background:rgba(255,248,232,.97);backdrop-filter:blur(8px)}
+    .brand{margin-right:auto;display:block;width:154px;color:var(--coral)}
+    .brand .bubble-mark{width:100%}
+    .topbar nav{display:flex;gap:22px;align-items:center}
+    .topbar nav a{text-decoration:none;font-weight:900;font-size:.9rem;text-transform:uppercase}
+    .nav-cta{border:var(--border);border-radius:999px;padding:9px 15px;background:var(--coral);box-shadow:4px 4px 0 var(--ink)}
+    .mock-note{padding:9px 18px;background:var(--ink);color:var(--cream);font-weight:900;text-transform:uppercase;text-align:center;font-size:.75rem;letter-spacing:.06em}
+    .context{padding:48px clamp(20px,5vw,72px);background:var(--aqua);border-bottom:var(--border)}
+    .context h1{font-size:clamp(3rem,7vw,6rem);color:var(--purple)}
+    .context p{max-width:680px;font-weight:800;margin:18px 0 0}
+    .section{padding:clamp(58px,8vw,100px) clamp(20px,5vw,72px);border-bottom:var(--border)}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:36px}
+    .section-title{font-size:clamp(3rem,7vw,6rem)}
+    .section-copy{max-width:560px;font-weight:800}
+    .merch-home{background:var(--yellow)}
+    .merch-home .section-title{color:var(--coral)}
+    .merch-card{max-width:1040px;margin:auto;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);background:var(--white);border:var(--border);border-radius:30px;overflow:hidden;box-shadow:var(--shadow)}
+    .merch-image{position:relative;background:var(--pink);min-height:500px;padding:28px;display:grid;place-items:center;border-right:var(--border)}
+    .merch-image img{width:100%;height:100%;max-height:560px;object-fit:cover;border:var(--border);border-radius:20px}
+    .image-flag{position:absolute;left:42px;bottom:42px;background:var(--yellow);border:2px solid var(--ink);border-radius:999px;padding:7px 11px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:.67rem;box-shadow:3px 3px 0 var(--ink)}
+    .merch-info{padding:clamp(28px,5vw,52px);display:flex;flex-direction:column;justify-content:center}
+    .merch-info h2{font-size:clamp(2.3rem,5vw,4.5rem);color:var(--purple);margin:8px 0 12px}
+    .price{font-family:"Archivo Black",Impact,sans-serif;font-size:2rem;margin:0 0 18px}
+    .swatches{display:flex;gap:11px;margin:10px 0 22px;align-items:center;flex-wrap:wrap}
+    .swatch{width:36px;height:36px;border:3px solid var(--ink);border-radius:50%;box-shadow:2px 2px 0 var(--ink)}
+    .swatch.black{background:#151515}.swatch.yellow{background:#f2df4a}.swatch.mint{background:#93d8bd}.swatch.gray{background:#a9a9a9}
+    .button{display:inline-block;width:max-content;border:var(--border);border-radius:999px;padding:12px 18px;font-weight:900;text-transform:uppercase;text-decoration:none;background:var(--coral);box-shadow:4px 4px 0 var(--ink);cursor:pointer}
+    .button.alt{background:var(--aqua)}
+    .product{background:var(--cream)}
+    .product-shell{max-width:1180px;margin:auto;display:grid;grid-template-columns:1fr 1fr;border:var(--border);border-radius:30px;overflow:hidden;box-shadow:var(--shadow);background:var(--white)}
+    .product-media{background:var(--aqua);padding:28px;border-right:var(--border)}
+    .product-media img{width:100%;aspect-ratio:1/1;object-fit:cover;border:var(--border);border-radius:22px;background:#eee}
+    .product-detail{padding:clamp(28px,5vw,54px)}
+    .product-detail h2{font-size:clamp(2.5rem,5vw,4.8rem);color:var(--purple);margin:8px 0 12px}
+    .label{display:block;margin:24px 0 9px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:.82rem;letter-spacing:.05em}
+    .choice-row{display:flex;flex-wrap:wrap;gap:10px}
+    .choice{border:2px solid var(--ink);background:var(--white);border-radius:999px;padding:9px 14px;font-weight:900;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+    .choice.active{background:var(--yellow);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+    .color-choice{display:inline-flex;align-items:center;gap:8px}
+    .dot{width:18px;height:18px;border:2px solid var(--ink);border-radius:50%;display:inline-block}
+    .dot.black{background:#151515}.dot.yellow{background:#f2df4a}.dot.mint{background:#93d8bd}.dot.gray{background:#a9a9a9}
+    .selection{margin:24px 0 18px;padding:14px 16px;border:2px dashed var(--ink);border-radius:16px;background:var(--cream);font-weight:800}
+    .cart-button{width:100%;text-align:center;font-size:1rem}
+    .mock-response{min-height:24px;margin:13px 0 0;font-weight:900;color:var(--purple)}
+    .upcoming-placeholder{background:var(--yellow)}
+    .placeholder-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1300px;margin:auto}
+    .placeholder-card{height:150px;border:var(--border);border-radius:24px;background:var(--white);box-shadow:5px 5px 0 var(--ink)}
+    footer{padding:34px clamp(20px,5vw,72px);background:var(--ink);color:var(--cream);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    @media(max-width:800px){
+      .topbar{min-height:64px;padding:8px 12px}.brand{width:108px}.topbar nav a:not(.nav-cta){display:none}.nav-cta{font-size:.72rem!important;padding:7px 10px}
+      .section-head{display:block}.section-copy{margin-top:12px}
+      .merch-card,.product-shell{grid-template-columns:1fr}
+      .merch-image,.product-media{border-right:0;border-bottom:var(--border);min-height:0}
+      .merch-image{padding:18px}.image-flag{left:30px;bottom:30px}
+      .product-media{padding:18px}
+      .placeholder-grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="mock-note">Private-ish mock page · not linked from the live homepage · checkout is not wired yet</div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Back to Howzit Brewing"><span class="bubble-mark" aria-hidden="true"></span></a>
+    <nav>
+      <a href="#placement">Merch placement</a>
+      <a href="#product">Product page</a>
+      <a class="nav-cta" href="/" >Back to live site</a>
+    </nav>
+  </header>
+
+  <section class="context">
+    <div class="eyebrow">Homepage flow mock</div>
+    <h1 class="display">Tap List → Merch → Upcoming</h1>
+    <p>This is a standalone preview so we can judge the ecommerce experience before touching the live homepage. The tee image is temporary.</p>
+  </section>
+
+  <section class="section merch-home" id="placement">
+    <div class="section-head">
+      <h2 class="display section-title">Merch</h2>
+      <div class="section-copy">One product on the homepage. Four colorways live behind it. Keeps the site feeling like Howzit, not a generic online store.</div>
+    </div>
+
+    <article class="merch-card">
+      <div class="merch-image">
+        <img src="https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=900&w=1200" alt="Temporary generic t-shirt mock image">
+        <div class="image-flag">Temporary image</div>
+      </div>
+      <div class="merch-info">
+        <div class="eyebrow">Howzit goods</div>
+        <h2 class="display">Howzit Tee</h2>
+        <p class="price">$32</p>
+        <p>Our everyday Howzit tee. Four colors, sizes S–2XL. Real product photos will replace this placeholder before launch.</p>
+        <div class="swatches" aria-label="Available colors">
+          <span class="swatch black" title="Black"></span>
+          <span class="swatch yellow" title="Yellow"></span>
+          <span class="swatch mint" title="Mint"></span>
+          <span class="swatch gray" title="Heather Gray"></span>
+        </div>
+        <a class="button" href="#product">Shop Tee</a>
+      </div>
+    </article>
+  </section>
+
+  <section class="section product" id="product">
+    <div class="section-head">
+      <h2 class="display section-title" style="color:var(--purple)">Product Page</h2>
+      <div class="section-copy">This is the interaction I’d use once we connect the approved Square variations and inventory.</div>
+    </div>
+
+    <div class="product-shell">
+      <div class="product-media">
+        <img src="https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=900&w=1200" alt="Temporary generic t-shirt mock image">
+      </div>
+      <div class="product-detail">
+        <div class="eyebrow">Howzit Brewing</div>
+        <h2 class="display">Howzit Tee</h2>
+        <p class="price">$32</p>
+        <p>Pick your color and size. When this is live, Square inventory will determine which combinations can actually be purchased.</p>
+
+        <span class="label">Color</span>
+        <div class="choice-row" id="colors">
+          <button class="choice color-choice active" data-value="Black"><span class="dot black"></span>Black</button>
+          <button class="choice color-choice" data-value="Yellow"><span class="dot yellow"></span>Yellow</button>
+          <button class="choice color-choice" data-value="Mint"><span class="dot mint"></span>Mint</button>
+          <button class="choice color-choice" data-value="Heather Gray"><span class="dot gray"></span>Heather Gray</button>
+        </div>
+
+        <span class="label">Size</span>
+        <div class="choice-row" id="sizes">
+          <button class="choice" data-value="S">S</button>
+          <button class="choice active" data-value="M">M</button>
+          <button class="choice" data-value="L">L</button>
+          <button class="choice" data-value="XL">XL</button>
+          <button class="choice" data-value="2XL">2XL</button>
+        </div>
+
+        <div class="selection" id="selection">Black · M · $32</div>
+        <button class="button cart-button" id="cart">Add to Cart — $32</button>
+        <p class="mock-response" id="response"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section upcoming-placeholder">
+    <div class="section-head">
+      <h2 class="display section-title" style="color:var(--coral)">Upcoming</h2>
+      <div class="section-copy">Your existing events section would continue immediately after Merch.</div>
+    </div>
+    <div class="placeholder-grid" aria-hidden="true">
+      <div class="placeholder-card"></div><div class="placeholder-card"></div><div class="placeholder-card"></div><div class="placeholder-card"></div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Howzit Brewing</strong><br>330 Kamani Street · Honolulu, Hawaiʻi</div>
+    <div>Shopping mock · noindex</div>
+  </footer>
+
+  <script>
+    let color = 'Black';
+    let size = 'M';
+    const selection = document.getElementById('selection');
+    const response = document.getElementById('response');
+
+    function updateSelection(){
+      selection.textContent = color + ' · ' + size + ' · $32';
+      response.textContent = '';
+    }
+
+    document.querySelectorAll('#colors .choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#colors .choice').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        color = btn.dataset.value;
+        updateSelection();
+      });
+    });
+
+    document.querySelectorAll('#sizes .choice').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#sizes .choice').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        size = btn.dataset.value;
+        updateSelection();
+      });
+    });
+
+    document.getElementById('cart').addEventListener('click', () => {
+      response.textContent = 'Mock only — this is where Square cart / checkout gets wired.';
+    });
+  </script>
+</body>
+</html>
