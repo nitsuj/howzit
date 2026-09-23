@@ -203,8 +203,8 @@
         return `<article class="event-card"><div class="event-date">${esc(meta)}</div><h3>${esc(e.event)}</h3>${e.description ? `<p>${formatEventDescription(e.description)}</p>` : ''}${recurring}</article>`;
       }).join('')}</div>`;
 
-    const taplist = document.getElementById('taplist');
-    if (taplist) taplist.insertAdjacentElement('afterend', section);
+    const anchor = document.getElementById('merch') || document.getElementById('taplist');
+    if (anchor) anchor.insertAdjacentElement('afterend', section);
 
     const nav = document.querySelector('.topbar nav');
     if (nav && !nav.querySelector('a[href="#events"]')) {
