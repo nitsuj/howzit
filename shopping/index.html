@@ -146,6 +146,10 @@
     .cart-body { flex:1;overflow:auto;padding:16px; }
     .cart-empty { padding:28px 12px;text-align:center;font-weight:900; }
     .cart-row { display:grid;grid-template-columns:78px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:2px solid var(--ink); }
+    .cart-upsell { margin:16px 0 4px;padding:14px;border:2px solid var(--ink);border-radius:18px;background:var(--aqua);box-shadow:3px 3px 0 var(--ink); }
+    .cart-upsell-title { margin:0 0 4px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:1.05rem; }
+    .cart-upsell-copy { margin:0 0 10px;font-size:.82rem;font-weight:800;line-height:1.35; }
+    .cart-upsell button { width:100%;font:inherit;cursor:pointer; }
     .cart-thumb { width:78px;height:78px;object-fit:cover;border:2px solid var(--ink);border-radius:14px;background:var(--pink); }
     .cart-item-title { margin:0 0 3px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;line-height:1; }
     .cart-item-meta { margin:0 0 10px;font-size:.84rem;font-weight:800; }
@@ -332,20 +336,6 @@
         </div>
       </div>
 
-      <div class="merch-addons">
-        <article class="merch-addon-card" id="sticker-card" hidden>
-          <div class="merch-addon-art" id="sticker-art">
-            <span class="bubble-mark" aria-hidden="true"></span>
-          </div>
-          <div class="merch-addon-copy">
-            <h3 id="sticker-name">Howzit Sticker</h3>
-            <p class="merch-addon-price" id="sticker-price">$1</p>
-            <p>A little Howzit for the cooler, board, laptop, whatever.</p>
-            <button class="button merch-addon-buy" type="button" id="sticker-buy">Add to Cart — $1</button>
-            <p class="merch-status" id="sticker-status"></p>
-          </div>
-        </article>
-      </div>
     </section>
 
     <section id="visit">
@@ -484,12 +474,6 @@
       const cartSubtotal = document.getElementById('cart-subtotal');
       const cartCheckout = document.getElementById('cart-checkout');
       const cartStatus = document.getElementById('cart-status');
-      const stickerCard = document.getElementById('sticker-card');
-      const stickerArt = document.getElementById('sticker-art');
-      const stickerName = document.getElementById('sticker-name');
-      const stickerPrice = document.getElementById('sticker-price');
-      const stickerBuy = document.getElementById('sticker-buy');
-      const stickerStatus = document.getElementById('sticker-status');
 
       function money(cents) {
         const value = Number(cents || 0) / 100;
@@ -546,18 +530,28 @@
 
       function renderCart() {
         const count = cartQty();
+        const hasTee = cart.some((item) => item.kind !== 'sticker');
+        const hasSticker = cart.some((item) => item.kind === 'sticker');
+        const stickerOnlyMessage = 'Stickers are available as an add-on with a tee order.';
+
         cartCount.textContent = String(count);
         cartCount.style.display = count ? 'inline-grid' : 'none';
         cartToggle.classList.toggle('has-items', count > 0);
         cartSubtotal.textContent = money(cartSubtotalCents());
-        cartCheckout.disabled = !cart.length;
+        cartCheckout.disabled = !cart.length || !hasTee;
+
+        if (cart.length && !hasTee) {
+          cartStatus.textContent = stickerOnlyMessage;
+        } else if (cartStatus.textContent === stickerOnlyMessage) {
+          cartStatus.textContent = '';
+        }
 
         if (!cart.length) {
           cartBody.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
           return;
         }
 
-        cartBody.innerHTML = cart.map((item) => {
+        const rows = cart.map((item) => {
           const image = item.image || fallbackImage;
           const title = item.kind === 'sticker' ? (item.name || 'Howzit Sticker') : 'The Tee';
           const meta = item.kind === 'sticker'
@@ -581,6 +575,17 @@
             '</div>' +
           '</div>';
         }).join('');
+
+        const sticker = product && product.sticker;
+        const upsell = hasTee && !hasSticker && sticker && sticker.available
+          ? '<div class="cart-upsell">' +
+              '<p class="cart-upsell-title">Want a sticker?</p>' +
+              '<p class="cart-upsell-copy">Throw a small Howzit sticker in the order while we are already shipping your tee.</p>' +
+              '<button class="button" type="button" data-action="add-sticker">Add a sticker — ' + money(sticker.priceCents) + '</button>' +
+            '</div>'
+          : '';
+
+        cartBody.innerHTML = rows + upsell;
       }
 
       function reconcileCart() {
@@ -602,6 +607,8 @@
           const live = product.variations.find((v) => v.id === item.variationId);
           if (!live || !live.available) return null;
           return {
+            kind: 'tee',
+            name: 'The Tee',
             variationId: live.id,
             color: live.color,
             size: live.size,
@@ -647,6 +654,11 @@
       }
 
       function addStickerToCart() {
+        const hasTee = cart.some((item) => item.kind !== 'sticker');
+        if (!hasTee) {
+          cartStatus.textContent = 'Stickers are available as an add-on with a tee order.';
+          return;
+        }
         if (!(product && product.sticker && product.sticker.available && product.sticker.id)) return;
         const sticker = product.sticker;
         const existing = cart.find((item) => item.variationId === sticker.id);
@@ -674,42 +686,6 @@
         saveCart();
         cartStatus.textContent = '';
         openCart();
-      }
-
-      function renderSticker() {
-        const sticker = product && product.sticker;
-        if (!sticker) {
-          stickerCard.hidden = true;
-          return;
-        }
-
-        stickerCard.hidden = false;
-        stickerName.textContent = sticker.name || 'Howzit Sticker';
-        stickerPrice.textContent = money(sticker.priceCents);
-        stickerBuy.textContent = 'Add to Cart - ' + money(sticker.priceCents);
-        stickerBuy.disabled = !sticker.available;
-
-        if (sticker.available) {
-          stickerStatus.textContent = '';
-        } else {
-          const states = Array.isArray(sticker.inventoryStates) ? sticker.inventoryStates : [];
-          const liveStates = states.filter((entry) => entry.quantity !== 0);
-          const tracking = sticker.trackInventory ? 'tracking ON' : 'tracking OFF';
-
-          if (liveStates.length) {
-            stickerStatus.textContent = 'Square: ' + tracking + '. Inventory states: ' +
-              liveStates.map((entry) =>
-                entry.state + ' ' + entry.quantity + ' @ ' + entry.locationName
-              ).join(', ') + '.';
-          } else {
-            stickerStatus.textContent = 'Square: ' + tracking +
-              '. API is returning no non-zero inventory state for sticker / regular.';
-          }
-        }
-
-        if (sticker.image) {
-          stickerArt.innerHTML = '<img src="' + sticker.image + '" alt="' + (sticker.name || 'Howzit Sticker') + '">';
-        }
       }
 
       function markActive(groupId, value) {
@@ -778,7 +754,6 @@
       });
 
       buy.addEventListener('click', addSelectedToCart);
-      stickerBuy.addEventListener('click', addStickerToCart);
       cartToggle.addEventListener('click', openCart);
       cartClose.addEventListener('click', closeCart);
       cartBackdrop.addEventListener('click', closeCart);
@@ -789,6 +764,12 @@
       cartBody.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-action]');
         if (!button) return;
+
+        if (button.dataset.action === 'add-sticker') {
+          addStickerToCart();
+          return;
+        }
+
         const row = button.closest('.cart-row');
         const item = row && cart.find((candidate) => candidate.variationId === row.dataset.id);
         if (!item) return;
@@ -809,6 +790,12 @@
 
       cartCheckout.addEventListener('click', async () => {
         if (!cart.length) return;
+        const hasTee = cart.some((item) => item.kind !== 'sticker');
+        if (!hasTee) {
+          cartStatus.textContent = 'Stickers are available as an add-on with a tee order.';
+          renderCart();
+          return;
+        }
         cartCheckout.disabled = true;
         cartCheckout.textContent = 'Opening Square...';
         cartStatus.textContent = 'Opening secure checkout...';
@@ -859,7 +846,6 @@
           }
 
           product = data;
-          renderSticker();
           reconcileCart();
 
           const firstAvailable = product.variations.find((v) => v.available && v.id);
