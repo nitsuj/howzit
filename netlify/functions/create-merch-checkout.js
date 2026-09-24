@@ -136,7 +136,13 @@ async function validateVariation(line, token) {
   const parentDisplayName = (parent.item_data && parent.item_data.name) || '';
   const parentName = normalize(parentDisplayName);
 
-  if (parentName.includes('sticker')) {
+  if (parentName === 'sticker') {
+    if (normalize(data.name) !== 'regular') {
+      const err = new Error('Sticker variation is not approved for web sale');
+      err.publicStatus = 400;
+      throw err;
+    }
+
     return {
       variationId: line.variationId,
       quantity: line.quantity,
@@ -247,6 +253,19 @@ exports.handler = async function (event) {
     const validated = [];
     for (const line of cart) {
       validated.push(await validateVariation(line, token));
+    }
+
+    const hasTee = validated.some(function (line) { return line.kind === 'tee'; });
+    const hasSticker = validated.some(function (line) { return line.kind === 'sticker'; });
+
+    if (hasSticker && !hasTee) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          error: 'Stickers are available as an add-on with a tee order.'
+        })
+      };
     }
 
     const ids = validated.map(function (line) { return line.variationId; });
