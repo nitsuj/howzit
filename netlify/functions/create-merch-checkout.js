@@ -58,7 +58,8 @@ async function square(path, token, options) {
       return {
         code: e.code || null,
         category: e.category || null,
-        detail: e.detail || null
+        detail: e.detail || null,
+        field: e.field || null
       };
     });
     throw err;
@@ -155,7 +156,14 @@ exports.handler = async function (event) {
 
   const token = process.env.SQUARE_ACCESS_TOKEN;
   const locationId = process.env.SQUARE_LOCATION_ID;
-  const shippingCents = Number(process.env.MERCH_SHIPPING_CENTS || 995);
+  const rawShipping = String(process.env.MERCH_SHIPPING_CENTS || '995').trim();
+  let shippingCents = Number(rawShipping);
+  if (rawShipping.includes('.') && shippingCents > 0 && shippingCents < 100) {
+    shippingCents = Math.round(shippingCents * 100);
+  }
+  if (!Number.isInteger(shippingCents) || shippingCents <= 0) {
+    shippingCents = 995;
+  }
 
   if (!token || !locationId) {
     return {
