@@ -202,17 +202,16 @@ exports.handler = async function (event) {
   const stickerCandidates = [];
   items.forEach(function (candidate) {
     const itemName = (candidate.item_data && candidate.item_data.name) || '';
-    if (!normalize(itemName).includes('sticker')) return;
+    if (normalize(itemName) !== 'sticker') return;
 
     ((candidate.item_data && candidate.item_data.variations) || []).forEach(function (variation) {
       const data = variation.item_variation_data || {};
-      const priceCents = Number((data.price_money && data.price_money.amount) || 0);
       stickerCandidates.push({
         itemId: candidate.id,
         itemName: itemName,
         id: variation.id,
         variationName: data.name || '',
-        priceCents: priceCents,
+        priceCents: Number((data.price_money && data.price_money.amount) || 0),
         imageId: (data.image_ids && data.image_ids[0]) ||
           ((candidate.item_data && candidate.item_data.image_ids && candidate.item_data.image_ids[0]) || null)
       });
@@ -220,7 +219,7 @@ exports.handler = async function (event) {
   });
 
   const stickerMatch = stickerCandidates.find(function (candidate) {
-    return candidate.priceCents === 100;
+    return normalize(candidate.variationName) === 'regular';
   }) || null;
 
   const parsed = rawVariations.map(function (variation) {
@@ -337,6 +336,7 @@ exports.handler = async function (event) {
         stickerCandidates: stickerCandidates.map(function (candidate) {
           return candidate.itemName + ' / ' + candidate.variationName + ' / ' + candidate.priceCents;
         }).slice(0, 10),
+        matchedSticker: stickerMatch ? (stickerMatch.itemName + ' / ' + stickerMatch.variationName) : null,
         inventoryError: inventoryError
       }
     })
