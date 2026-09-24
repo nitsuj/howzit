@@ -692,15 +692,18 @@
         if (sticker.available) {
           stickerStatus.textContent = '';
         } else {
-          const locations = Array.isArray(sticker.inventoryByLocation)
-            ? sticker.inventoryByLocation.filter((entry) => entry.quantity > 0)
-            : [];
-          if (locations.length) {
-            stickerStatus.textContent = 'Square shows stock at ' + locations.map((entry) =>
-              entry.locationName + ' (' + entry.quantity + ')'
-            ).join(', ') + ', but 0 at the website location.';
+          const states = Array.isArray(sticker.inventoryStates) ? sticker.inventoryStates : [];
+          const liveStates = states.filter((entry) => entry.quantity !== 0);
+          const tracking = sticker.trackInventory ? 'tracking ON' : 'tracking OFF';
+
+          if (liveStates.length) {
+            stickerStatus.textContent = 'Square: ' + tracking + '. Inventory states: ' +
+              liveStates.map((entry) =>
+                entry.state + ' ' + entry.quantity + ' @ ' + entry.locationName
+              ).join(', ') + '.';
           } else {
-            stickerStatus.textContent = 'Square is reporting 0 in stock for this variation at the website location.';
+            stickerStatus.textContent = 'Square: ' + tracking +
+              '. API is returning no non-zero inventory state for sticker / regular.';
           }
         }
 
