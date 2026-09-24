@@ -385,6 +385,7 @@
   <script>
     (() => {
       const PRODUCT_ENDPOINT = '/.netlify/functions/merch-product';
+      const CHECKOUT_ENDPOINT = '/.netlify/functions/create-merch-checkout';
       const fallbackImage = 'https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400';
 
       let product = null;
@@ -480,8 +481,42 @@
         });
       });
 
-      buy.addEventListener('click', () => {
-        status.textContent = 'Square checkout wiring is the final step; no charge can occur from this preview yet.';
+      buy.addEventListener('click', async () => {
+        const variation = variationFor(color, size);
+        if (!(variation && variation.available && variation.id)) return;
+
+        const originalText = buy.textContent;
+        buy.disabled = true;
+        buy.textContent = 'Opening Square...';
+        status.textContent = 'Opening secure Square checkout...';
+
+        try {
+          const response = await fetch(CHECKOUT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              variationId: variation.id,
+              quantity: 1
+            })
+          });
+          const data = await response.json();
+
+          if (!response.ok || !data.checkoutUrl) {
+            const details = [];
+            if (data.squareStatus) details.push('Square HTTP ' + data.squareStatus);
+            if (Array.isArray(data.squareErrors) && data.squareErrors.length) {
+              details.push(data.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
+            }
+            throw new Error((data.error || 'Checkout unavailable') + (details.length ? ' (' + details.join('; ') + ')' : ''));
+          }
+
+          window.location.assign(data.checkoutUrl);
+        } catch (error) {
+          console.error('Merch checkout failed', error);
+          status.textContent = error.message || 'Checkout is temporarily unavailable.';
+          buy.disabled = false;
+          buy.textContent = originalText;
+        }
       });
 
       async function loadProduct() {
@@ -524,6 +559,8 @@
             }
             status.textContent = bits.join(' · ');
             buy.disabled = true;
+          } else if (new URLSearchParams(window.location.search).get('checkout') === 'success') {
+            status.textContent = 'Order complete — mahalo!';
           } else if (!firstAvailable) {
             status.textContent = 'No tee variations are currently ready for online sale.';
           }
