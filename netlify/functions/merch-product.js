@@ -292,7 +292,11 @@ exports.handler = async function (event) {
         variationName: data.name || '',
         priceCents: Number((data.price_money && data.price_money.amount) || 0),
         imageId: (data.image_ids && data.image_ids[0]) ||
-          ((candidate.item_data && candidate.item_data.image_ids && candidate.item_data.image_ids[0]) || null)
+          ((candidate.item_data && candidate.item_data.image_ids && candidate.item_data.image_ids[0]) || null),
+        trackInventory: data.track_inventory === true,
+        sellable: data.sellable !== false,
+        stockable: data.stockable !== false,
+        locationOverrides: data.location_overrides || []
       });
     });
   });
@@ -340,13 +344,13 @@ exports.handler = async function (event) {
   }
 
   let stickerInventoryByLocation = [];
+  let stickerInventoryStates = [];
   if (stickerMatch) {
     try {
       const allStickerInventory = await square('/v2/inventory/counts/batch-retrieve', token, {
         method: 'POST',
         body: JSON.stringify({
-          catalog_object_ids: [stickerMatch.id],
-          states: ['IN_STOCK']
+          catalog_object_ids: [stickerMatch.id]
         })
       });
 
@@ -355,18 +359,23 @@ exports.handler = async function (event) {
         locationNames[entry.id] = entry.name || entry.id;
       });
 
-      stickerInventoryByLocation = (allStickerInventory.counts || [])
+      stickerInventoryStates = (allStickerInventory.counts || [])
         .filter(function (count) {
-          return count.catalog_object_id === stickerMatch.id && count.state === 'IN_STOCK';
+          return count.catalog_object_id === stickerMatch.id;
         })
         .map(function (count) {
           return {
+            state: count.state,
             locationId: count.location_id,
             locationName: locationNames[count.location_id] || count.location_id,
             quantity: Number(count.quantity || 0),
+            calculatedAt: count.calculated_at || null,
             isWebsiteLocation: count.location_id === locationId
           };
         });
+
+      stickerInventoryByLocation = stickerInventoryStates
+        .filter(function (count) { return count.state === 'IN_STOCK'; });
     } catch (error) {
       console.error('sticker location diagnostics failed', error);
     }
@@ -424,6 +433,11 @@ exports.handler = async function (event) {
     available: (inventoryMap[stickerMatch.id] || 0) > 0,
     image: (stickerMatch.imageId && images[stickerMatch.imageId]) || null,
     inventoryByLocation: stickerInventoryByLocation,
+    inventoryStates: stickerInventoryStates,
+    trackInventory: stickerMatch.trackInventory,
+    sellable: stickerMatch.sellable,
+    stockable: stickerMatch.stockable,
+    locationOverrides: stickerMatch.locationOverrides,
     websiteLocationId: locationId,
     websiteLocationName: location.name
   } : null;
