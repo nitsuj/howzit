@@ -419,7 +419,8 @@
         const liveImage = (variation && variation.image) || (product && product.image);
         imageEl.src = liveImage || fallbackImage;
         imageEl.alt = liveImage ? ('Howzit Tee - ' + color) : 'Temporary generic T-shirt photo';
-        imageNote.style.display = liveImage ? 'none' : 'block';
+        imageNote.textContent = liveImage ? 'Live from Square' : 'Temporary photo';
+        imageNote.style.display = 'block';
       }
 
       function refreshSizes() {
