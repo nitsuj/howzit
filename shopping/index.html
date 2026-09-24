@@ -342,6 +342,7 @@
             <p class="merch-addon-price" id="sticker-price">$1</p>
             <p>A little Howzit for the cooler, board, laptop, whatever.</p>
             <button class="button merch-addon-buy" type="button" id="sticker-buy">Add to Cart — $1</button>
+            <p class="merch-status" id="sticker-status"></p>
           </div>
         </article>
       </div>
@@ -488,6 +489,7 @@
       const stickerName = document.getElementById('sticker-name');
       const stickerPrice = document.getElementById('sticker-price');
       const stickerBuy = document.getElementById('sticker-buy');
+      const stickerStatus = document.getElementById('sticker-status');
 
       function money(cents) {
         const value = Number(cents || 0) / 100;
@@ -686,6 +688,21 @@
         stickerPrice.textContent = money(sticker.priceCents);
         stickerBuy.textContent = 'Add to Cart - ' + money(sticker.priceCents);
         stickerBuy.disabled = !sticker.available;
+
+        if (sticker.available) {
+          stickerStatus.textContent = '';
+        } else {
+          const locations = Array.isArray(sticker.inventoryByLocation)
+            ? sticker.inventoryByLocation.filter((entry) => entry.quantity > 0)
+            : [];
+          if (locations.length) {
+            stickerStatus.textContent = 'Square shows stock at ' + locations.map((entry) =>
+              entry.locationName + ' (' + entry.quantity + ')'
+            ).join(', ') + ', but 0 at the website location.';
+          } else {
+            stickerStatus.textContent = 'Square is reporting 0 in stock for this variation at the website location.';
+          }
+        }
 
         if (sticker.image) {
           stickerArt.innerHTML = '<img src="' + sticker.image + '" alt="' + (sticker.name || 'Howzit Sticker') + '">';
