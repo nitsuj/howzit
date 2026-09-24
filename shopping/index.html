@@ -515,12 +515,21 @@
           markActive('merch-colors', color);
           refresh();
 
-          if (!firstAvailable) {
+          if (product.debug && product.debug.inventoryError) {
+            const err = product.debug.inventoryError;
+            const bits = ['Square image/catalog connected'];
+            if (err.squareStatus) bits.push('inventory HTTP ' + err.squareStatus);
+            if (Array.isArray(err.squareErrors) && err.squareErrors.length) {
+              bits.push(err.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
+            }
+            status.textContent = bits.join(' · ');
+            buy.disabled = true;
+          } else if (!firstAvailable) {
             status.textContent = 'No tee variations are currently ready for online sale.';
           }
         } catch (error) {
           console.error('Merch inventory load failed', error);
-          status.textContent = 'Live Square inventory is unavailable right now.';
+          status.textContent = error.message || 'Live Square inventory is unavailable right now.';
           buy.disabled = true;
         }
       }
