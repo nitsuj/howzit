@@ -690,7 +690,7 @@
         if (!cart.length) return;
         cartCheckout.disabled = true;
         cartCheckout.textContent = 'Opening Square...';
-        cartStatus.textContent = 'Rechecking inventory and opening secure checkout...';
+        cartStatus.textContent = 'Opening secure checkout...';
 
         try {
           const response = await fetch(CHECKOUT_ENDPOINT, {
