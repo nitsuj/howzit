@@ -5,6 +5,8 @@ const API = 'https://connect.squareup.com';
 const VERSION = '2026-09-16';
 const COLORS = ['Black', 'Yellow', 'Mint', 'Heather Gray'];
 const SIZES = ['S', 'M', 'L', 'XL', '2XL'];
+const MAX_LINES = 8;
+const MAX_TOTAL_QTY = 10;
 
 function headers(token) {
   return {
@@ -65,6 +67,83 @@ async function square(path, token, options) {
   return data;
 }
 
+function parseCart(body) {
+  let source = Array.isArray(body.items) ? body.items : [];
+
+  // Backward compatibility with the first prototype request shape.
+  if (!source.length && body.variationId) {
+    source = [{ variationId: body.variationId, quantity: body.quantity || 1 }];
+  }
+
+  const merged = new Map();
+
+  source.forEach(function (line) {
+    const variationId = String((line && line.variationId) || '').trim();
+    const quantity = Number((line && line.quantity) || 0);
+    if (!variationId || !Number.isInteger(quantity) || quantity < 1 || quantity > 5) return;
+    merged.set(variationId, (merged.get(variationId) || 0) + quantity);
+  });
+
+  return Array.from(merged.entries()).map(function (entry) {
+    return { variationId: entry[0], quantity: entry[1] };
+  });
+}
+
+async function validateVariation(line, token) {
+  const catalog = await square(
+    '/v2/catalog/object/' + encodeURIComponent(line.variationId) + '?include_related_objects=true',
+    token,
+    { method: 'GET' }
+  );
+
+  const variation = catalog.object;
+  const data = variation && variation.item_variation_data;
+  const parent = (catalog.related_objects || []).find(function (obj) {
+    return obj.type === 'ITEM' && data && obj.id === data.item_id;
+  });
+
+  if (!variation || variation.type !== 'ITEM_VARIATION' || !data || !parent) {
+    const err = new Error('Invalid product selection');
+    err.publicStatus = 400;
+    throw err;
+  }
+
+  const parentName = normalize(parent.item_data && parent.item_data.name);
+  if (!(parentName.includes('tee') || parentName.includes('shirt'))) {
+    const err = new Error('Item is not approved for web sale');
+    err.publicStatus = 400;
+    throw err;
+  }
+
+  const color = getColor(data.name);
+  const size = getSize(data.name);
+
+  if (!COLORS.includes(color) || !SIZES.includes(size)) {
+    const err = new Error('Variation is not approved for web sale');
+    err.publicStatus = 400;
+    throw err;
+  }
+
+  const parentVariations = (parent.item_data && parent.item_data.variations) || [];
+  const sameCombo = parentVariations.filter(function (candidate) {
+    const candidateData = candidate.item_variation_data || {};
+    return getColor(candidateData.name) === color && getSize(candidateData.name) === size;
+  });
+
+  if (sameCombo.length !== 1 || sameCombo[0].id !== line.variationId) {
+    const err = new Error('That color/size needs cleanup in Square before web sale');
+    err.publicStatus = 409;
+    throw err;
+  }
+
+  return {
+    variationId: line.variationId,
+    quantity: line.quantity,
+    color: color,
+    size: size
+  };
+}
+
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return {
@@ -97,111 +176,62 @@ exports.handler = async function (event) {
     };
   }
 
-  const variationId = String(body.variationId || '').trim();
-  const quantity = Number(body.quantity || 1);
+  const cart = parseCart(body);
+  const totalQty = cart.reduce(function (sum, line) { return sum + line.quantity; }, 0);
 
-  if (!variationId || !Number.isInteger(quantity) || quantity < 1 || quantity > 5) {
+  if (!cart.length || cart.length > MAX_LINES || totalQty < 1 || totalQty > MAX_TOTAL_QTY) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Invalid product selection' })
+      body: JSON.stringify({ error: 'Invalid cart' })
     };
   }
 
   try {
-    const catalog = await square(
-      '/v2/catalog/object/' + encodeURIComponent(variationId) + '?include_related_objects=true',
-      token,
-      { method: 'GET' }
-    );
-
-    const variation = catalog.object;
-    const variationData = variation && variation.item_variation_data;
-    const parent = (catalog.related_objects || []).find(function (obj) {
-      return obj.type === 'ITEM' && variationData && obj.id === variationData.item_id;
-    });
-
-    if (!variation || variation.type !== 'ITEM_VARIATION' || !variationData || !parent) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Invalid product selection' })
-      };
+    const validated = [];
+    for (const line of cart) {
+      validated.push(await validateVariation(line, token));
     }
 
-    const parentName = normalize(parent.item_data && parent.item_data.name);
-    if (!(parentName.includes('tee') || parentName.includes('shirt'))) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Item is not approved for web sale' })
-      };
-    }
-
-    const color = getColor(variationData.name);
-    const size = getSize(variationData.name);
-
-    if (!COLORS.includes(color) || !SIZES.includes(size)) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Variation is not approved for web sale' })
-      };
-    }
-
-    const parentVariations = (parent.item_data && parent.item_data.variations) || [];
-    const recognized = parentVariations.filter(function (candidate) {
-      const data = candidate.item_variation_data || {};
-      return COLORS.includes(getColor(data.name)) && SIZES.includes(getSize(data.name));
-    });
-
-    const comboSet = new Set(recognized.map(function (candidate) {
-      const data = candidate.item_variation_data || {};
-      return getColor(data.name) + '|' + getSize(data.name);
-    }));
-
-    if (comboSet.size < 10) {
-      return {
-        statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Item is not approved for web sale' })
-      };
-    }
-
-    const sameCombo = parentVariations.filter(function (candidate) {
-      const data = candidate.item_variation_data || {};
-      return getColor(data.name) === color && getSize(data.name) === size;
-    });
-
-    if (sameCombo.length !== 1 || sameCombo[0].id !== variationId) {
-      return {
-        statusCode: 409,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'That color/size needs cleanup in Square before web sale' })
-      };
-    }
-
+    const ids = validated.map(function (line) { return line.variationId; });
     const inventory = await square('/v2/inventory/counts/batch-retrieve', token, {
       method: 'POST',
       body: JSON.stringify({
-        catalog_object_ids: [variationId],
+        catalog_object_ids: ids,
         location_ids: [locationId],
         states: ['IN_STOCK']
       })
     });
 
-    const available = (inventory.counts || []).reduce(function (sum, count) {
-      if (count.catalog_object_id !== variationId || count.state !== 'IN_STOCK') return sum;
-      return sum + Number(count.quantity || 0);
-    }, 0);
+    const stock = {};
+    (inventory.counts || []).forEach(function (count) {
+      if (count.state !== 'IN_STOCK') return;
+      stock[count.catalog_object_id] =
+        (stock[count.catalog_object_id] || 0) + Number(count.quantity || 0);
+    });
 
-    if (available < quantity) {
-      return {
-        statusCode: 409,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'That size/color is sold out' })
-      };
+    for (const line of validated) {
+      if ((stock[line.variationId] || 0) < line.quantity) {
+        return {
+          statusCode: 409,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: line.color + ' / ' + line.size + ' does not have enough stock'
+          })
+        };
+      }
     }
+
+    const lineItems = validated.map(function (line) {
+      return {
+        quantity: String(line.quantity),
+        catalog_object_id: line.variationId
+      };
+    });
+
+    const note = validated.map(function (line) {
+      return line.quantity + 'x ' + line.color + ' / ' + line.size;
+    }).join(', ');
 
     const paymentLink = await square('/v2/online-checkout/payment-links', token, {
       method: 'POST',
@@ -210,10 +240,7 @@ exports.handler = async function (event) {
         description: 'Howzit website merch',
         order: {
           location_id: locationId,
-          line_items: [{
-            quantity: String(quantity),
-            catalog_object_id: variationId
-          }],
+          line_items: lineItems,
           pricing_options: {
             auto_apply_taxes: true
           }
@@ -231,7 +258,7 @@ exports.handler = async function (event) {
             }
           }
         },
-        payment_note: 'Howzit website merch: ' + color + ' / ' + size
+        payment_note: 'Howzit website merch: ' + note
       })
     });
 
@@ -248,12 +275,19 @@ exports.handler = async function (event) {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-store'
       },
-      body: JSON.stringify({
-        checkoutUrl: checkoutUrl
-      })
+      body: JSON.stringify({ checkoutUrl: checkoutUrl })
     };
   } catch (error) {
     console.error('create-merch-checkout failed', error);
+
+    if (error && error.publicStatus) {
+      return {
+        statusCode: error.publicStatus,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: error.message })
+      };
+    }
+
     return {
       statusCode: 502,
       headers: { 'Content-Type': 'application/json' },
