@@ -68,6 +68,30 @@ async function square(path, token, options) {
   return data;
 }
 
+async function resolveLocation(token, configuredLocationId) {
+  try {
+    const data = await square('/v2/locations', token, { method: 'GET' });
+    const locations = data.locations || [];
+    const active = locations.filter(function (location) {
+      return location.status === 'ACTIVE';
+    });
+
+    if (active.length === 1) return active[0];
+
+    const configured = active.find(function (location) {
+      return location.id === configuredLocationId;
+    });
+    if (configured) return configured;
+
+    if (active.length) return active[0];
+  } catch (error) {
+    console.error('checkout location resolution failed', error);
+  }
+
+  if (configuredLocationId) return { id: configuredLocationId, name: configuredLocationId };
+  throw new Error('No Square location available');
+}
+
 function parseCart(body) {
   let source = Array.isArray(body.items) ? body.items : [];
 
@@ -167,7 +191,7 @@ exports.handler = async function (event) {
   }
 
   const token = process.env.SQUARE_ACCESS_TOKEN;
-  const locationId = process.env.SQUARE_LOCATION_ID;
+  const configuredLocationId = process.env.SQUARE_LOCATION_ID;
   const rawShipping = String(process.env.MERCH_SHIPPING_CENTS || '995').trim();
   let shippingCents = Number(rawShipping);
   if (rawShipping.includes('.') && shippingCents > 0 && shippingCents < 100) {
@@ -177,13 +201,25 @@ exports.handler = async function (event) {
     shippingCents = 995;
   }
 
-  if (!token || !locationId) {
+  if (!token) {
     return {
       statusCode: 503,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Square is not configured' })
     };
   }
+
+  let location;
+  try {
+    location = await resolveLocation(token, configuredLocationId);
+  } catch (error) {
+    return {
+      statusCode: 503,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'No usable Square location found' })
+    };
+  }
+  const locationId = location.id;
 
   let body;
   try {
