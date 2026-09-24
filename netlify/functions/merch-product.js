@@ -82,6 +82,74 @@ async function listCatalog(token) {
   return objects;
 }
 
+async function resolveLocation(token, configuredLocationId) {
+  try {
+    const data = await square('/v2/locations', token, { method: 'GET' });
+    const locations = data.locations || [];
+    const active = locations.filter(function (location) {
+      return location.status === 'ACTIVE';
+    });
+
+    if (active.length === 1) {
+      return {
+        id: active[0].id,
+        name: active[0].name || active[0].id,
+        configuredId: configuredLocationId || null,
+        source: configuredLocationId === active[0].id ? 'configured' : 'single-active',
+        locations: locations
+      };
+    }
+
+    const configured = active.find(function (location) {
+      return location.id === configuredLocationId;
+    });
+
+    if (configured) {
+      return {
+        id: configured.id,
+        name: configured.name || configured.id,
+        configuredId: configuredLocationId || null,
+        source: 'configured',
+        locations: locations
+      };
+    }
+
+    if (configuredLocationId) {
+      return {
+        id: configuredLocationId,
+        name: configuredLocationId,
+        configuredId: configuredLocationId,
+        source: 'configured-fallback',
+        locations: locations
+      };
+    }
+
+    if (active.length) {
+      return {
+        id: active[0].id,
+        name: active[0].name || active[0].id,
+        configuredId: null,
+        source: 'first-active',
+        locations: locations
+      };
+    }
+  } catch (error) {
+    console.error('location resolution failed', error);
+  }
+
+  if (configuredLocationId) {
+    return {
+      id: configuredLocationId,
+      name: configuredLocationId,
+      configuredId: configuredLocationId,
+      source: 'configured-fallback',
+      locations: []
+    };
+  }
+
+  throw new Error('No Square location available');
+}
+
 function errorBody(error, stage) {
   return {
     error: 'Unable to load Square merch right now',
@@ -97,21 +165,32 @@ exports.handler = async function (event) {
   }
 
   const token = process.env.SQUARE_ACCESS_TOKEN;
-  const locationId = process.env.SQUARE_LOCATION_ID;
+  const configuredLocationId = process.env.SQUARE_LOCATION_ID;
 
-  if (!token || !locationId) {
+  if (!token) {
     return {
       statusCode: 503,
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       body: JSON.stringify({
         error: 'Square is not configured',
         missing: {
-          SQUARE_ACCESS_TOKEN: !token,
-          SQUARE_LOCATION_ID: !locationId
+          SQUARE_ACCESS_TOKEN: !token
         }
       })
     };
   }
+
+  let location;
+  try {
+    location = await resolveLocation(token, configuredLocationId);
+  } catch (error) {
+    return {
+      statusCode: 503,
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+      body: JSON.stringify({ error: 'No usable Square location found' })
+    };
+  }
+  const locationId = location.id;
 
   let objects;
   try {
@@ -271,10 +350,9 @@ exports.handler = async function (event) {
         })
       });
 
-      const locationsData = await square('/v2/locations', token, { method: 'GET' });
       const locationNames = {};
-      (locationsData.locations || []).forEach(function (location) {
-        locationNames[location.id] = location.name || location.id;
+      (location.locations || []).forEach(function (entry) {
+        locationNames[entry.id] = entry.name || entry.id;
       });
 
       stickerInventoryByLocation = (allStickerInventory.counts || [])
@@ -346,7 +424,8 @@ exports.handler = async function (event) {
     available: (inventoryMap[stickerMatch.id] || 0) > 0,
     image: (stickerMatch.imageId && images[stickerMatch.imageId]) || null,
     inventoryByLocation: stickerInventoryByLocation,
-    websiteLocationId: locationId
+    websiteLocationId: locationId,
+    websiteLocationName: location.name
   } : null;
 
   return {
@@ -369,6 +448,13 @@ exports.handler = async function (event) {
         variationCountParsed: parsed.length,
         imageCount: Object.keys(images).length,
         matchedSquareItem: (item.item_data && item.item_data.name) || null,
+        configuredLocationId: configuredLocationId || null,
+        resolvedLocationId: locationId,
+        resolvedLocationName: location.name,
+        locationSource: location.source,
+        locations: (location.locations || []).map(function (entry) {
+          return { id: entry.id, name: entry.name || entry.id, status: entry.status || null };
+        }),
         stickerCandidates: stickerCandidates.map(function (candidate) {
           return candidate.itemName + ' / ' + candidate.variationName + ' / ' + candidate.priceCents;
         }).slice(0, 10),
