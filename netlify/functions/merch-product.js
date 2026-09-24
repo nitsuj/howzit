@@ -199,6 +199,30 @@ exports.handler = async function (event) {
 
   const rawVariations = (item.item_data && item.item_data.variations) || [];
 
+  const stickerCandidates = [];
+  items.forEach(function (candidate) {
+    const itemName = (candidate.item_data && candidate.item_data.name) || '';
+    if (!normalize(itemName).includes('sticker')) return;
+
+    ((candidate.item_data && candidate.item_data.variations) || []).forEach(function (variation) {
+      const data = variation.item_variation_data || {};
+      const priceCents = Number((data.price_money && data.price_money.amount) || 0);
+      stickerCandidates.push({
+        itemId: candidate.id,
+        itemName: itemName,
+        id: variation.id,
+        variationName: data.name || '',
+        priceCents: priceCents,
+        imageId: (data.image_ids && data.image_ids[0]) ||
+          ((candidate.item_data && candidate.item_data.image_ids && candidate.item_data.image_ids[0]) || null)
+      });
+    });
+  });
+
+  const stickerMatch = stickerCandidates.find(function (candidate) {
+    return candidate.priceCents === 100;
+  }) || null;
+
   const parsed = rawVariations.map(function (variation) {
     const data = variation.item_variation_data || {};
     return {
@@ -215,12 +239,12 @@ exports.handler = async function (event) {
 
   const inventoryMap = {};
   let inventoryError = null;
-  if (parsed.length) {
+  if (parsed.length || stickerMatch) {
     try {
       const inventory = await square('/v2/inventory/counts/batch-retrieve', token, {
         method: 'POST',
         body: JSON.stringify({
-          catalog_object_ids: parsed.map(function (v) { return v.id; }),
+          catalog_object_ids: parsed.map(function (v) { return v.id; }).concat(stickerMatch ? [stickerMatch.id] : []),
           location_ids: [locationId],
           states: ['IN_STOCK']
         })
@@ -278,6 +302,17 @@ exports.handler = async function (event) {
   });
 
   const priced = variations.find(function (v) { return v.priceCents; });
+  const sticker = stickerMatch ? {
+    id: stickerMatch.id,
+    itemId: stickerMatch.itemId,
+    name: stickerMatch.itemName || 'Howzit Sticker',
+    variationName: stickerMatch.variationName,
+    priceCents: stickerMatch.priceCents,
+    price: stickerMatch.priceCents / 100,
+    stock: inventoryMap[stickerMatch.id] || 0,
+    available: (inventoryMap[stickerMatch.id] || 0) > 0,
+    image: (stickerMatch.imageId && images[stickerMatch.imageId]) || null
+  } : null;
 
   return {
     statusCode: 200,
@@ -291,6 +326,7 @@ exports.handler = async function (event) {
       priceCents: priced ? priced.priceCents : 3200,
       price: priced ? priced.price : 32,
       variations: variations,
+      sticker: sticker,
       debug: {
         itemImageId: itemImageId || null,
         itemImageResolved: !!itemImage,
@@ -298,6 +334,9 @@ exports.handler = async function (event) {
         variationCountParsed: parsed.length,
         imageCount: Object.keys(images).length,
         matchedSquareItem: (item.item_data && item.item_data.name) || null,
+        stickerCandidates: stickerCandidates.map(function (candidate) {
+          return candidate.itemName + ' / ' + candidate.variationName + ' / ' + candidate.priceCents;
+        }).slice(0, 10),
         inventoryError: inventoryError
       }
     })
