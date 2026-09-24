@@ -122,6 +122,32 @@
     .merch-selection { margin:22px 0 14px;padding:12px 14px;border:2px dashed var(--ink);border-radius:15px;background:var(--cream);font-weight:900; }
     .merch-buy { width:100%;text-align:center;cursor:pointer;font:inherit; }
     .merch-status { min-height:24px;margin:12px 0 0;font-weight:900;color:var(--purple); }
+    .cart-button { border:2px solid var(--ink);border-radius:999px;padding:9px 13px;background:var(--yellow);font:inherit;font-size:.84rem;font-weight:900;text-transform:uppercase;box-shadow:3px 3px 0 var(--ink);cursor:pointer;white-space:nowrap; }
+    .cart-count { display:inline-grid;place-items:center;min-width:22px;height:22px;margin-left:5px;padding:0 6px;border:2px solid var(--ink);border-radius:999px;background:var(--coral);font-size:.7rem;line-height:1; }
+    .cart-backdrop { position:fixed;inset:0;z-index:80;background:rgba(17,17,17,.42);opacity:0;pointer-events:none;transition:opacity .2s ease; }
+    .cart-backdrop.open { opacity:1;pointer-events:auto; }
+    .cart-drawer { position:fixed;z-index:90;top:0;right:0;width:min(430px,94vw);height:100dvh;background:var(--cream);border-left:var(--border);transform:translateX(105%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-8px 0 0 rgba(17,17,17,.08); }
+    .cart-drawer.open { transform:translateX(0); }
+    .cart-head { display:flex;align-items:center;gap:14px;padding:18px;border-bottom:var(--border);background:var(--yellow); }
+    .cart-head h2 { margin:0 auto 0 0;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:2rem;letter-spacing:-.04em; }
+    .cart-close { width:42px;height:42px;border:2px solid var(--ink);border-radius:50%;background:var(--white);font-size:1.35rem;font-weight:900;cursor:pointer;box-shadow:2px 2px 0 var(--ink); }
+    .cart-body { flex:1;overflow:auto;padding:16px; }
+    .cart-empty { padding:28px 12px;text-align:center;font-weight:900; }
+    .cart-row { display:grid;grid-template-columns:78px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:2px solid var(--ink); }
+    .cart-thumb { width:78px;height:78px;object-fit:cover;border:2px solid var(--ink);border-radius:14px;background:var(--pink); }
+    .cart-item-title { margin:0 0 3px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;line-height:1; }
+    .cart-item-meta { margin:0 0 10px;font-size:.84rem;font-weight:800; }
+    .cart-item-bottom { display:flex;align-items:center;gap:9px;flex-wrap:wrap; }
+    .cart-qty { display:inline-flex;align-items:center;border:2px solid var(--ink);border-radius:999px;overflow:hidden;background:var(--white); }
+    .cart-qty button { width:31px;height:29px;border:0;background:transparent;font:inherit;font-weight:900;cursor:pointer; }
+    .cart-qty span { min-width:28px;text-align:center;font-weight:900; }
+    .cart-remove { border:0;background:transparent;padding:0;font:inherit;font-size:.75rem;font-weight:900;text-decoration:underline;cursor:pointer; }
+    .cart-line-price { margin-left:auto;font-weight:900; }
+    .cart-footer { border-top:var(--border);padding:16px;background:var(--white); }
+    .cart-summary { display:flex;justify-content:space-between;gap:12px;margin-bottom:4px;font-weight:900; }
+    .cart-shipping-note { margin:0 0 14px;font-size:.75rem;font-weight:800;opacity:.72; }
+    .cart-checkout { width:100%;font:inherit;cursor:pointer; }
+    body.cart-open { overflow:hidden; }
     footer { padding:42px clamp(20px,5vw,72px);background:var(--ink);color:var(--cream);display:flex;gap:30px;justify-content:space-between;align-items:end;flex-wrap:wrap; }
     footer a { font-weight:900; }
     .loading { opacity:.72; }
@@ -134,6 +160,8 @@
       .topbar nav { margin-left:auto;gap:7px; }
       .topbar nav a { display:none !important; }
       .topbar nav a[href="#taplist"],.topbar nav a[href="#merch"] { display:inline-flex !important;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:999px;padding:7px 10px;background:var(--white);box-shadow:2px 2px 0 var(--ink);font-size:.7rem;line-height:1;text-decoration:none; }
+      .cart-button { padding:7px 9px;font-size:.7rem;box-shadow:2px 2px 0 var(--ink); }
+      .cart-count { min-width:19px;height:19px;margin-left:3px;padding:0 5px;font-size:.62rem; }
       .mobile-quick { display:block;padding:26px 16px 30px;background:var(--yellow);border-bottom:var(--border); }
       .mobile-quick-inner { max-width:560px;margin:0 auto; }
       .mobile-quick .eyebrow { margin-bottom:7px; }
@@ -178,9 +206,25 @@
       <a href="#taplist">Tap List</a>
       <a href="#merch">Merch</a>
       <a href="#visit">Visit</a>
+      <button class="cart-button" type="button" id="cart-toggle" aria-controls="cart-drawer" aria-expanded="false">Cart <span class="cart-count" id="cart-count">0</span></button>
       <a class="nav-cta" href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">Instagram</a>
     </nav>
   </header>
+
+  <div class="cart-backdrop" id="cart-backdrop" hidden></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-hidden="true" aria-label="Shopping cart">
+    <div class="cart-head">
+      <h2>Your Cart</h2>
+      <button class="cart-close" type="button" id="cart-close" aria-label="Close cart">×</button>
+    </div>
+    <div class="cart-body" id="cart-body"><div class="cart-empty">Your cart is empty.</div></div>
+    <div class="cart-footer">
+      <div class="cart-summary"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+      <p class="cart-shipping-note">$9.95 flat-rate U.S. shipping + tax at Square checkout.</p>
+      <button class="button cart-checkout" type="button" id="cart-checkout" disabled>Checkout securely with Square</button>
+      <p class="merch-status" id="cart-status"></p>
+    </div>
+  </aside>
 
   <main id="top">
     <section class="mobile-quick" aria-label="Quick visit info">
@@ -267,8 +311,8 @@
           </div>
 
           <div class="merch-selection" id="merch-selection">Black · M · $32</div>
-          <button class="button merch-buy" type="button" id="merch-buy" disabled>Checkout — $32</button>
-          <p style="margin:10px 0 0;font-size:.78rem;font-weight:800;opacity:.72;">$9.95 flat-rate U.S. shipping · Secure checkout by Square</p>
+          <button class="button merch-buy" type="button" id="merch-buy" disabled>Add to Cart — $32</button>
+          <p style="margin:10px 0 0;font-size:.78rem;font-weight:800;opacity:.72;">$9.95 flat-rate U.S. shipping · Secure payment by Square</p>
           <p class="merch-status" id="merch-status">Loading live inventory...</p>
         </div>
       </div>
