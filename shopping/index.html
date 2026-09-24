@@ -122,6 +122,16 @@
     .merch-selection { margin:22px 0 14px;padding:12px 14px;border:2px dashed var(--ink);border-radius:15px;background:var(--cream);font-weight:900; }
     .merch-buy { width:100%;text-align:center;cursor:pointer;font:inherit; }
     .merch-status { min-height:24px;margin:12px 0 0;font-weight:900;color:var(--purple); }
+    .merch-addons { max-width:1300px;margin:22px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px; }
+    .merch-addon-card { display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;border:var(--border);border-radius:24px;background:var(--white);box-shadow:5px 5px 0 var(--ink);padding:16px; }
+    .merch-addon-art { aspect-ratio:1;border:var(--border);border-radius:18px;background:var(--coral);display:grid;place-items:center;padding:20px;overflow:hidden; }
+    .merch-addon-art img { width:100%;height:100%;object-fit:contain; }
+    .merch-addon-art .bubble-mark { width:100%;color:var(--cream); }
+    .merch-addon-copy h3 { margin:0 0 4px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:1.8rem;letter-spacing:-.03em; }
+    .merch-addon-price { margin:0 0 10px;font-family:"Archivo Black",Impact,sans-serif;font-size:1.35rem; }
+    .merch-addon-copy p { margin:0 0 14px;font-size:.9rem; }
+    .merch-addon-buy { width:100%;font:inherit;cursor:pointer; }
+    .merch-addon-card[hidden] { display:none !important; }
     .cart-button { border:0;padding:0;background:transparent;font:inherit;font-size:.9rem;font-weight:900;text-transform:uppercase;cursor:pointer;white-space:nowrap; }
     .cart-button:hover { text-decoration:underline 3px;text-underline-offset:5px; }
     .cart-button.has-items { border:2px solid var(--ink);border-radius:999px;padding:9px 13px;background:var(--coral);box-shadow:3px 3px 0 var(--ink);text-decoration:none; }
@@ -184,6 +194,9 @@
       .merch-photo-note { left:24px;bottom:24px; }
       .merch-detail { padding:22px 18px 24px; }
       .merch-detail h3 { font-size:2.4rem; }
+      .merch-addons { margin-top:14px; }
+      .merch-addon-card { grid-template-columns:100px 1fr;padding:12px;gap:12px;border-radius:18px;box-shadow:3px 3px 0 var(--ink); }
+      .merch-addon-copy h3 { font-size:1.35rem; }
       #taplist { padding:34px 14px 42px;border-bottom:var(--border); }
       #taplist .section-head { margin-bottom:18px; }
       #taplist .section-title { margin:0 0 5px;font-size:clamp(2.8rem,14vw,4.4rem);line-height:.9; }
@@ -317,6 +330,20 @@
           <p style="margin:10px 0 0;font-size:.78rem;font-weight:800;opacity:.72;">$9.95 flat-rate U.S. shipping · Secure payment by Square</p>
           <p class="merch-status" id="merch-status">Loading live inventory...</p>
         </div>
+      </div>
+
+      <div class="merch-addons">
+        <article class="merch-addon-card" id="sticker-card" hidden>
+          <div class="merch-addon-art" id="sticker-art">
+            <span class="bubble-mark" aria-hidden="true"></span>
+          </div>
+          <div class="merch-addon-copy">
+            <h3 id="sticker-name">Howzit Sticker</h3>
+            <p class="merch-addon-price" id="sticker-price">$1</p>
+            <p>A little Howzit for the cooler, board, laptop, whatever.</p>
+            <button class="button merch-addon-buy" type="button" id="sticker-buy">Add to Cart — $1</button>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -456,6 +483,11 @@
       const cartSubtotal = document.getElementById('cart-subtotal');
       const cartCheckout = document.getElementById('cart-checkout');
       const cartStatus = document.getElementById('cart-status');
+      const stickerCard = document.getElementById('sticker-card');
+      const stickerArt = document.getElementById('sticker-art');
+      const stickerName = document.getElementById('sticker-name');
+      const stickerPrice = document.getElementById('sticker-price');
+      const stickerBuy = document.getElementById('sticker-buy');
 
       function money(cents) {
         const value = Number(cents || 0) / 100;
@@ -525,11 +557,16 @@
 
         cartBody.innerHTML = cart.map((item) => {
           const image = item.image || fallbackImage;
+          const title = item.kind === 'sticker' ? (item.name || 'Howzit Sticker') : 'The Tee';
+          const meta = item.kind === 'sticker'
+            ? money(item.priceCents)
+            : item.color + ' / ' + item.size + ' / ' + money(item.priceCents);
+          const alt = item.kind === 'sticker' ? title : ('Howzit Tee - ' + item.color);
           return '<div class="cart-row" data-id="' + item.variationId + '">' +
-            '<img class="cart-thumb" src="' + image + '" alt="Howzit Tee - ' + item.color + '">' +
+            '<img class="cart-thumb" src="' + image + '" alt="' + alt + '">' +
             '<div>' +
-              '<p class="cart-item-title">The Tee</p>' +
-              '<p class="cart-item-meta">' + item.color + ' / ' + item.size + ' / ' + money(item.priceCents) + '</p>' +
+              '<p class="cart-item-title">' + title + '</p>' +
+              '<p class="cart-item-meta">' + meta + '</p>' +
               '<div class="cart-item-bottom">' +
                 '<div class="cart-qty">' +
                   '<button type="button" data-action="minus" aria-label="Decrease quantity">−</button>' +
@@ -547,6 +584,19 @@
       function reconcileCart() {
         if (!product || !product.variations) return;
         cart = cart.map((item) => {
+          if (item.kind === 'sticker') {
+            const sticker = product.sticker;
+            if (!sticker || sticker.id !== item.variationId || !sticker.available) return null;
+            return {
+              kind: 'sticker',
+              variationId: sticker.id,
+              name: sticker.name || 'Howzit Sticker',
+              priceCents: sticker.priceCents,
+              image: sticker.image || '/bubble.svg',
+              stock: sticker.stock,
+              quantity: Math.min(item.quantity, Math.max(1, Math.floor(sticker.stock || 1)))
+            };
+          }
           const live = product.variations.find((v) => v.id === item.variationId);
           if (!live || !live.available) return null;
           return {
@@ -577,6 +627,8 @@
           existing.stock = variation.stock;
         } else {
           cart.push({
+            kind: 'tee',
+            name: 'The Tee',
             variationId: variation.id,
             color: variation.color,
             size: variation.size,
@@ -590,6 +642,54 @@
         saveCart();
         status.textContent = variation.color + ' / ' + variation.size + ' added to cart.';
         openCart();
+      }
+
+      function addStickerToCart() {
+        if (!(product && product.sticker && product.sticker.available && product.sticker.id)) return;
+        const sticker = product.sticker;
+        const existing = cart.find((item) => item.variationId === sticker.id);
+
+        if (existing) {
+          if (existing.quantity >= sticker.stock) {
+            cartStatus.textContent = 'That is all we have in stock for stickers.';
+            openCart();
+            return;
+          }
+          existing.quantity += 1;
+          existing.stock = sticker.stock;
+        } else {
+          cart.push({
+            kind: 'sticker',
+            name: sticker.name || 'Howzit Sticker',
+            variationId: sticker.id,
+            priceCents: sticker.priceCents,
+            image: sticker.image || '/bubble.svg',
+            stock: sticker.stock,
+            quantity: 1
+          });
+        }
+
+        saveCart();
+        cartStatus.textContent = '';
+        openCart();
+      }
+
+      function renderSticker() {
+        const sticker = product && product.sticker;
+        if (!sticker) {
+          stickerCard.hidden = true;
+          return;
+        }
+
+        stickerCard.hidden = false;
+        stickerName.textContent = sticker.name || 'Howzit Sticker';
+        stickerPrice.textContent = money(sticker.priceCents);
+        stickerBuy.textContent = 'Add to Cart - ' + money(sticker.priceCents);
+        stickerBuy.disabled = !sticker.available;
+
+        if (sticker.image) {
+          stickerArt.innerHTML = '<img src="' + sticker.image + '" alt="' + (sticker.name || 'Howzit Sticker') + '">';
+        }
       }
 
       function markActive(groupId, value) {
@@ -658,6 +758,7 @@
       });
 
       buy.addEventListener('click', addSelectedToCart);
+      stickerBuy.addEventListener('click', addStickerToCart);
       cartToggle.addEventListener('click', openCart);
       cartClose.addEventListener('click', closeCart);
       cartBackdrop.addEventListener('click', closeCart);
@@ -738,6 +839,7 @@
           }
 
           product = data;
+          renderSticker();
           reconcileCart();
 
           const firstAvailable = product.variations.find((v) => v.available && v.id);
