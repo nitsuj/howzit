@@ -175,6 +175,7 @@ exports.handler = async function (event) {
   });
 
   const inventoryMap = {};
+  let inventoryError = null;
   if (parsed.length) {
     try {
       const inventory = await square('/v2/inventory/counts/batch-retrieve', token, {
@@ -193,11 +194,7 @@ exports.handler = async function (event) {
       });
     } catch (error) {
       console.error('merch-product inventory failed', error);
-      return {
-        statusCode: 502,
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-        body: JSON.stringify(errorBody(error, 'inventory'))
-      };
+      inventoryError = errorBody(error, 'inventory');
     }
   }
 
@@ -259,7 +256,9 @@ exports.handler = async function (event) {
         itemImageId: itemImageId || null,
         itemImageResolved: !!itemImage,
         variationCountRaw: rawVariations.length,
-        variationCountParsed: parsed.length
+        variationCountParsed: parsed.length,
+        imageCount: Object.keys(images).length,
+        inventoryError: inventoryError
       }
     })
   };
