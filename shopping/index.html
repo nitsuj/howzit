@@ -267,7 +267,8 @@
           </div>
 
           <div class="merch-selection" id="merch-selection">Black · M · $32</div>
-          <button class="button merch-buy" type="button" id="merch-buy" disabled>Add to Cart — $32</button>
+          <button class="button merch-buy" type="button" id="merch-buy" disabled>Checkout — $32</button>
+          <p style="margin:10px 0 0;font-size:.78rem;font-weight:800;opacity:.72;">$9.95 flat-rate U.S. shipping · Secure checkout by Square</p>
           <p class="merch-status" id="merch-status">Loading live inventory...</p>
         </div>
       </div>
@@ -449,7 +450,7 @@
 
         selection.textContent = color + ' / ' + size + ' / ' + price;
         priceEl.textContent = price;
-        buy.textContent = 'Add to Cart - ' + price;
+        buy.textContent = 'Checkout - ' + price;
         buy.disabled = !(variation && variation.available && variation.id);
         setImage(variation);
 
