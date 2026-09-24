@@ -488,7 +488,22 @@
         try {
           const response = await fetch(PRODUCT_ENDPOINT + '?v=' + Date.now(), { cache: 'no-store' });
           const data = await response.json();
-          if (!response.ok) throw new Error(data.error || 'Inventory unavailable');
+          if (!response.ok) {
+            const details = [];
+            if (data.stage) details.push('stage: ' + data.stage);
+            if (data.squareStatus) details.push('Square HTTP ' + data.squareStatus);
+            if (Array.isArray(data.squareErrors) && data.squareErrors.length) {
+              details.push(data.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
+            }
+            if (Array.isArray(data.candidates) && data.candidates.length) {
+              details.push('found: ' + data.candidates.join(' | '));
+            }
+            if (data.missing) {
+              const missing = Object.keys(data.missing).filter((key) => data.missing[key]);
+              if (missing.length) details.push('missing env: ' + missing.join(', '));
+            }
+            throw new Error((data.error || 'Inventory unavailable') + (details.length ? ' (' + details.join('; ') + ')' : ''));
+          }
           product = data;
 
           const firstAvailable = product.variations.find((v) => v.available && v.id);
