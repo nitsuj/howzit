@@ -109,7 +109,18 @@ async function validateVariation(line, token) {
     throw err;
   }
 
-  const parentName = normalize(parent.item_data && parent.item_data.name);
+  const parentDisplayName = (parent.item_data && parent.item_data.name) || '';
+  const parentName = normalize(parentDisplayName);
+
+  if (parentName.includes('sticker')) {
+    return {
+      variationId: line.variationId,
+      quantity: line.quantity,
+      kind: 'sticker',
+      name: parentDisplayName || 'Howzit Sticker'
+    };
+  }
+
   if (!(parentName.includes('tee') || parentName.includes('shirt'))) {
     const err = new Error('Item is not approved for web sale');
     err.publicStatus = 400;
@@ -140,6 +151,7 @@ async function validateVariation(line, token) {
   return {
     variationId: line.variationId,
     quantity: line.quantity,
+    kind: 'tee',
     color: color,
     size: size
   };
@@ -224,7 +236,9 @@ exports.handler = async function (event) {
           statusCode: 409,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            error: line.color + ' / ' + line.size + ' does not have enough stock'
+            error: line.kind === 'sticker'
+              ? (line.name + ' does not have enough stock')
+              : (line.color + ' / ' + line.size + ' does not have enough stock')
           })
         };
       }
@@ -238,6 +252,7 @@ exports.handler = async function (event) {
     });
 
     const note = validated.map(function (line) {
+      if (line.kind === 'sticker') return line.quantity + 'x ' + line.name;
       return line.quantity + 'x ' + line.color + ' / ' + line.size;
     }).join(', ');
 
