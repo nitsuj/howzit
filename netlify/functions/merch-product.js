@@ -133,31 +133,70 @@ exports.handler = async function (event) {
     }
   });
 
-  const exact = items.filter(function (item) {
-    return normalize(item.item_data && item.item_data.name) === normalize(ITEM_NAME);
-  });
+  function scoreItem(item) {
+    const vars = (item.item_data && item.item_data.variations) || [];
+    const recognized = vars.map(function (variation) {
+      const data = variation.item_variation_data || {};
+      return {
+        color: getColor(data.name),
+        size: getSize(data.name),
+        priceCents: Number((data.price_money && data.price_money.amount) || 0)
+      };
+    }).filter(function (v) {
+      return COLORS.includes(v.color) && SIZES.includes(v.size);
+    });
 
-  if (exact.length !== 1) {
-    const candidates = items
-      .map(function (item) { return (item.item_data && item.item_data.name) || ''; })
-      .filter(function (name) {
-        const n = normalize(name);
-        return n.includes('howzit') || n.includes('tee') || n.includes('shirt');
-      })
-      .slice(0, 20);
-
+    const combos = new Set(recognized.map(function (v) { return v.color + '|' + v.size; }));
+    const priceMatches = recognized.filter(function (v) { return v.priceCents === 3200; }).length;
     return {
-      statusCode: exact.length ? 409 : 404,
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-      body: JSON.stringify({
-        error: exact.length ? 'Multiple Howzit Tee items found' : 'Howzit Tee not found',
-        stage: 'item-match',
-        candidates: candidates
-      })
+      item: item,
+      combos: combos.size,
+      recognized: recognized.length,
+      priceMatches: priceMatches
     };
   }
 
-  const item = exact[0];
+  let item = items.find(function (candidate) {
+    return normalize(candidate.item_data && candidate.item_data.name) === normalize(ITEM_NAME);
+  });
+
+  if (!item) {
+    const teeCandidates = items
+      .filter(function (candidate) {
+        const n = normalize(candidate.item_data && candidate.item_data.name);
+        return n.includes('tee') || n.includes('shirt');
+      })
+      .map(scoreItem)
+      .sort(function (a, b) {
+        return (b.combos - a.combos) ||
+               (b.priceMatches - a.priceMatches) ||
+               (b.recognized - a.recognized);
+      });
+
+    if (teeCandidates.length && teeCandidates[0].combos >= 10) {
+      const top = teeCandidates[0];
+      const next = teeCandidates[1];
+      if (!next || top.combos > next.combos || top.priceMatches > next.priceMatches) {
+        item = top.item;
+      }
+    }
+
+    if (!item) {
+      return {
+        statusCode: 404,
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        body: JSON.stringify({
+          error: 'Howzit Tee not found',
+          stage: 'item-match',
+          candidates: teeCandidates.slice(0, 10).map(function (c) {
+            return ((c.item.item_data && c.item.item_data.name) || '') +
+              ' [' + c.combos + ' combos / ' + c.recognized + ' recognized]';
+          })
+        })
+      };
+    }
+  }
+
   const rawVariations = (item.item_data && item.item_data.variations) || [];
 
   const parsed = rawVariations.map(function (variation) {
@@ -258,6 +297,7 @@ exports.handler = async function (event) {
         variationCountRaw: rawVariations.length,
         variationCountParsed: parsed.length,
         imageCount: Object.keys(images).length,
+        matchedSquareItem: (item.item_data && item.item_data.name) || null,
         inventoryError: inventoryError
       }
     })
