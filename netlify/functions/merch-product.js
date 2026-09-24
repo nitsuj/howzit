@@ -260,6 +260,40 @@ exports.handler = async function (event) {
     }
   }
 
+  let stickerInventoryByLocation = [];
+  if (stickerMatch) {
+    try {
+      const allStickerInventory = await square('/v2/inventory/counts/batch-retrieve', token, {
+        method: 'POST',
+        body: JSON.stringify({
+          catalog_object_ids: [stickerMatch.id],
+          states: ['IN_STOCK']
+        })
+      });
+
+      const locationsData = await square('/v2/locations', token, { method: 'GET' });
+      const locationNames = {};
+      (locationsData.locations || []).forEach(function (location) {
+        locationNames[location.id] = location.name || location.id;
+      });
+
+      stickerInventoryByLocation = (allStickerInventory.counts || [])
+        .filter(function (count) {
+          return count.catalog_object_id === stickerMatch.id && count.state === 'IN_STOCK';
+        })
+        .map(function (count) {
+          return {
+            locationId: count.location_id,
+            locationName: locationNames[count.location_id] || count.location_id,
+            quantity: Number(count.quantity || 0),
+            isWebsiteLocation: count.location_id === locationId
+          };
+        });
+    } catch (error) {
+      console.error('sticker location diagnostics failed', error);
+    }
+  }
+
   const grouped = {};
   parsed.forEach(function (variation) {
     const key = variation.color + '|' + variation.size;
@@ -310,7 +344,9 @@ exports.handler = async function (event) {
     price: stickerMatch.priceCents / 100,
     stock: inventoryMap[stickerMatch.id] || 0,
     available: (inventoryMap[stickerMatch.id] || 0) > 0,
-    image: (stickerMatch.imageId && images[stickerMatch.imageId]) || null
+    image: (stickerMatch.imageId && images[stickerMatch.imageId]) || null,
+    inventoryByLocation: stickerInventoryByLocation,
+    websiteLocationId: locationId
   } : null;
 
   return {
