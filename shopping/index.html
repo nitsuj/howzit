@@ -431,11 +431,13 @@
     (() => {
       const PRODUCT_ENDPOINT = '/.netlify/functions/merch-product';
       const CHECKOUT_ENDPOINT = '/.netlify/functions/create-merch-checkout';
+      const CART_KEY = 'howzit-merch-cart-v1';
       const fallbackImage = 'https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400';
 
       let product = null;
       let color = 'Black';
       let size = 'M';
+      let cart = [];
 
       const selection = document.getElementById('merch-selection');
       const status = document.getElementById('merch-status');
@@ -443,6 +445,15 @@
       const priceEl = document.getElementById('merch-price');
       const imageEl = document.getElementById('merch-image');
       const imageNote = document.getElementById('merch-photo-note');
+      const cartToggle = document.getElementById('cart-toggle');
+      const cartCount = document.getElementById('cart-count');
+      const cartDrawer = document.getElementById('cart-drawer');
+      const cartBackdrop = document.getElementById('cart-backdrop');
+      const cartClose = document.getElementById('cart-close');
+      const cartBody = document.getElementById('cart-body');
+      const cartSubtotal = document.getElementById('cart-subtotal');
+      const cartCheckout = document.getElementById('cart-checkout');
+      const cartStatus = document.getElementById('cart-status');
 
       function money(cents) {
         const value = Number(cents || 0) / 100;
@@ -453,6 +464,127 @@
         return product && product.variations
           ? product.variations.find((v) => v.color === c && v.size === z)
           : null;
+      }
+
+      function loadCart() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+          cart = Array.isArray(saved) ? saved : [];
+        } catch (error) {
+          cart = [];
+        }
+      }
+
+      function saveCart() {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        renderCart();
+      }
+
+      function cartQty() {
+        return cart.reduce((sum, item) => sum + item.quantity, 0);
+      }
+
+      function cartSubtotalCents() {
+        return cart.reduce((sum, item) => sum + (item.priceCents * item.quantity), 0);
+      }
+
+      function openCart() {
+        cartBackdrop.hidden = false;
+        requestAnimationFrame(() => {
+          cartBackdrop.classList.add('open');
+          cartDrawer.classList.add('open');
+        });
+        cartDrawer.setAttribute('aria-hidden', 'false');
+        cartToggle.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('cart-open');
+      }
+
+      function closeCart() {
+        cartBackdrop.classList.remove('open');
+        cartDrawer.classList.remove('open');
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        cartToggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('cart-open');
+        setTimeout(() => { cartBackdrop.hidden = true; }, 220);
+      }
+
+      function renderCart() {
+        cartCount.textContent = String(cartQty());
+        cartSubtotal.textContent = money(cartSubtotalCents());
+        cartCheckout.disabled = !cart.length;
+
+        if (!cart.length) {
+          cartBody.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
+          return;
+        }
+
+        cartBody.innerHTML = cart.map((item) => {
+          const image = item.image || fallbackImage;
+          return '<div class="cart-row" data-id="' + item.variationId + '">' +
+            '<img class="cart-thumb" src="' + image + '" alt="Howzit Tee - ' + item.color + '">' +
+            '<div>' +
+              '<p class="cart-item-title">The Tee</p>' +
+              '<p class="cart-item-meta">' + item.color + ' / ' + item.size + ' / ' + money(item.priceCents) + '</p>' +
+              '<div class="cart-item-bottom">' +
+                '<div class="cart-qty">' +
+                  '<button type="button" data-action="minus" aria-label="Decrease quantity">−</button>' +
+                  '<span>' + item.quantity + '</span>' +
+                  '<button type="button" data-action="plus" aria-label="Increase quantity">+</button>' +
+                '</div>' +
+                '<button class="cart-remove" type="button" data-action="remove">Remove</button>' +
+                '<span class="cart-line-price">' + money(item.priceCents * item.quantity) + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      function reconcileCart() {
+        if (!product || !product.variations) return;
+        cart = cart.map((item) => {
+          const live = product.variations.find((v) => v.id === item.variationId);
+          if (!live || !live.available) return null;
+          return {
+            variationId: live.id,
+            color: live.color,
+            size: live.size,
+            priceCents: live.priceCents || item.priceCents,
+            image: live.image || product.image || item.image || null,
+            stock: live.stock,
+            quantity: Math.min(item.quantity, Math.max(1, Math.floor(live.stock || 1)))
+          };
+        }).filter(Boolean);
+        saveCart();
+      }
+
+      function addSelectedToCart() {
+        const variation = variationFor(color, size);
+        if (!(variation && variation.available && variation.id)) return;
+
+        const existing = cart.find((item) => item.variationId === variation.id);
+        if (existing) {
+          if (existing.quantity >= variation.stock) {
+            status.textContent = 'That is all we have in stock for this size/color.';
+            openCart();
+            return;
+          }
+          existing.quantity += 1;
+          existing.stock = variation.stock;
+        } else {
+          cart.push({
+            variationId: variation.id,
+            color: variation.color,
+            size: variation.size,
+            priceCents: variation.priceCents || product.priceCents || 3200,
+            image: variation.image || product.image || null,
+            stock: variation.stock,
+            quantity: 1
+          });
+        }
+
+        saveCart();
+        status.textContent = variation.color + ' / ' + variation.size + ' added to cart.';
+        openCart();
       }
 
       function markActive(groupId, value) {
@@ -487,26 +619,20 @@
       function refresh() {
         if (!product) return;
         refreshSizes();
-
         const variation = variationFor(color, size);
         const priceCents = (variation && variation.priceCents) || product.priceCents || 3200;
         const price = money(priceCents);
 
         selection.textContent = color + ' / ' + size + ' / ' + price;
         priceEl.textContent = price;
-        buy.textContent = 'Checkout - ' + price;
+        buy.textContent = 'Add to Cart - ' + price;
         buy.disabled = !(variation && variation.available && variation.id);
         setImage(variation);
 
-        if (variation && variation.ambiguous) {
-          status.textContent = 'That option needs cleanup in Square before it can be sold online.';
-        } else if (variation && variation.missing) {
-          status.textContent = 'That option is not set up in Square yet.';
-        } else if (variation && !variation.available) {
-          status.textContent = 'Sold out online.';
-        } else {
-          status.textContent = '';
-        }
+        if (variation && variation.ambiguous) status.textContent = 'That option needs cleanup in Square before it can be sold online.';
+        else if (variation && variation.missing) status.textContent = 'That option is not set up in Square yet.';
+        else if (variation && !variation.available) status.textContent = 'Sold out online.';
+        else status.textContent = '';
       }
 
       document.querySelectorAll('#merch-colors .merch-option').forEach((button) => {
@@ -526,22 +652,47 @@
         });
       });
 
-      buy.addEventListener('click', async () => {
-        const variation = variationFor(color, size);
-        if (!(variation && variation.available && variation.id)) return;
+      buy.addEventListener('click', addSelectedToCart);
+      cartToggle.addEventListener('click', openCart);
+      cartClose.addEventListener('click', closeCart);
+      cartBackdrop.addEventListener('click', closeCart);
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && cartDrawer.classList.contains('open')) closeCart();
+      });
 
-        const originalText = buy.textContent;
-        buy.disabled = true;
-        buy.textContent = 'Opening Square...';
-        status.textContent = 'Opening secure Square checkout...';
+      cartBody.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const row = button.closest('.cart-row');
+        const item = row && cart.find((candidate) => candidate.variationId === row.dataset.id);
+        if (!item) return;
+
+        if (button.dataset.action === 'remove') {
+          cart = cart.filter((candidate) => candidate.variationId !== item.variationId);
+        } else if (button.dataset.action === 'minus') {
+          item.quantity -= 1;
+          if (item.quantity <= 0) cart = cart.filter((candidate) => candidate.variationId !== item.variationId);
+        } else if (button.dataset.action === 'plus') {
+          const max = Math.max(1, Math.floor(item.stock || 1));
+          if (item.quantity < max) item.quantity += 1;
+        }
+
+        cartStatus.textContent = '';
+        saveCart();
+      });
+
+      cartCheckout.addEventListener('click', async () => {
+        if (!cart.length) return;
+        cartCheckout.disabled = true;
+        cartCheckout.textContent = 'Opening Square...';
+        cartStatus.textContent = 'Rechecking inventory and opening secure checkout...';
 
         try {
           const response = await fetch(CHECKOUT_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              variationId: variation.id,
-              quantity: 1
+              items: cart.map((item) => ({ variationId: item.variationId, quantity: item.quantity }))
             })
           });
           const data = await response.json();
@@ -558,9 +709,9 @@
           window.location.assign(data.checkoutUrl);
         } catch (error) {
           console.error('Merch checkout failed', error);
-          status.textContent = error.message || 'Checkout is temporarily unavailable.';
-          buy.disabled = false;
-          buy.textContent = originalText;
+          cartStatus.textContent = error.message || 'Checkout is temporarily unavailable.';
+          cartCheckout.disabled = false;
+          cartCheckout.textContent = 'Checkout securely with Square';
         }
       });
 
@@ -572,19 +723,17 @@
             const details = [];
             if (data.stage) details.push('stage: ' + data.stage);
             if (data.squareStatus) details.push('Square HTTP ' + data.squareStatus);
-            if (Array.isArray(data.squareErrors) && data.squareErrors.length) {
-              details.push(data.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
-            }
-            if (Array.isArray(data.candidates) && data.candidates.length) {
-              details.push('found: ' + data.candidates.join(' | '));
-            }
+            if (Array.isArray(data.squareErrors) && data.squareErrors.length) details.push(data.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
+            if (Array.isArray(data.candidates) && data.candidates.length) details.push('found: ' + data.candidates.join(' | '));
             if (data.missing) {
               const missing = Object.keys(data.missing).filter((key) => data.missing[key]);
               if (missing.length) details.push('missing env: ' + missing.join(', '));
             }
             throw new Error((data.error || 'Inventory unavailable') + (details.length ? ' (' + details.join('; ') + ')' : ''));
           }
+
           product = data;
+          reconcileCart();
 
           const firstAvailable = product.variations.find((v) => v.available && v.id);
           if (firstAvailable) {
@@ -599,12 +748,12 @@
             const err = product.debug.inventoryError;
             const bits = ['Square image/catalog connected'];
             if (err.squareStatus) bits.push('inventory HTTP ' + err.squareStatus);
-            if (Array.isArray(err.squareErrors) && err.squareErrors.length) {
-              bits.push(err.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
-            }
+            if (Array.isArray(err.squareErrors) && err.squareErrors.length) bits.push(err.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
             status.textContent = bits.join(' · ');
             buy.disabled = true;
           } else if (new URLSearchParams(window.location.search).get('checkout') === 'success') {
+            cart = [];
+            saveCart();
             status.textContent = 'Order complete — mahalo!';
           } else if (!firstAvailable) {
             status.textContent = 'No tee variations are currently ready for online sale.';
@@ -616,6 +765,8 @@
         }
       }
 
+      loadCart();
+      renderCart();
       loadProduct();
     })();
   </script>
