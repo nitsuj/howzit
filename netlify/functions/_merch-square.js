@@ -195,6 +195,58 @@ function variationEligibility(variation, parentItem, locationId) {
   };
 }
 
+function selectTeeItem(items, optionLookup) {
+  const candidates = (items || []).filter(function (item) {
+    return item && item.type === 'ITEM' && item.item_data;
+  });
+
+  const exact = candidates.find(function (item) {
+    return normalize(item.item_data.name) === normalize(ITEM_NAME);
+  });
+  if (exact) return exact;
+
+  const scored = candidates.map(function (item) {
+    const itemName = normalize(item.item_data.name);
+    const variations = item.item_data.variations || [];
+    const recognized = variations.map(function (variation) {
+      const data = variation.item_variation_data || {};
+      const parsed = parseVariation(data, optionLookup);
+      return {
+        color: parsed.color,
+        size: parsed.size
+      };
+    }).filter(function (entry) {
+      return COLORS.includes(entry.color) && SIZES.includes(entry.size);
+    });
+
+    const combos = new Set(recognized.map(function (entry) {
+      return entry.color + '|' + entry.size;
+    }));
+
+    return {
+      item: item,
+      nameLooksLikeTee: itemName.includes('tee') || itemName.includes('shirt'),
+      recognized: recognized.length,
+      combos: combos.size
+    };
+  }).filter(function (entry) {
+    return entry.nameLooksLikeTee && entry.recognized > 0;
+  }).sort(function (a, b) {
+    return (b.combos - a.combos) || (b.recognized - a.recognized);
+  });
+
+  if (!scored.length) return null;
+
+  const top = scored[0];
+  const next = scored[1];
+
+  // Require a meaningful set of mapped variants and a unique best match.
+  if (top.combos < 4) return null;
+  if (next && top.combos === next.combos && top.recognized === next.recognized) return null;
+
+  return top.item;
+}
+
 async function square(path, token, options) {
   const response = await fetch(API + path, Object.assign({}, options || {}, {
     headers: Object.assign({}, headers(token), (options && options.headers) || {})
@@ -303,6 +355,7 @@ module.exports = {
   effectiveTrackInventory,
   effectivePriceCents,
   variationEligibility,
+  selectTeeItem,
   square,
   listCatalog,
   resolveLocation
