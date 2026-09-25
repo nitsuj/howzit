@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#f7ee69" />
+  <meta name="theme-color" content="#f7ee69" />\n  <meta name="robots" content="noindex,nofollow" />
   <title>Howzit Brewing — Craft Beer. Good Vibes.</title>
   <meta name="description" content="Howzit Brewing in Honolulu. Craft beer, good vibes, rotating taps, run club, trivia and more." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +30,7 @@
     button,a { -webkit-tap-highlight-color:transparent; }
     .display { margin:0;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:-.05em;line-height:.91; }
     .eyebrow { font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.78rem; }
-    .bubble-mark { display:block;background:currentColor;-webkit-mask:url("bubble.svg") center/contain no-repeat;mask:url("bubble.svg") center/contain no-repeat;aspect-ratio:983/533; }
+    .bubble-mark { display:block;background:currentColor;-webkit-mask:url("/bubble.svg") center/contain no-repeat;mask:url("/bubble.svg") center/contain no-repeat;aspect-ratio:983/533; }
     .topbar { position:sticky;top:0;z-index:30;min-height:78px;display:flex;align-items:center;gap:28px;padding:10px 24px;border-bottom:var(--border);background:rgba(255,248,232,.96);backdrop-filter:blur(8px); }
     .brand { margin-right:auto;display:block;width:154px;color:var(--coral); }
     .brand .bubble-mark { width:100%; }
@@ -101,6 +101,76 @@
     .visit-art { background:var(--aqua);border-left:var(--border);position:relative;overflow:hidden;min-height:520px;display:grid;place-items:center; }
     .visit-sun { position:absolute;width:min(52vw,420px);aspect-ratio:1;border:var(--border);border-radius:50%;background:var(--coral);right:-10%;top:-9%; }
     .visit-wave { position:absolute;left:-10%;right:-10%;bottom:-7%;height:49%;border-top:5px solid var(--ink);background:var(--purple);clip-path:polygon(0 38%,12% 28%,25% 42%,40% 25%,53% 44%,68% 27%,82% 42%,100% 26%,100% 100%,0 100%); }
+    #merch { background:var(--yellow); }
+    #merch .section-title { color:var(--coral); }
+    .merch-shell { max-width:1300px;margin:auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr);border:var(--border);border-radius:28px;background:var(--white);overflow:hidden;box-shadow:var(--shadow); }
+    .merch-photo { background:var(--pink);padding:22px;border-right:var(--border);position:relative;min-height:520px;display:grid;place-items:center; }
+    .merch-photo img { width:100%;height:100%;max-height:620px;object-fit:cover;border:var(--border);border-radius:20px;background:var(--cream); }
+    .merch-photo-note { position:absolute;left:38px;bottom:38px;background:var(--yellow);border:2px solid var(--ink);border-radius:999px;padding:6px 10px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:.66rem;box-shadow:3px 3px 0 var(--ink); }
+    .merch-detail { padding:clamp(28px,5vw,58px);display:flex;flex-direction:column;justify-content:center; }
+    .merch-detail h3 { margin:8px 0 10px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:-.04em;line-height:.94;font-size:clamp(2.8rem,5vw,5rem);color:var(--purple); }
+    .merch-price { margin:0 0 18px;font-family:"Archivo Black",Impact,sans-serif;font-size:2rem; }
+    .merch-detail p { max-width:540px; }
+    .merch-label { display:block;margin:22px 0 9px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:.78rem;letter-spacing:.05em; }
+    .merch-options { display:flex;flex-wrap:wrap;gap:9px; }
+    .merch-option { border:2px solid var(--ink);border-radius:999px;padding:8px 12px;background:var(--white);font-weight:900;box-shadow:2px 2px 0 var(--ink);cursor:pointer; }
+    .merch-option.active { background:var(--aqua);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink); }
+    .merch-option:disabled { opacity:.35;cursor:not-allowed;box-shadow:none;text-decoration:line-through; }
+    .merch-color { display:inline-flex;align-items:center;gap:7px; }
+    .merch-swatch { width:17px;height:17px;border:2px solid var(--ink);border-radius:50%;display:inline-block; }
+    .merch-swatch.black { background:#171717; }.merch-swatch.yellow { background:#f2df4a; }.merch-swatch.mint { background:#91d8bd; }.merch-swatch.gray { background:#aaa; }
+    .merch-selection { margin:22px 0 14px;padding:12px 14px;border:2px dashed var(--ink);border-radius:15px;background:var(--cream);font-weight:900; }
+    .merch-buy { width:100%;text-align:center;cursor:pointer;font:inherit; }
+    .merch-status { min-height:24px;margin:12px 0 0;font-weight:900;color:var(--purple); }
+    .merch-addons { max-width:1300px;margin:22px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px; }
+    .merch-addon-card { display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:center;border:var(--border);border-radius:24px;background:var(--white);box-shadow:5px 5px 0 var(--ink);padding:16px; }
+    .merch-addon-art { aspect-ratio:1;border:var(--border);border-radius:18px;background:var(--coral);display:grid;place-items:center;padding:20px;overflow:hidden; }
+    .merch-addon-art img { width:100%;height:100%;object-fit:contain; }
+    .merch-addon-art .bubble-mark { width:100%;color:var(--cream); }
+    .merch-addon-copy h3 { margin:0 0 4px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:1.8rem;letter-spacing:-.03em; }
+    .merch-addon-price { margin:0 0 10px;font-family:"Archivo Black",Impact,sans-serif;font-size:1.35rem; }
+    .merch-addon-copy p { margin:0 0 14px;font-size:.9rem; }
+    .merch-addon-buy { width:100%;font:inherit;cursor:pointer; }
+    .merch-addon-card[hidden] { display:none !important; }
+    .cart-button { border:0;padding:0;background:transparent;font:inherit;font-size:.9rem;font-weight:900;text-transform:uppercase;cursor:pointer;white-space:nowrap; }
+    .cart-button:hover { text-decoration:underline 3px;text-underline-offset:5px; }
+    .cart-button.has-items { border:2px solid var(--ink);border-radius:999px;padding:9px 13px;background:var(--coral);box-shadow:3px 3px 0 var(--ink);text-decoration:none; }
+    .cart-count { display:inline-grid;place-items:center;min-width:22px;height:22px;margin-left:5px;padding:0 6px;border:2px solid var(--ink);border-radius:999px;background:var(--coral);font-size:.7rem;line-height:1; }
+    .cart-backdrop { position:fixed;inset:0;z-index:80;background:rgba(17,17,17,.42);opacity:0;pointer-events:none;transition:opacity .2s ease; }
+    .cart-backdrop.open { opacity:1;pointer-events:auto; }
+    .cart-drawer { position:fixed;z-index:90;top:0;right:0;width:min(430px,94vw);height:100dvh;background:var(--cream);border-left:var(--border);transform:translateX(105%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-8px 0 0 rgba(17,17,17,.08); }
+    .cart-drawer.open { transform:translateX(0); }
+    .cart-head { display:flex;align-items:center;gap:14px;padding:18px;border-bottom:var(--border);background:var(--yellow); }
+    .cart-head h2 { margin:0 auto 0 0;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:2rem;letter-spacing:-.04em; }
+    .cart-close { width:42px;height:42px;border:2px solid var(--ink);border-radius:50%;background:var(--white);font-size:1.35rem;font-weight:900;cursor:pointer;box-shadow:2px 2px 0 var(--ink); }
+    .cart-body { flex:1;overflow:auto;padding:16px; }
+    .cart-empty { padding:28px 12px;text-align:center;font-weight:900; }
+    .cart-row { display:grid;grid-template-columns:78px minmax(0,1fr);gap:12px;padding:12px 0;border-bottom:2px solid var(--ink); }
+    .cart-upsell { margin:16px 0 4px;padding:14px;border:2px solid var(--ink);border-radius:18px;background:var(--aqua);box-shadow:3px 3px 0 var(--ink); }
+    .cart-upsell-title { margin:0 0 4px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:1.05rem; }
+    .cart-upsell-copy { margin:0 0 10px;font-size:.82rem;font-weight:800;line-height:1.35; }
+    .cart-upsell button { width:100%;font:inherit;cursor:pointer; }
+    .cart-thumb { width:78px;height:78px;object-fit:cover;border:2px solid var(--ink);border-radius:14px;background:var(--pink); }
+    .cart-item-title { margin:0 0 3px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;line-height:1; }
+    .cart-item-meta { margin:0 0 10px;font-size:.84rem;font-weight:800; }
+    .cart-item-bottom { display:flex;align-items:center;gap:9px;flex-wrap:wrap; }
+    .cart-qty { display:inline-flex;align-items:center;border:2px solid var(--ink);border-radius:999px;overflow:hidden;background:var(--white); }
+    .cart-qty button { width:31px;height:29px;border:0;background:transparent;font:inherit;font-weight:900;cursor:pointer; }
+    .cart-qty span { min-width:28px;text-align:center;font-weight:900; }
+    .cart-remove { border:0;background:transparent;padding:0;font:inherit;font-size:.75rem;font-weight:900;text-decoration:underline;cursor:pointer; }
+    .cart-line-price { margin-left:auto;font-weight:900; }
+    .cart-footer { border-top:var(--border);padding:16px;background:var(--white); }
+    .cart-summary { display:flex;justify-content:space-between;gap:12px;margin-bottom:4px;font-weight:900; }
+    .cart-shipping-note { margin:0 0 14px;font-size:.75rem;font-weight:800;opacity:.72; }
+    .cart-checkout { width:100%;font:inherit;cursor:pointer; }
+    .order-confirmation { position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:20px;background:rgba(17,17,17,.56); }
+    .order-confirmation[hidden] { display:none; }
+    .order-confirmation-card { width:min(560px,94vw);background:var(--cream);border:var(--border);border-radius:28px;box-shadow:10px 10px 0 var(--ink);padding:28px;text-align:center; }
+    .order-confirmation-mark { width:78px;height:78px;margin:0 auto 18px;border:var(--border);border-radius:50%;display:grid;place-items:center;background:var(--aqua);font-family:"Archivo Black",Impact,sans-serif;font-size:2.4rem; }
+    .order-confirmation h2 { margin:0 0 10px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:clamp(2.3rem,7vw,4rem);line-height:.92;letter-spacing:-.04em;color:var(--purple); }
+    .order-confirmation p { margin:8px auto;max-width:430px;font-weight:800; }
+    .order-confirmation .button { margin-top:18px;width:100%;font:inherit;cursor:pointer; }
+    body.cart-open { overflow:hidden; }
     footer { padding:42px clamp(20px,5vw,72px);background:var(--ink);color:var(--cream);display:flex;gap:30px;justify-content:space-between;align-items:end;flex-wrap:wrap; }
     footer a { font-weight:900; }
     .loading { opacity:.72; }
@@ -112,7 +182,10 @@
       .brand { width:108px; }
       .topbar nav { margin-left:auto;gap:7px; }
       .topbar nav a { display:none !important; }
-      .topbar nav a[href="#taplist"] { display:inline-flex !important;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:999px;padding:7px 10px;background:var(--white);box-shadow:2px 2px 0 var(--ink);font-size:.7rem;line-height:1;text-decoration:none; }
+      .topbar nav a[href="#taplist"],.topbar nav a[href="#merch"] { display:inline-flex !important;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:999px;padding:7px 10px;background:var(--white);box-shadow:2px 2px 0 var(--ink);font-size:.7rem;line-height:1;text-decoration:none; }
+      .cart-button { padding:0;font-size:.7rem;box-shadow:none; }
+      .cart-button.has-items { padding:7px 9px;box-shadow:2px 2px 0 var(--ink); }
+      .cart-count { min-width:19px;height:19px;margin-left:3px;padding:0 5px;font-size:.62rem; }
       .mobile-quick { display:block;padding:26px 16px 30px;background:var(--yellow);border-bottom:var(--border); }
       .mobile-quick-inner { max-width:560px;margin:0 auto; }
       .mobile-quick .eyebrow { margin-bottom:7px; }
@@ -123,6 +196,18 @@
       .mobile-actions { display:flex;gap:9px;margin-top:14px; }
       .mobile-actions .button { flex:1;text-align:center;padding:10px 12px;font-size:.78rem;box-shadow:3px 3px 0 var(--ink); }
       .hero,.marquee,#visit { display:none !important; }
+      #merch { padding:34px 14px 42px; }
+      #merch .section-head { margin-bottom:18px; }
+      #merch .section-title { font-size:clamp(2.8rem,14vw,4.4rem); }
+      .merch-shell { grid-template-columns:1fr;border-radius:20px;box-shadow:3px 3px 0 var(--ink); }
+      .merch-photo { min-height:0;padding:12px;border-right:0;border-bottom:var(--border); }
+      .merch-photo img { aspect-ratio:1/1;max-height:none; }
+      .merch-photo-note { left:24px;bottom:24px; }
+      .merch-detail { padding:22px 18px 24px; }
+      .merch-detail h3 { font-size:2.4rem; }
+      .merch-addons { margin-top:14px; }
+      .merch-addon-card { grid-template-columns:100px 1fr;padding:12px;gap:12px;border-radius:18px;box-shadow:3px 3px 0 var(--ink); }
+      .merch-addon-copy h3 { font-size:1.35rem; }
       #taplist { padding:34px 14px 42px;border-bottom:var(--border); }
       #taplist .section-head { margin-bottom:18px; }
       #taplist .section-title { margin:0 0 5px;font-size:clamp(2.8rem,14vw,4.4rem);line-height:.9; }
@@ -140,16 +225,43 @@
       footer .footer-copy { margin-top:8px; }
     }
   </style>
+  <!-- shopping-cart-upsell-build: 2026-09-24b -->
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="#top" aria-label="Howzit Brewing home"><span class="bubble-mark" aria-hidden="true"></span></a>
     <nav aria-label="Primary">
       <a href="#taplist">Tap List</a>
+      <a href="#merch">Merch</a>
       <a href="#visit">Visit</a>
-      <a class="nav-cta" href="https://www.instagram.com/howzitbrewing" target="_blank" rel="noreferrer">Instagram</a>
+      <button class="cart-button" type="button" id="cart-toggle" aria-controls="cart-drawer" aria-expanded="false">Cart <span class="cart-count" id="cart-count">0</span></button>
     </nav>
   </header>
+
+  <div class="cart-backdrop" id="cart-backdrop" hidden></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-hidden="true" aria-label="Shopping cart">
+    <div class="cart-head">
+      <h2>Your Cart</h2>
+      <button class="cart-close" type="button" id="cart-close" aria-label="Close cart">×</button>
+    </div>
+    <div class="cart-body" id="cart-body"><div class="cart-empty">Your cart is empty.</div></div>
+    <div class="cart-footer">
+      <div class="cart-summary"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
+      <p class="cart-shipping-note">$9.95 Flat Rate Shipping + tax at Square checkout.</p>
+      <button class="button cart-checkout" type="button" id="cart-checkout" disabled>Checkout Now</button>
+      <p class="merch-status" id="cart-status"></p>
+    </div>
+  </aside>
+
+  <div class="order-confirmation" id="order-confirmation" hidden role="dialog" aria-modal="true" aria-labelledby="order-confirmation-title">
+    <div class="order-confirmation-card">
+      <div class="order-confirmation-mark" aria-hidden="true">✓</div>
+      <h2 id="order-confirmation-title">Order received — mahalo!</h2>
+      <p>Your payment went through and Square emailed your receipt.</p>
+      <p>We’ve got your order and will get it ready to ship.</p>
+      <button class="button" type="button" id="order-confirmation-close">Continue shopping</button>
+    </div>
+  </div>
 
   <main id="top">
     <section class="mobile-quick" aria-label="Quick visit info">
@@ -202,6 +314,46 @@
       <div class="tap-grid loading" id="tap-grid" aria-live="polite">
         <div class="tap-empty">Loading today’s taps…</div>
       </div>
+    </section>
+
+    <section class="section" id="merch">
+      <div class="section-head">
+        <h2 class="display section-title">Merch</h2>
+      </div>
+      <div class="merch-shell">
+        <div class="merch-photo">
+          <img id="merch-image" src="https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400" alt="Temporary generic T-shirt photo">
+          <div class="merch-photo-note" id="merch-photo-note">Temporary photo</div>
+        </div>
+        <div class="merch-detail">
+          <h3>THE TEE</h3>
+          <p class="merch-price" id="merch-price">$32</p>
+          <p>Our everyday Howzit tee. Choose from Black, Yellow, Mint or Heather Gray in sizes S through 2XL.</p>
+
+          <span class="merch-label">Color</span>
+          <div class="merch-options" id="merch-colors">
+            <button class="merch-option merch-color active" type="button" data-value="Black"><span class="merch-swatch black"></span>Black</button>
+            <button class="merch-option merch-color" type="button" data-value="Yellow"><span class="merch-swatch yellow"></span>Yellow</button>
+            <button class="merch-option merch-color" type="button" data-value="Mint"><span class="merch-swatch mint"></span>Mint</button>
+            <button class="merch-option merch-color" type="button" data-value="Heather Gray"><span class="merch-swatch gray"></span>Heather Gray</button>
+          </div>
+
+          <span class="merch-label">Size</span>
+          <div class="merch-options" id="merch-sizes">
+            <button class="merch-option" type="button" data-value="S">S</button>
+            <button class="merch-option active" type="button" data-value="M">M</button>
+            <button class="merch-option" type="button" data-value="L">L</button>
+            <button class="merch-option" type="button" data-value="XL">XL</button>
+            <button class="merch-option" type="button" data-value="2XL">2XL</button>
+          </div>
+
+          <div class="merch-selection" id="merch-selection">Black · M · $32</div>
+          <button class="button merch-buy" type="button" id="merch-buy" disabled>Add to Cart — $32</button>
+          <p style="margin:10px 0 0;font-size:.78rem;font-weight:800;opacity:.72;">$9.95 Flat Rate Shipping · Secure payment by Square</p>
+          <p class="merch-status" id="merch-status">Loading live inventory...</p>
+        </div>
+      </div>
+
     </section>
 
     <section id="visit">
@@ -312,5 +464,573 @@
     Promise.all([getCSV(TAPLIST_ENDPOINT),getCSV(HERO_ENDPOINT)]).then(([beers,hero])=>{renderTaplist(beers);renderHero(hero);}).catch(err=>{console.error('Howzit sheet load failed:',err);getCSV(TAPLIST_ENDPOINT).then(renderTaplist).catch(()=>{document.getElementById('tap-grid').innerHTML='<div class="tap-empty">Tap list is temporarily unavailable.</div>';});});
   }
   </script>
+
+  <script>
+    (() => {
+      const PRODUCT_ENDPOINT = '/.netlify/functions/merch-product';
+      const CHECKOUT_ENDPOINT = '/.netlify/functions/create-merch-checkout';
+      const CART_KEY = 'howzit-merch-cart-v1';
+      const fallbackImage = 'https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400';
+
+      let product = null;
+      let color = 'Black';
+      let size = 'M';
+      let cart = [];
+      let checkoutInProgress = false;
+
+      const selection = document.getElementById('merch-selection');
+      const status = document.getElementById('merch-status');
+      const buy = document.getElementById('merch-buy');
+      const priceEl = document.getElementById('merch-price');
+      const imageEl = document.getElementById('merch-image');
+      const imageNote = document.getElementById('merch-photo-note');
+      const cartToggle = document.getElementById('cart-toggle');
+      const cartCount = document.getElementById('cart-count');
+      const cartDrawer = document.getElementById('cart-drawer');
+      const cartBackdrop = document.getElementById('cart-backdrop');
+      const cartClose = document.getElementById('cart-close');
+      const cartBody = document.getElementById('cart-body');
+      const cartSubtotal = document.getElementById('cart-subtotal');
+      const cartCheckout = document.getElementById('cart-checkout');
+      const cartStatus = document.getElementById('cart-status');
+      const orderConfirmation = document.getElementById('order-confirmation');
+      const orderConfirmationClose = document.getElementById('order-confirmation-close');
+
+      function money(cents) {
+        const value = Number(cents || 0) / 100;
+        return '$' + (Number.isInteger(value) ? value.toFixed(0) : value.toFixed(2));
+      }
+
+      function variationFor(c, z) {
+        return product && product.variations
+          ? product.variations.find((v) => v.color === c && v.size === z)
+          : null;
+      }
+
+      function loadCart() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+          cart = Array.isArray(saved) ? saved : [];
+        } catch (error) {
+          cart = [];
+        }
+      }
+
+      function saveCart() {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        renderCart();
+      }
+
+      function cartQty() {
+        return cart.reduce((sum, item) => sum + item.quantity, 0);
+      }
+
+      function cartSubtotalCents() {
+        return cart.reduce((sum, item) => sum + (item.priceCents * item.quantity), 0);
+      }
+
+      function openCart() {
+        cartBackdrop.hidden = false;
+        requestAnimationFrame(() => {
+          cartBackdrop.classList.add('open');
+          cartDrawer.classList.add('open');
+        });
+        cartDrawer.setAttribute('aria-hidden', 'false');
+        cartToggle.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('cart-open');
+      }
+
+      function closeCart() {
+        cartBackdrop.classList.remove('open');
+        cartDrawer.classList.remove('open');
+        cartDrawer.setAttribute('aria-hidden', 'true');
+        cartToggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('cart-open');
+        setTimeout(() => { cartBackdrop.hidden = true; }, 220);
+      }
+
+      function renderCart() {
+        const count = cartQty();
+        const hasTee = cart.some((item) => item.kind !== 'sticker');
+        const hasSticker = cart.some((item) => item.kind === 'sticker');
+        const stickerOnlyMessage = 'Stickers are available as an add-on with a tee order.';
+
+        cartCount.textContent = String(count);
+        cartCount.style.display = count ? 'inline-grid' : 'none';
+        cartToggle.classList.toggle('has-items', count > 0);
+        cartSubtotal.textContent = money(cartSubtotalCents());
+        renderCheckoutState();
+
+        if (cart.length && !hasTee) {
+          cartStatus.textContent = stickerOnlyMessage;
+        } else if (cartStatus.textContent === stickerOnlyMessage) {
+          cartStatus.textContent = '';
+        }
+
+        if (!cart.length) {
+          cartBody.innerHTML = '<div class="cart-empty">Your cart is empty.</div>';
+          return;
+        }
+
+        const rows = cart.map((item) => {
+          const image = item.image || fallbackImage;
+          const title = item.kind === 'sticker' ? (item.name || 'Howzit Sticker') : 'The Tee';
+          const meta = item.kind === 'sticker'
+            ? money(item.priceCents)
+            : item.color + ' / ' + item.size + ' / ' + money(item.priceCents);
+          const alt = item.kind === 'sticker' ? title : ('Howzit Tee - ' + item.color);
+          return '<div class="cart-row" data-id="' + item.variationId + '">' +
+            '<img class="cart-thumb" src="' + image + '" alt="' + alt + '">' +
+            '<div>' +
+              '<p class="cart-item-title">' + title + '</p>' +
+              '<p class="cart-item-meta">' + meta + '</p>' +
+              '<div class="cart-item-bottom">' +
+                '<div class="cart-qty">' +
+                  '<button type="button" data-action="minus" aria-label="Decrease quantity">−</button>' +
+                  '<span>' + item.quantity + '</span>' +
+                  '<button type="button" data-action="plus" aria-label="Increase quantity">+</button>' +
+                '</div>' +
+                '<button class="cart-remove" type="button" data-action="remove">Remove</button>' +
+                '<span class="cart-line-price">' + money(item.priceCents * item.quantity) + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+
+        const sticker = product && product.sticker;
+        const upsell = hasTee && !hasSticker && sticker && sticker.available
+          ? '<div class="cart-upsell">' +
+              '<p class="cart-upsell-title">Want a sticker?</p>' +
+              '<p class="cart-upsell-copy">Throw a small Howzit sticker in the order while we are already shipping your tee.</p>' +
+              '<button class="button" type="button" data-action="add-sticker">Add a sticker — ' + money(sticker.priceCents) + '</button>' +
+            '</div>'
+          : '';
+
+        cartBody.innerHTML = rows + upsell;
+      }
+
+      function reconcileCart() {
+        if (!product || !product.variations) return;
+        cart = cart.map((item) => {
+          if (item.kind === 'sticker') {
+            const sticker = product.sticker;
+            if (!sticker || sticker.id !== item.variationId || !sticker.available) return null;
+            return {
+              kind: 'sticker',
+              variationId: sticker.id,
+              name: sticker.name || 'Howzit Sticker',
+              priceCents: sticker.priceCents,
+              image: sticker.image || '/bubble.svg',
+              stock: sticker.stock,
+              quantity: Math.min(item.quantity, Math.max(1, Math.floor(sticker.stock || 1)))
+            };
+          }
+          const live = product.variations.find((v) => v.id === item.variationId);
+          if (!live || !live.available) return null;
+          return {
+            kind: 'tee',
+            name: 'The Tee',
+            variationId: live.id,
+            color: live.color,
+            size: live.size,
+            priceCents: live.priceCents || item.priceCents,
+            image: live.image || product.image || item.image || null,
+            stock: live.stock,
+            quantity: Math.min(item.quantity, Math.max(1, Math.floor(live.stock || 1)))
+          };
+        }).filter(Boolean);
+        saveCart();
+      }
+
+      function addSelectedToCart() {
+        const variation = variationFor(color, size);
+        if (!(variation && variation.available && variation.id)) return;
+
+        const existing = cart.find((item) => item.variationId === variation.id);
+        if (existing) {
+          if (existing.quantity >= variation.stock) {
+            status.textContent = 'That is all we have in stock for this size/color.';
+            openCart();
+            return;
+          }
+          existing.quantity += 1;
+          existing.stock = variation.stock;
+        } else {
+          cart.push({
+            kind: 'tee',
+            name: 'The Tee',
+            variationId: variation.id,
+            color: variation.color,
+            size: variation.size,
+            priceCents: variation.priceCents || product.priceCents || 3200,
+            image: variation.image || product.image || null,
+            stock: variation.stock,
+            quantity: 1
+          });
+        }
+
+        saveCart();
+        status.textContent = variation.color + ' / ' + variation.size + ' added to cart.';
+        openCart();
+      }
+
+      function addStickerToCart() {
+        const hasTee = cart.some((item) => item.kind !== 'sticker');
+        if (!hasTee) {
+          cartStatus.textContent = 'Stickers are available as an add-on with a tee order.';
+          return;
+        }
+        if (!(product && product.sticker && product.sticker.available && product.sticker.id)) return;
+        const sticker = product.sticker;
+        const existing = cart.find((item) => item.variationId === sticker.id);
+
+        if (existing) {
+          if (existing.quantity >= sticker.stock) {
+            cartStatus.textContent = 'That is all we have in stock for stickers.';
+            openCart();
+            return;
+          }
+          existing.quantity += 1;
+          existing.stock = sticker.stock;
+        } else {
+          cart.push({
+            kind: 'sticker',
+            name: sticker.name || 'Howzit Sticker',
+            variationId: sticker.id,
+            priceCents: sticker.priceCents,
+            image: sticker.image || '/bubble.svg',
+            stock: sticker.stock,
+            quantity: 1
+          });
+        }
+
+        saveCart();
+        cartStatus.textContent = '';
+        openCart();
+      }
+
+      function markActive(groupId, value) {
+        document.querySelectorAll('#' + groupId + ' .merch-option').forEach((button) => {
+          button.classList.toggle('active', button.dataset.value === value);
+        });
+      }
+
+      function setImage(variation) {
+        const liveImage = (variation && variation.image) || (product && product.image);
+        imageEl.src = liveImage || fallbackImage;
+        imageEl.alt = liveImage ? ('Howzit Tee - ' + color) : 'Temporary generic T-shirt photo';
+        imageNote.textContent = liveImage ? 'Live from Square' : 'Temporary photo';
+        imageNote.style.display = 'block';
+      }
+
+      function refreshSizes() {
+        const sizeButtons = [...document.querySelectorAll('#merch-sizes .merch-option')];
+        sizeButtons.forEach((button) => {
+          const variation = variationFor(color, button.dataset.value);
+          button.disabled = !(variation && variation.available);
+        });
+
+        const current = variationFor(color, size);
+        if (!(current && current.available)) {
+          const firstAvailable = sizeButtons.find((button) => !button.disabled);
+          if (firstAvailable) size = firstAvailable.dataset.value;
+        }
+        markActive('merch-sizes', size);
+      }
+
+      function refresh() {
+        if (!product) return;
+        refreshSizes();
+        const variation = variationFor(color, size);
+        const priceCents = (variation && variation.priceCents) || product.priceCents || 3200;
+        const price = money(priceCents);
+
+        selection.textContent = color + ' / ' + size + ' / ' + price;
+        priceEl.textContent = price;
+        buy.textContent = 'Add to Cart - ' + price;
+        buy.disabled = !(variation && variation.available && variation.id);
+        setImage(variation);
+
+        if (variation && variation.ambiguous) status.textContent = 'That option needs cleanup in Square before it can be sold online.';
+        else if (variation && variation.missing) status.textContent = 'That option is not set up in Square yet.';
+        else if (variation && !variation.available) status.textContent = 'Sold out online.';
+        else status.textContent = '';
+      }
+
+      document.querySelectorAll('#merch-colors .merch-option').forEach((button) => {
+        button.addEventListener('click', () => {
+          color = button.dataset.value;
+          markActive('merch-colors', color);
+          refresh();
+        });
+      });
+
+      document.querySelectorAll('#merch-sizes .merch-option').forEach((button) => {
+        button.addEventListener('click', () => {
+          if (button.disabled) return;
+          size = button.dataset.value;
+          markActive('merch-sizes', size);
+          refresh();
+        });
+      });
+
+      buy.addEventListener('click', addSelectedToCart);
+      cartToggle.addEventListener('click', openCart);
+      cartClose.addEventListener('click', closeCart);
+      cartBackdrop.addEventListener('click', closeCart);
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && cartDrawer.classList.contains('open')) closeCart();
+      });
+
+      cartBody.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+
+        if (button.dataset.action === 'add-sticker') {
+          addStickerToCart();
+          return;
+        }
+
+        const row = button.closest('.cart-row');
+        const item = row && cart.find((candidate) => candidate.variationId === row.dataset.id);
+        if (!item) return;
+
+        if (button.dataset.action === 'remove') {
+          cart = cart.filter((candidate) => candidate.variationId !== item.variationId);
+        } else if (button.dataset.action === 'minus') {
+          item.quantity -= 1;
+          if (item.quantity <= 0) cart = cart.filter((candidate) => candidate.variationId !== item.variationId);
+        } else if (button.dataset.action === 'plus') {
+          const max = Math.max(1, Math.floor(item.stock || 1));
+          if (item.quantity < max) item.quantity += 1;
+        }
+
+        cartStatus.textContent = '';
+        saveCart();
+      });
+
+      function renderCheckoutState() {
+        const hasTee = cart.some((item) => item.kind !== 'sticker');
+        cartCheckout.disabled = checkoutInProgress || !cart.length || !hasTee;
+        cartCheckout.textContent = checkoutInProgress ? 'Opening Square...' : 'Checkout Now';
+      }
+
+      function clearTransientCheckoutState() {
+        checkoutInProgress = false;
+        if (cartStatus.dataset.transient === 'checkout') {
+          cartStatus.textContent = '';
+          delete cartStatus.dataset.transient;
+        }
+        renderCheckoutState();
+      }
+
+      // pageshow fires on normal navigation and back/forward-cache restores.
+      window.addEventListener('pageshow', clearTransientCheckoutState);
+
+      orderConfirmationClose.addEventListener('click', () => {
+        orderConfirmation.hidden = true;
+      });
+
+      orderConfirmation.addEventListener('click', (event) => {
+        if (event.target === orderConfirmation) orderConfirmation.hidden = true;
+      });
+
+      cartCheckout.addEventListener('click', async () => {
+        if (checkoutInProgress || !cart.length) return;
+        const hasTee = cart.some((item) => item.kind !== 'sticker');
+        if (!hasTee) {
+          cartStatus.textContent = 'Stickers are available as an add-on with a tee order.';
+          delete cartStatus.dataset.transient;
+          renderCart();
+          return;
+        }
+
+        checkoutInProgress = true;
+        cartStatus.textContent = 'Opening secure checkout...';
+        cartStatus.dataset.transient = 'checkout';
+        renderCheckoutState();
+
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 15000);
+
+          let response;
+          try {
+            response = await fetch(CHECKOUT_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              signal: controller.signal,
+              body: JSON.stringify({
+                items: cart.map((item) => ({ variationId: item.variationId, quantity: item.quantity }))
+              })
+            });
+          } finally {
+            clearTimeout(timeout);
+          }
+
+          const data = await response.json();
+
+          if (!response.ok || !data.checkoutUrl) {
+            const details = [];
+            if (data.squareStatus) details.push('Square HTTP ' + data.squareStatus);
+            if (Array.isArray(data.squareErrors) && data.squareErrors.length) {
+              details.push(data.squareErrors.map((e) => [e.code, e.detail, e.field].filter(Boolean).join(': ')).filter(Boolean).join(', '));
+            }
+            throw new Error((data.error || 'Checkout unavailable') + (details.length ? ' (' + details.join('; ') + ')' : ''));
+          }
+
+          clearTransientCheckoutState();
+          window.location.assign(data.checkoutUrl);
+        } catch (error) {
+          console.error('Merch checkout failed', error);
+          checkoutInProgress = false;
+          cartStatus.textContent = error && error.name === 'AbortError'
+            ? 'Square checkout took too long to respond. Please try again.'
+            : (error.message || 'Checkout is temporarily unavailable.');
+          delete cartStatus.dataset.transient;
+          renderCheckoutState();
+        }
+      });
+
+      async function loadProduct() {
+        try {
+          const response = await fetch(PRODUCT_ENDPOINT + '?v=' + Date.now(), { cache: 'no-store' });
+          const data = await response.json();
+          if (!response.ok) {
+            const details = [];
+            if (data.stage) details.push('stage: ' + data.stage);
+            if (data.squareStatus) details.push('Square HTTP ' + data.squareStatus);
+            if (Array.isArray(data.squareErrors) && data.squareErrors.length) details.push(data.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
+            if (Array.isArray(data.candidates) && data.candidates.length) details.push('found: ' + data.candidates.join(' | '));
+            if (data.missing) {
+              const missing = Object.keys(data.missing).filter((key) => data.missing[key]);
+              if (missing.length) details.push('missing env: ' + missing.join(', '));
+            }
+            throw new Error((data.error || 'Inventory unavailable') + (details.length ? ' (' + details.join('; ') + ')' : ''));
+          }
+
+          product = data;
+
+          if (new URLSearchParams(window.location.search).get('debug') === '1') {
+            let debugPanel = document.getElementById('shopping-debug');
+            if (!debugPanel) {
+              debugPanel = document.createElement('section');
+              debugPanel.id = 'shopping-debug';
+              debugPanel.style.cssText = 'position:relative;z-index:1000;margin:18px;padding:16px;border:3px solid #111;border-radius:16px;background:#fffdf8;box-shadow:5px 5px 0 #111;font:13px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;max-height:70vh;';
+              document.body.appendChild(debugPanel);
+            }
+
+            const storefront = product.variations || [];
+            const rows = storefront.map((v) => ({
+              color: v.color,
+              size: v.size,
+              quantity: Number(v.stock || 0),
+              available: !!v.available,
+              id: v.id || null,
+              ambiguous: !!v.ambiguous,
+              missing: !!v.missing
+            }));
+
+            const byColor = {};
+            rows.forEach((row) => {
+              if (!byColor[row.color]) byColor[row.color] = [];
+              byColor[row.color].push(row);
+            });
+
+            const esc = (value) => String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            const colorSections = Object.keys(byColor).map((colorName) => {
+              const body = byColor[colorName].map((row) => {
+                const state = row.ambiguous ? 'AMBIGUOUS' : row.missing ? 'MISSING' : row.available ? 'IN STOCK' : 'OUT';
+                return '<tr>' +
+                  '<td style="padding:4px 8px;border-bottom:1px solid #ccc"><b>' + esc(row.size) + '</b></td>' +
+                  '<td style="padding:4px 8px;border-bottom:1px solid #ccc;text-align:right">' + row.quantity + '</td>' +
+                  '<td style="padding:4px 8px;border-bottom:1px solid #ccc">' + state + '</td>' +
+                  '<td style="padding:4px 8px;border-bottom:1px solid #ccc;font-size:11px">' + esc(row.id || '—') + '</td>' +
+                '</tr>';
+              }).join('');
+              return '<h3 style="margin:16px 0 6px">' + esc(colorName) + '</h3>' +
+                '<table style="border-collapse:collapse;width:100%;min-width:620px">' +
+                  '<thead><tr><th align="left">Size</th><th align="right">Qty</th><th align="left">Status</th><th align="left">Square variation ID</th></tr></thead>' +
+                  '<tbody>' + body + '</tbody>' +
+                '</table>';
+            }).join('');
+
+            debugPanel.innerHTML =
+              '<strong style="font-size:16px">SHOPPING QA DEBUG — ALL TEE INVENTORY</strong>' +
+              '<p><b>Website inventory location:</b> ' +
+                esc((product.debug && product.debug.resolvedLocationName) || 'unknown') + ' (' +
+                esc((product.debug && product.debug.resolvedLocationId) || 'unknown') + ')' +
+              '</p>' +
+              colorSections +
+              '<details style="margin-top:16px"><summary><b>Raw parsed Square variations</b></summary><pre style="white-space:pre-wrap">' +
+                esc(JSON.stringify((product.debug && product.debug.parsedVariations) || [], null, 2)) +
+              '</pre></details>' +
+              '<details style="margin-top:12px"><summary><b>Square inventory by location/state</b></summary><pre style="white-space:pre-wrap">' +
+                esc(JSON.stringify((product.debug && product.debug.teeInventoryStates) || [], null, 2)) +
+              '</pre></details>';
+          }
+
+          const inventoryHealthy = !(product.debug && product.debug.inventoryError);
+          if (inventoryHealthy) {
+            reconcileCart();
+          } else {
+            // Preserve the buyer's saved cart when Square inventory is temporarily unavailable.
+            renderCart();
+          }
+
+          const firstAvailable = product.variations.find((v) => v.available && v.id);
+          if (firstAvailable) {
+            color = firstAvailable.color;
+            size = firstAvailable.size;
+          }
+
+          markActive('merch-colors', color);
+          refresh();
+
+          if (product.debug && product.debug.inventoryError) {
+            const err = product.debug.inventoryError;
+            const bits = ['Square image/catalog connected'];
+            if (err.squareStatus) bits.push('inventory HTTP ' + err.squareStatus);
+            if (Array.isArray(err.squareErrors) && err.squareErrors.length) bits.push(err.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
+            status.textContent = bits.join(' · ');
+            buy.disabled = true;
+          } else if (!firstAvailable) {
+            status.textContent = 'No tee variations are currently ready for online sale.';
+          }
+        } catch (error) {
+          console.error('Merch inventory load failed', error);
+          status.textContent = error.message || 'Live Square inventory is unavailable right now.';
+          buy.disabled = true;
+        }
+      }
+
+      loadCart();
+      clearTransientCheckoutState();
+
+      const checkoutReturnedSuccess =
+        new URLSearchParams(window.location.search).get('checkout') === 'success';
+
+      if (checkoutReturnedSuccess) {
+        cart = [];
+        saveCart();
+        clearTransientCheckoutState();
+        status.textContent = 'Order complete — mahalo!';
+        orderConfirmation.hidden = false;
+
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('checkout');
+        window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+      }
+
+      renderCart();
+
+      if (checkoutReturnedSuccess) {
+        orderConfirmationClose.focus();
+      }
+
+      loadProduct();
+    })();
+  </script>
+  <script src="/events.js" defer></script>
 </body>
 </html>
