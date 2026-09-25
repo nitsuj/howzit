@@ -285,6 +285,7 @@ exports.handler = async function (event) {
         description: 'Howzit website merch',
         order: {
           location_id: locationId,
+          reference_id: 'HOWZIT-WEB-MERCH',
           line_items: lineItems,
           pricing_options: {
             auto_apply_taxes: true
