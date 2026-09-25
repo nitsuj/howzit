@@ -25,6 +25,14 @@ function normalize(value) {
 
 function getColor(name) {
   const n = normalize(name);
+
+  // Explicit Square -> storefront color aliases.
+  if (n === 'lifeguard') return 'Yellow';
+  if (n === 'mint') return 'Mint';
+  if (n === 'black aqua') return 'Black';
+  if (n === 'gray blue') return 'Heather Gray';
+
+  // Storefront/native labels and legacy fallbacks.
   if (n.includes('heather gray')) return 'Heather Gray';
   if (/(^| )black( |$)/.test(n)) return 'Black';
   if (/(^| )yellow( |$)/.test(n)) return 'Yellow';
@@ -442,11 +450,18 @@ exports.handler = async function (event) {
   }
 
   const grouped = {};
+  const colorImageIds = {};
   parsed.forEach(function (variation) {
     const key = variation.color + '|' + variation.size;
     if (!grouped[key]) grouped[key] = [];
     variation.stock = inventoryMap[variation.id] || 0;
     grouped[key].push(variation);
+
+    // Let one Square variation image represent the whole storefront color.
+    // Exact variation image still wins below when present.
+    if (variation.color && variation.imageId && !colorImageIds[variation.color]) {
+      colorImageIds[variation.color] = variation.imageId;
+    }
   });
 
   const itemImageId = item.item_data && item.item_data.image_ids && item.item_data.image_ids[0];
@@ -476,7 +491,9 @@ exports.handler = async function (event) {
         price: v.priceCents / 100,
         stock: v.stock,
         available: v.stock > 0,
-        image: (v.imageId && images[v.imageId]) || itemImage
+        image: (v.imageId && images[v.imageId]) ||
+          (colorImageIds[color] && images[colorImageIds[color]]) ||
+          itemImage
       });
     });
   });
@@ -522,6 +539,20 @@ exports.handler = async function (event) {
         variationCountParsed: parsed.length,
         variationCountStructuredColor: parsed.filter(function (v) { return v.usedStructuredColor; }).length,
         variationCountStructuredSize: parsed.filter(function (v) { return v.usedStructuredSize; }).length,
+        parsedVariations: parsed.map(function (v) {
+          return {
+            id: v.id,
+            name: v.name,
+            color: v.color,
+            size: v.size,
+            stock: v.stock,
+            imageId: v.imageId,
+            imageResolved: !!(v.imageId && images[v.imageId]),
+            usedStructuredColor: v.usedStructuredColor,
+            usedStructuredSize: v.usedStructuredSize
+          };
+        }),
+        colorImageIds: colorImageIds,
         itemOptionCount: Object.keys(optionLookup.options).length,
         imageCount: Object.keys(images).length,
         matchedSquareItem: (item.item_data && item.item_data.name) || null,
