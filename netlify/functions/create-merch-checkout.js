@@ -1,113 +1,24 @@
-const fetch = require('node-fetch');
 const crypto = require('crypto');
+const {
+  ITEM_NAME,
+  STICKER_ITEM_NAME,
+  COLORS,
+  SIZES,
+  normalize,
+  buildOptionLookup,
+  parseVariation,
+  variationEligibility,
+  square,
+  listCatalog,
+  resolveLocation
+} = require('./_merch-square');
 
-const API = 'https://connect.squareup.com';
-const VERSION = '2026-09-16';
-const COLORS = ['Black', 'Yellow', 'Mint', 'Heather Gray'];
-const SIZES = ['S', 'M', 'L', 'XL', '2XL'];
 const MAX_LINES = 8;
 const MAX_TOTAL_QTY = 10;
-
-function headers(token) {
-  return {
-    Authorization: 'Bearer ' + token,
-    'Content-Type': 'application/json',
-    'Square-Version': VERSION
-  };
-}
-
-function normalize(value) {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/grey/g, 'gray')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim()
-    .replace(/\s+/g, ' ');
-}
-
-function getColor(name) {
-  const n = normalize(name);
-  if (n === 'lifeguard' || n === 'yellow') return 'Yellow';
-  if (n === 'mint') return 'Mint';
-  if (n === 'black aqua' || n === 'black') return 'Black';
-  if (n === 'gray blue' || n === 'heather gray') return 'Heather Gray';
-  return null;
-}
-
-function getSize(name) {
-  const n = normalize(name);
-  const t = new Set(n.split(' '));
-  if (t.has('2xl') || t.has('xxl') || t.has('2x') || n.includes('2x large')) return '2XL';
-  if (t.has('xl') || t.has('xlarge') || n.includes('x large')) return 'XL';
-  if (t.has('l') || t.has('large')) return 'L';
-  if (t.has('m') || t.has('medium')) return 'M';
-  if (t.has('s') || t.has('small')) return 'S';
-  return null;
-}
-
-function parseVariationName(name) {
-  const parts = String(name || '').split(',').map(function (part) { return part.trim(); });
-  if (parts.length < 2) {
-    return { size: getSize(name), color: null };
-  }
-
-  return {
-    size: getSize(parts[0]),
-    color: getColor(parts.slice(1).join(','))
-  };
-}
-
-async function square(path, token, options) {
-  const response = await fetch(API + path, Object.assign({}, options || {}, {
-    headers: Object.assign({}, headers(token), (options && options.headers) || {})
-  }));
-  const data = await response.json().catch(function () { return {}; });
-
-  if (!response.ok) {
-    const err = new Error('Square API ' + response.status);
-    err.status = response.status;
-    err.squareErrors = (data.errors || []).map(function (e) {
-      return {
-        code: e.code || null,
-        category: e.category || null,
-        detail: e.detail || null,
-        field: e.field || null
-      };
-    });
-    throw err;
-  }
-
-  return data;
-}
-
-async function resolveLocation(token, configuredLocationId) {
-  try {
-    const data = await square('/v2/locations', token, { method: 'GET' });
-    const locations = data.locations || [];
-    const active = locations.filter(function (location) {
-      return location.status === 'ACTIVE';
-    });
-
-    if (active.length === 1) return active[0];
-
-    const configured = active.find(function (location) {
-      return location.id === configuredLocationId;
-    });
-    if (configured) return configured;
-
-    if (active.length) return active[0];
-  } catch (error) {
-    console.error('checkout location resolution failed', error);
-  }
-
-  if (configuredLocationId) return { id: configuredLocationId, name: configuredLocationId };
-  throw new Error('No Square location available');
-}
 
 function parseCart(body) {
   let source = Array.isArray(body.items) ? body.items : [];
 
-  // Backward compatibility with the first prototype request shape.
   if (!source.length && body.variationId) {
     source = [{ variationId: body.variationId, quantity: body.quantity || 1 }];
   }
@@ -126,70 +37,64 @@ function parseCart(body) {
   });
 }
 
-async function validateVariation(line, token) {
-  const catalog = await square(
-    '/v2/catalog/object/' + encodeURIComponent(line.variationId) + '?include_related_objects=true',
-    token,
-    { method: 'GET' }
-  );
+function publicError(message, status) {
+  const error = new Error(message);
+  error.publicStatus = status || 400;
+  return error;
+}
 
-  const variation = catalog.object;
+function validateVariation(line, variation, parent, optionLookup, locationId) {
   const data = variation && variation.item_variation_data;
-  const parent = (catalog.related_objects || []).find(function (obj) {
-    return obj.type === 'ITEM' && data && obj.id === data.item_id;
-  });
 
-  if (!variation || variation.type !== 'ITEM_VARIATION' || !data || !parent) {
-    const err = new Error('Invalid product selection');
-    err.publicStatus = 400;
-    throw err;
+  if (!variation || variation.type !== 'ITEM_VARIATION' || !data || !parent || parent.type !== 'ITEM') {
+    throw publicError('Invalid product selection', 400);
   }
 
   const parentDisplayName = (parent.item_data && parent.item_data.name) || '';
   const parentName = normalize(parentDisplayName);
+  const eligibility = variationEligibility(variation, parent, locationId);
 
-  if (parentName === 'sticker') {
+  if (!eligibility.eligible) {
+    throw publicError('That item is not currently available for web sale', 409);
+  }
+
+  if (parentName === normalize(STICKER_ITEM_NAME)) {
     if (normalize(data.name) !== 'regular') {
-      const err = new Error('Sticker variation is not approved for web sale');
-      err.publicStatus = 400;
-      throw err;
+      throw publicError('Sticker variation is not approved for web sale', 400);
     }
 
     return {
       variationId: line.variationId,
       quantity: line.quantity,
       kind: 'sticker',
-      name: parentDisplayName || 'Howzit Sticker'
+      name: parentDisplayName || STICKER_ITEM_NAME
     };
   }
 
-  if (!(parentName.includes('tee') || parentName.includes('shirt'))) {
-    const err = new Error('Item is not approved for web sale');
-    err.publicStatus = 400;
-    throw err;
+  if (parentName !== normalize(ITEM_NAME)) {
+    throw publicError('Item is not approved for web sale', 400);
   }
 
-  const parsedVariation = parseVariationName(data.name);
-  const color = parsedVariation.color;
-  const size = parsedVariation.size;
+  const parsed = parseVariation(data, optionLookup);
+  const color = parsed.color;
+  const size = parsed.size;
 
   if (!COLORS.includes(color) || !SIZES.includes(size)) {
-    const err = new Error('Variation is not approved for web sale');
-    err.publicStatus = 400;
-    throw err;
+    throw publicError('Variation is not approved for web sale', 400);
   }
 
-  const parentVariations = (parent.item_data && parent.item_data.variations) || [];
-  const sameCombo = parentVariations.filter(function (candidate) {
+  const sameCombo = ((parent.item_data && parent.item_data.variations) || []).filter(function (candidate) {
     const candidateData = candidate.item_variation_data || {};
-    const parsedCandidate = parseVariationName(candidateData.name);
-    return parsedCandidate.color === color && parsedCandidate.size === size;
+    const candidateParsed = parseVariation(candidateData, optionLookup);
+    const candidateEligibility = variationEligibility(candidate, parent, locationId);
+
+    return candidateEligibility.eligible &&
+      candidateParsed.color === color &&
+      candidateParsed.size === size;
   });
 
   if (sameCombo.length !== 1 || sameCombo[0].id !== line.variationId) {
-    const err = new Error('That color/size needs cleanup in Square before web sale');
-    err.publicStatus = 409;
-    throw err;
+    throw publicError('That color/size needs cleanup in Square before web sale', 409);
   }
 
   return {
@@ -205,7 +110,7 @@ exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
@@ -214,6 +119,7 @@ exports.handler = async function (event) {
   const configuredLocationId = process.env.SQUARE_LOCATION_ID;
   const rawShipping = String(process.env.MERCH_SHIPPING_CENTS || '995').trim();
   let shippingCents = Number(rawShipping);
+
   if (rawShipping.includes('.') && shippingCents > 0 && shippingCents < 100) {
     shippingCents = Math.round(shippingCents * 100);
   }
@@ -224,22 +130,10 @@ exports.handler = async function (event) {
   if (!token) {
     return {
       statusCode: 503,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       body: JSON.stringify({ error: 'Square is not configured' })
     };
   }
-
-  let location;
-  try {
-    location = await resolveLocation(token, configuredLocationId);
-  } catch (error) {
-    return {
-      statusCode: 503,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'No usable Square location found' })
-    };
-  }
-  const locationId = location.id;
 
   let body;
   try {
@@ -247,7 +141,7 @@ exports.handler = async function (event) {
   } catch (error) {
     return {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       body: JSON.stringify({ error: 'Invalid request' })
     };
   }
@@ -258,16 +152,54 @@ exports.handler = async function (event) {
   if (!cart.length || cart.length > MAX_LINES || totalQty < 1 || totalQty > MAX_TOTAL_QTY) {
     return {
       statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       body: JSON.stringify({ error: 'Invalid cart' })
     };
   }
 
   try {
-    const validated = [];
-    for (const line of cart) {
-      validated.push(await validateVariation(line, token));
-    }
+    const location = await resolveLocation(token, configuredLocationId);
+    const locationId = location.id;
+    const ids = cart.map(function (line) { return line.variationId; });
+
+    const results = await Promise.all([
+      square('/v2/catalog/batch-retrieve', token, {
+        method: 'POST',
+        body: JSON.stringify({
+          object_ids: ids,
+          include_related_objects: true
+        })
+      }),
+      listCatalog(token, ['ITEM_OPTION'])
+    ]);
+
+    const catalog = results[0];
+    const optionLookup = buildOptionLookup(results[1]);
+    const variationsById = {};
+    const parentsById = {};
+
+    (catalog.objects || []).forEach(function (object) {
+      if (object.type === 'ITEM_VARIATION') variationsById[object.id] = object;
+      if (object.type === 'ITEM') parentsById[object.id] = object;
+    });
+
+    (catalog.related_objects || []).forEach(function (object) {
+      if (object.type === 'ITEM') parentsById[object.id] = object;
+    });
+
+    const validated = cart.map(function (line) {
+      const variation = variationsById[line.variationId];
+      const data = variation && variation.item_variation_data;
+      const parent = data && parentsById[data.item_id];
+
+      return validateVariation(
+        line,
+        variation,
+        parent,
+        optionLookup,
+        locationId
+      );
+    });
 
     const hasTee = validated.some(function (line) { return line.kind === 'tee'; });
     const hasSticker = validated.some(function (line) { return line.kind === 'sticker'; });
@@ -275,14 +207,13 @@ exports.handler = async function (event) {
     if (hasSticker && !hasTee) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
         body: JSON.stringify({
           error: 'Stickers are available as an add-on with a tee order.'
         })
       };
     }
 
-    const ids = validated.map(function (line) { return line.variationId; });
     const inventory = await square('/v2/inventory/counts/batch-retrieve', token, {
       method: 'POST',
       body: JSON.stringify({
@@ -303,7 +234,7 @@ exports.handler = async function (event) {
       if ((stock[line.variationId] || 0) < line.quantity) {
         return {
           statusCode: 409,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
           body: JSON.stringify({
             error: line.kind === 'sticker'
               ? (line.name + ' does not have enough stock')
@@ -375,14 +306,14 @@ exports.handler = async function (event) {
     if (error && error.publicStatus) {
       return {
         statusCode: error.publicStatus,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
         body: JSON.stringify({ error: error.message })
       };
     }
 
     return {
       statusCode: 502,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       body: JSON.stringify({
         error: 'Unable to start Square checkout right now',
         squareStatus: error && error.status ? error.status : null,
