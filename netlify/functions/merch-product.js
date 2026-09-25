@@ -43,6 +43,60 @@ function getSize(name) {
   return null;
 }
 
+function buildOptionLookup(objects) {
+  const options = {};
+  const values = {};
+
+  (objects || []).forEach(function (obj) {
+    if (obj.type !== 'ITEM_OPTION' || !obj.item_option_data) return;
+    const optionName = obj.item_option_data.name || '';
+
+    options[obj.id] = optionName;
+
+    (obj.item_option_data.values || []).forEach(function (value) {
+      const valueData = value.item_option_value_data || {};
+      values[value.id] = {
+        optionId: obj.id,
+        optionName: optionName,
+        valueName: valueData.name || ''
+      };
+    });
+  });
+
+  return { options: options, values: values };
+}
+
+function getStructuredVariationOptions(data, optionLookup) {
+  let color = null;
+  let size = null;
+
+  ((data && data.item_option_values) || []).forEach(function (selection) {
+    const optionId = selection.item_option_id || null;
+    const valueId = selection.item_option_value_id || null;
+    const resolved = valueId && optionLookup.values[valueId];
+    const optionName = normalize((resolved && resolved.optionName) || optionLookup.options[optionId] || '');
+    const valueName = (resolved && resolved.valueName) || '';
+
+    if (optionName.includes('color') || optionName.includes('colour')) {
+      color = getColor(valueName) || color;
+    } else if (optionName.includes('size')) {
+      size = getSize(valueName) || size;
+    }
+  });
+
+  return { color: color, size: size };
+}
+
+function parseVariation(data, optionLookup) {
+  const structured = getStructuredVariationOptions(data, optionLookup);
+  return {
+    color: structured.color || getColor(data && data.name),
+    size: structured.size || getSize(data && data.name),
+    usedStructuredColor: !!structured.color,
+    usedStructuredSize: !!structured.size
+  };
+}
+
 async function square(path, token, options) {
   const response = await fetch(API + path, Object.assign({}, options || {}, {
     headers: Object.assign({}, headers(token), (options && options.headers) || {})
@@ -71,7 +125,7 @@ async function listCatalog(token) {
   const objects = [];
 
   do {
-    const params = new URLSearchParams({ types: 'ITEM,IMAGE' });
+    const params = new URLSearchParams({ types: 'ITEM,IMAGE,ITEM_OPTION' });
     if (cursor) params.set('cursor', cursor);
 
     const page = await square('/v2/catalog/list?' + params.toString(), token, { method: 'GET' });
@@ -212,13 +266,16 @@ exports.handler = async function (event) {
     }
   });
 
+  const optionLookup = buildOptionLookup(objects);
+
   function scoreItem(item) {
     const vars = (item.item_data && item.item_data.variations) || [];
     const recognized = vars.map(function (variation) {
       const data = variation.item_variation_data || {};
+      const parsedVariation = parseVariation(data, optionLookup);
       return {
-        color: getColor(data.name),
-        size: getSize(data.name),
+        color: parsedVariation.color,
+        size: parsedVariation.size,
         priceCents: Number((data.price_money && data.price_money.amount) || 0)
       };
     }).filter(function (v) {
@@ -307,11 +364,14 @@ exports.handler = async function (event) {
 
   const parsed = rawVariations.map(function (variation) {
     const data = variation.item_variation_data || {};
+    const parsedVariation = parseVariation(data, optionLookup);
     return {
       id: variation.id,
       name: data.name || '',
-      color: getColor(data.name),
-      size: getSize(data.name),
+      color: parsedVariation.color,
+      size: parsedVariation.size,
+      usedStructuredColor: parsedVariation.usedStructuredColor,
+      usedStructuredSize: parsedVariation.usedStructuredSize,
       priceCents: Number((data.price_money && data.price_money.amount) || 0),
       imageId: (data.image_ids && data.image_ids[0]) || null
     };
@@ -460,6 +520,9 @@ exports.handler = async function (event) {
         itemImageResolved: !!itemImage,
         variationCountRaw: rawVariations.length,
         variationCountParsed: parsed.length,
+        variationCountStructuredColor: parsed.filter(function (v) { return v.usedStructuredColor; }).length,
+        variationCountStructuredSize: parsed.filter(function (v) { return v.usedStructuredSize; }).length,
+        itemOptionCount: Object.keys(optionLookup.options).length,
         imageCount: Object.keys(images).length,
         matchedSquareItem: (item.item_data && item.item_data.name) || null,
         configuredLocationId: configuredLocationId || null,
