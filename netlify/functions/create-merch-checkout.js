@@ -329,7 +329,7 @@ exports.handler = async function (event) {
           enable_coupon: false,
           redirect_url: 'https://www.howzitbrewing.com/shopping/?checkout=success',
           shipping_fee: {
-            name: 'Shipping',
+            name: 'Flat Rate Shipping',
             charge: {
               amount: shippingCents,
               currency: 'USD'
