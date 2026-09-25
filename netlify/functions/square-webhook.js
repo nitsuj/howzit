@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const fetch = require('node-fetch');
 const { square } = require('./_merch-square');
 
 const WEB_MERCH_REFERENCE = 'HOWZIT-WEB-MERCH';
@@ -136,7 +137,7 @@ function buildEmail(order, payment) {
   return { subject, text, html };
 }
 
-async function sendEmail(email, eventId) {
+async function sendEmail(email, paymentId) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured');
 
@@ -155,7 +156,7 @@ async function sendEmail(email, eventId) {
     headers: {
       Authorization: 'Bearer ' + apiKey,
       'Content-Type': 'application/json',
-      'Idempotency-Key': 'square-web-order/' + eventId
+      'Idempotency-Key': 'square-web-order/' + paymentId
     },
     body: JSON.stringify({
       from,
@@ -212,6 +213,11 @@ exports.handler = async function (event) {
     return json(200, { ignored: true });
   }
 
+  // A refund or later refund-related payment update is not a new order.
+  if (Number(payment.refunded_money && payment.refunded_money.amount || 0) > 0) {
+    return json(200, { ignored: true, reason: 'Refunded payment update' });
+  }
+
   if (!String(payment.note || '').startsWith('Howzit website merch:')) {
     return json(200, { ignored: true });
   }
@@ -240,7 +246,7 @@ exports.handler = async function (event) {
     }
 
     const email = buildEmail(order, payment);
-    const emailResult = await sendEmail(email, webhook.event_id || payment.id);
+    const emailResult = await sendEmail(email, payment.id);
 
     return json(200, {
       ok: true,
