@@ -241,7 +241,7 @@
     <div class="cart-footer">
       <div class="cart-summary"><span>Subtotal</span><span id="cart-subtotal">$0</span></div>
       <p class="cart-shipping-note">$9.95 Flat Rate Shipping + tax at Square checkout.</p>
-      <button class="button cart-checkout" type="button" id="cart-checkout" disabled>Checkout securely with Square</button>
+      <button class="button cart-checkout" type="button" id="cart-checkout" disabled>Checkout Now</button>
       <p class="merch-status" id="cart-status"></p>
     </div>
   </aside>
@@ -459,6 +459,7 @@
       let color = 'Black';
       let size = 'M';
       let cart = [];
+      let checkoutInProgress = false;
 
       const selection = document.getElementById('merch-selection');
       const status = document.getElementById('merch-status');
@@ -539,7 +540,7 @@
         cartCount.style.display = count ? 'inline-grid' : 'none';
         cartToggle.classList.toggle('has-items', count > 0);
         cartSubtotal.textContent = money(cartSubtotalCents());
-        cartCheckout.disabled = !cart.length || !hasTee;
+        renderCheckoutState();
 
         if (cart.length && !hasTee) {
           cartStatus.textContent = stickerOnlyMessage;
@@ -789,31 +790,39 @@
         saveCart();
       });
 
-      function resetCheckoutButton() {
+      function renderCheckoutState() {
         const hasTee = cart.some((item) => item.kind !== 'sticker');
-        cartCheckout.disabled = !cart.length || !hasTee;
-        cartCheckout.textContent = 'Checkout Now';
-        if (cartStatus.textContent === 'Opening secure checkout...') {
-          cartStatus.textContent = '';
-        }
+        cartCheckout.disabled = checkoutInProgress || !cart.length || !hasTee;
+        cartCheckout.textContent = checkoutInProgress ? 'Opening Square...' : 'Checkout Now';
       }
 
-      window.addEventListener('pageshow', resetCheckoutButton);
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) resetCheckoutButton();
-      });
+      function clearTransientCheckoutState() {
+        checkoutInProgress = false;
+        if (cartStatus.dataset.transient === 'checkout') {
+          cartStatus.textContent = '';
+          delete cartStatus.dataset.transient;
+        }
+        renderCheckoutState();
+      }
+
+      // Prevent browser back/forward cache from preserving a transient checkout state.
+      window.addEventListener('pagehide', clearTransientCheckoutState);
+      window.addEventListener('pageshow', clearTransientCheckoutState);
 
       cartCheckout.addEventListener('click', async () => {
-        if (!cart.length) return;
+        if (checkoutInProgress || !cart.length) return;
         const hasTee = cart.some((item) => item.kind !== 'sticker');
         if (!hasTee) {
           cartStatus.textContent = 'Stickers are available as an add-on with a tee order.';
+          delete cartStatus.dataset.transient;
           renderCart();
           return;
         }
-        cartCheckout.disabled = true;
-        cartCheckout.textContent = 'Checkout Now';
+
+        checkoutInProgress = true;
         cartStatus.textContent = 'Opening secure checkout...';
+        cartStatus.dataset.transient = 'checkout';
+        renderCheckoutState();
 
         try {
           const response = await fetch(CHECKOUT_ENDPOINT, {
@@ -834,11 +843,14 @@
             throw new Error((data.error || 'Checkout unavailable') + (details.length ? ' (' + details.join('; ') + ')' : ''));
           }
 
+          clearTransientCheckoutState();
           window.location.assign(data.checkoutUrl);
         } catch (error) {
           console.error('Merch checkout failed', error);
+          checkoutInProgress = false;
           cartStatus.textContent = error.message || 'Checkout is temporarily unavailable.';
-          resetCheckoutButton();
+          delete cartStatus.dataset.transient;
+          renderCheckoutState();
         }
       });
 
@@ -953,6 +965,7 @@
       }
 
       loadCart();
+      clearTransientCheckoutState();
       renderCart();
       loadProduct();
     })();
