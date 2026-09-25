@@ -857,23 +857,54 @@
               document.body.appendChild(debugPanel);
             }
 
-            const yellow = (product.variations || []).filter((v) => v.color === 'Yellow');
-            const parsedYellow = ((product.debug && product.debug.parsedVariations) || []).filter((v) => v.color === 'Yellow');
-            const yellowInventory = ((product.debug && product.debug.teeInventoryStates) || []).filter((v) => v.color === 'Yellow' || /lifeguard/i.test(v.variationName || ''));
+            const storefront = product.variations || [];
+            const rows = storefront.map((v) => ({
+              color: v.color,
+              size: v.size,
+              quantity: Number(v.stock || 0),
+              available: !!v.available,
+              id: v.id || null,
+              ambiguous: !!v.ambiguous,
+              missing: !!v.missing
+            }));
+
+            const byColor = {};
+            rows.forEach((row) => {
+              if (!byColor[row.color]) byColor[row.color] = [];
+              byColor[row.color].push(row);
+            });
+
+            const esc = (value) => String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            const colorSections = Object.keys(byColor).map((colorName) => {
+              const body = byColor[colorName].map((row) => {
+                const state = row.ambiguous ? 'AMBIGUOUS' : row.missing ? 'MISSING' : row.available ? 'IN STOCK' : 'OUT';
+                return '<tr>' +
+                  '<td style="padding:4px 8px;border-bottom:1px solid #ccc"><b>' + esc(row.size) + '</b></td>' +
+                  '<td style="padding:4px 8px;border-bottom:1px solid #ccc;text-align:right">' + row.quantity + '</td>' +
+                  '<td style="padding:4px 8px;border-bottom:1px solid #ccc">' + state + '</td>' +
+                  '<td style="padding:4px 8px;border-bottom:1px solid #ccc;font-size:11px">' + esc(row.id || '—') + '</td>' +
+                '</tr>';
+              }).join('');
+              return '<h3 style="margin:16px 0 6px">' + esc(colorName) + '</h3>' +
+                '<table style="border-collapse:collapse;width:100%;min-width:620px">' +
+                  '<thead><tr><th align="left">Size</th><th align="right">Qty</th><th align="left">Status</th><th align="left">Square variation ID</th></tr></thead>' +
+                  '<tbody>' + body + '</tbody>' +
+                '</table>';
+            }).join('');
 
             debugPanel.innerHTML =
-              '<strong style="font-size:16px">SHOPPING QA DEBUG — YELLOW / LIFEGUARD</strong>' +
+              '<strong style="font-size:16px">SHOPPING QA DEBUG — ALL TEE INVENTORY</strong>' +
               '<p><b>Website inventory location:</b> ' +
-                ((product.debug && product.debug.resolvedLocationName) || 'unknown') + ' (' +
-                ((product.debug && product.debug.resolvedLocationId) || 'unknown') + ')' +
+                esc((product.debug && product.debug.resolvedLocationName) || 'unknown') + ' (' +
+                esc((product.debug && product.debug.resolvedLocationId) || 'unknown') + ')' +
               '</p>' +
-              '<p><b>Final storefront variations</b></p><pre style="white-space:pre-wrap">' +
-                JSON.stringify(yellow, null, 2).replace(/&/g,'&amp;').replace(/</g,'&lt;') +
-              '</pre><p><b>Parsed Square variations</b></p><pre style="white-space:pre-wrap">' +
-                JSON.stringify(parsedYellow, null, 2).replace(/&/g,'&amp;').replace(/</g,'&lt;') +
-              '</pre><p><b>Square inventory by location/state</b></p><pre style="white-space:pre-wrap">' +
-                JSON.stringify(yellowInventory, null, 2).replace(/&/g,'&amp;').replace(/</g,'&lt;') +
-              '</pre>';
+              colorSections +
+              '<details style="margin-top:16px"><summary><b>Raw parsed Square variations</b></summary><pre style="white-space:pre-wrap">' +
+                esc(JSON.stringify((product.debug && product.debug.parsedVariations) || [], null, 2)) +
+              '</pre></details>' +
+              '<details style="margin-top:12px"><summary><b>Square inventory by location/state</b></summary><pre style="white-space:pre-wrap">' +
+                esc(JSON.stringify((product.debug && product.debug.teeInventoryStates) || [], null, 2)) +
+              '</pre></details>';
           }
 
           reconcileCart();
