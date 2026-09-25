@@ -994,17 +994,6 @@
             if (Array.isArray(err.squareErrors) && err.squareErrors.length) bits.push(err.squareErrors.map((e) => e.code || e.detail).filter(Boolean).join(', '));
             status.textContent = bits.join(' · ');
             buy.disabled = true;
-          } else if (new URLSearchParams(window.location.search).get('checkout') === 'success') {
-            cart = [];
-            saveCart();
-            clearTransientCheckoutState();
-            status.textContent = 'Order complete — mahalo!';
-            orderConfirmation.hidden = false;
-            orderConfirmationClose.focus();
-
-            const cleanUrl = new URL(window.location.href);
-            cleanUrl.searchParams.delete('checkout');
-            window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
           } else if (!firstAvailable) {
             status.textContent = 'No tee variations are currently ready for online sale.';
           }
@@ -1017,7 +1006,28 @@
 
       loadCart();
       clearTransientCheckoutState();
+
+      const checkoutReturnedSuccess =
+        new URLSearchParams(window.location.search).get('checkout') === 'success';
+
+      if (checkoutReturnedSuccess) {
+        cart = [];
+        saveCart();
+        clearTransientCheckoutState();
+        status.textContent = 'Order complete — mahalo!';
+        orderConfirmation.hidden = false;
+
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('checkout');
+        window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+      }
+
       renderCart();
+
+      if (checkoutReturnedSuccess) {
+        orderConfirmationClose.focus();
+      }
+
       loadProduct();
     })();
   </script>
