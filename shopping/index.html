@@ -847,6 +847,35 @@
           }
 
           product = data;
+
+          if (new URLSearchParams(window.location.search).get('debug') === '1') {
+            let debugPanel = document.getElementById('shopping-debug');
+            if (!debugPanel) {
+              debugPanel = document.createElement('section');
+              debugPanel.id = 'shopping-debug';
+              debugPanel.style.cssText = 'position:relative;z-index:1000;margin:18px;padding:16px;border:3px solid #111;border-radius:16px;background:#fffdf8;box-shadow:5px 5px 0 #111;font:13px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;overflow:auto;max-height:70vh;';
+              document.body.appendChild(debugPanel);
+            }
+
+            const yellow = (product.variations || []).filter((v) => v.color === 'Yellow');
+            const parsedYellow = ((product.debug && product.debug.parsedVariations) || []).filter((v) => v.color === 'Yellow');
+            const yellowInventory = ((product.debug && product.debug.teeInventoryStates) || []).filter((v) => v.color === 'Yellow' || /lifeguard/i.test(v.variationName || ''));
+
+            debugPanel.innerHTML =
+              '<strong style="font-size:16px">SHOPPING QA DEBUG — YELLOW / LIFEGUARD</strong>' +
+              '<p><b>Website inventory location:</b> ' +
+                ((product.debug && product.debug.resolvedLocationName) || 'unknown') + ' (' +
+                ((product.debug && product.debug.resolvedLocationId) || 'unknown') + ')' +
+              '</p>' +
+              '<p><b>Final storefront variations</b></p><pre style="white-space:pre-wrap">' +
+                JSON.stringify(yellow, null, 2).replace(/&/g,'&amp;').replace(/</g,'&lt;') +
+              '</pre><p><b>Parsed Square variations</b></p><pre style="white-space:pre-wrap">' +
+                JSON.stringify(parsedYellow, null, 2).replace(/&/g,'&amp;').replace(/</g,'&lt;') +
+              '</pre><p><b>Square inventory by location/state</b></p><pre style="white-space:pre-wrap">' +
+                JSON.stringify(yellowInventory, null, 2).replace(/&/g,'&amp;').replace(/</g,'&lt;') +
+              '</pre>';
+          }
+
           reconcileCart();
 
           const firstAvailable = product.variations.find((v) => v.available && v.id);
