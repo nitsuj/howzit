@@ -1,5 +1,5 @@
 [build]
-  command = "node scripts/inject-events.js"
+  command = "npm run test:merch && node scripts/inject-events.js"
   publish = "."
 
 [functions]
