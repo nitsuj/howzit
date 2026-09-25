@@ -411,6 +411,39 @@ exports.handler = async function (event) {
     }
   }
 
+  let teeInventoryStates = [];
+  try {
+    const allTeeInventory = parsed.length ? await square('/v2/inventory/counts/batch-retrieve', token, {
+      method: 'POST',
+      body: JSON.stringify({
+        catalog_object_ids: parsed.map(function (v) { return v.id; })
+      })
+    }) : { counts: [] };
+
+    const locationNames = {};
+    (location.locations || []).forEach(function (entry) {
+      locationNames[entry.id] = entry.name || entry.id;
+    });
+
+    teeInventoryStates = (allTeeInventory.counts || []).map(function (count) {
+      const variation = parsed.find(function (v) { return v.id === count.catalog_object_id; });
+      return {
+        variationId: count.catalog_object_id,
+        variationName: variation ? variation.name : null,
+        color: variation ? variation.color : null,
+        size: variation ? variation.size : null,
+        state: count.state,
+        locationId: count.location_id,
+        locationName: locationNames[count.location_id] || count.location_id,
+        quantity: Number(count.quantity || 0),
+        calculatedAt: count.calculated_at || null,
+        isWebsiteLocation: count.location_id === locationId
+      };
+    });
+  } catch (error) {
+    console.error('tee location diagnostics failed', error);
+  }
+
   let stickerInventoryByLocation = [];
   let stickerInventoryStates = [];
   if (stickerMatch) {
@@ -566,6 +599,7 @@ exports.handler = async function (event) {
           };
         }),
         colorImageIds: colorImageIds,
+        teeInventoryStates: teeInventoryStates,
         itemOptionCount: Object.keys(optionLookup.options).length,
         imageCount: Object.keys(images).length,
         matchedSquareItem: (item.item_data && item.item_data.name) || null,
