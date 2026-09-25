@@ -805,8 +805,7 @@
         renderCheckoutState();
       }
 
-      // Prevent browser back/forward cache from preserving a transient checkout state.
-      window.addEventListener('pagehide', clearTransientCheckoutState);
+      // pageshow fires on normal navigation and back/forward-cache restores.
       window.addEventListener('pageshow', clearTransientCheckoutState);
 
       cartCheckout.addEventListener('click', async () => {
@@ -825,13 +824,23 @@
         renderCheckoutState();
 
         try {
-          const response = await fetch(CHECKOUT_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              items: cart.map((item) => ({ variationId: item.variationId, quantity: item.quantity }))
-            })
-          });
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 15000);
+
+          let response;
+          try {
+            response = await fetch(CHECKOUT_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              signal: controller.signal,
+              body: JSON.stringify({
+                items: cart.map((item) => ({ variationId: item.variationId, quantity: item.quantity }))
+              })
+            });
+          } finally {
+            clearTimeout(timeout);
+          }
+
           const data = await response.json();
 
           if (!response.ok || !data.checkoutUrl) {
@@ -848,7 +857,9 @@
         } catch (error) {
           console.error('Merch checkout failed', error);
           checkoutInProgress = false;
-          cartStatus.textContent = error.message || 'Checkout is temporarily unavailable.';
+          cartStatus.textContent = error && error.name === 'AbortError'
+            ? 'Square checkout took too long to respond. Please try again.'
+            : (error.message || 'Checkout is temporarily unavailable.');
           delete cartStatus.dataset.transient;
           renderCheckoutState();
         }
@@ -953,7 +964,12 @@
           } else if (new URLSearchParams(window.location.search).get('checkout') === 'success') {
             cart = [];
             saveCart();
+            clearTransientCheckoutState();
             status.textContent = 'Order complete — mahalo!';
+
+            const cleanUrl = new URL(window.location.href);
+            cleanUrl.searchParams.delete('checkout');
+            window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
           } else if (!firstAvailable) {
             status.textContent = 'No tee variations are currently ready for online sale.';
           }
