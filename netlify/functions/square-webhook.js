@@ -142,7 +142,7 @@ async function sendEmail(email, paymentId) {
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured');
 
   const from = process.env.MERCH_ALERT_FROM_EMAIL ||
-    'Howzit Web Orders <orders@howzitbrewing.com>';
+    'Howzit Web Orders <orders@notify.howzitbrewing.com>';
 
   const recipients = String(process.env.MERCH_ALERT_TO_EMAILS || DEFAULT_RECIPIENTS.join(','))
     .split(',')
