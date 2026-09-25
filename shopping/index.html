@@ -943,7 +943,13 @@
               '</pre></details>';
           }
 
-          reconcileCart();
+          const inventoryHealthy = !(product.debug && product.debug.inventoryError);
+          if (inventoryHealthy) {
+            reconcileCart();
+          } else {
+            // Preserve the buyer's saved cart when Square inventory is temporarily unavailable.
+            renderCart();
+          }
 
           const firstAvailable = product.variations.find((v) => v.available && v.id);
           if (firstAvailable) {
