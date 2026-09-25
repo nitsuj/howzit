@@ -23,14 +23,22 @@ function parseCart(body) {
     source = [{ variationId: body.variationId, quantity: body.quantity || 1 }];
   }
 
+  if (!source.length) return null;
+
   const merged = new Map();
 
-  source.forEach(function (line) {
+  for (const line of source) {
     const variationId = String((line && line.variationId) || '').trim();
     const quantity = Number((line && line.quantity) || 0);
-    if (!variationId || !Number.isInteger(quantity) || quantity < 1 || quantity > 5) return;
-    merged.set(variationId, (merged.get(variationId) || 0) + quantity);
-  });
+
+    if (!variationId || !Number.isInteger(quantity) || quantity < 1 || quantity > 5) {
+      return null;
+    }
+
+    const nextQuantity = (merged.get(variationId) || 0) + quantity;
+    if (nextQuantity > 5) return null;
+    merged.set(variationId, nextQuantity);
+  }
 
   return Array.from(merged.entries()).map(function (entry) {
     return { variationId: entry[0], quantity: entry[1] };
@@ -147,9 +155,11 @@ exports.handler = async function (event) {
   }
 
   const cart = parseCart(body);
-  const totalQty = cart.reduce(function (sum, line) { return sum + line.quantity; }, 0);
+  const totalQty = cart
+    ? cart.reduce(function (sum, line) { return sum + line.quantity; }, 0)
+    : 0;
 
-  if (!cart.length || cart.length > MAX_LINES || totalQty < 1 || totalQty > MAX_TOTAL_QTY) {
+  if (!cart || !cart.length || cart.length > MAX_LINES || totalQty < 1 || totalQty > MAX_TOTAL_QTY) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
