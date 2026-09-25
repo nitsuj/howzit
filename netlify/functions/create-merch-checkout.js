@@ -27,10 +27,10 @@ function normalize(value) {
 
 function getColor(name) {
   const n = normalize(name);
-  if (n.includes('heather gray')) return 'Heather Gray';
-  if (/(^| )black( |$)/.test(n)) return 'Black';
-  if (/(^| )yellow( |$)/.test(n)) return 'Yellow';
-  if (/(^| )mint( |$)/.test(n)) return 'Mint';
+  if (n === 'lifeguard' || n === 'yellow') return 'Yellow';
+  if (n === 'mint') return 'Mint';
+  if (n === 'black aqua' || n === 'black') return 'Black';
+  if (n === 'gray blue' || n === 'heather gray') return 'Heather Gray';
   return null;
 }
 
@@ -43,6 +43,18 @@ function getSize(name) {
   if (t.has('m') || t.has('medium')) return 'M';
   if (t.has('s') || t.has('small')) return 'S';
   return null;
+}
+
+function parseVariationName(name) {
+  const parts = String(name || '').split(',').map(function (part) { return part.trim(); });
+  if (parts.length < 2) {
+    return { size: getSize(name), color: null };
+  }
+
+  return {
+    size: getSize(parts[0]),
+    color: getColor(parts.slice(1).join(','))
+  };
 }
 
 async function square(path, token, options) {
@@ -157,8 +169,9 @@ async function validateVariation(line, token) {
     throw err;
   }
 
-  const color = getColor(data.name);
-  const size = getSize(data.name);
+  const parsedVariation = parseVariationName(data.name);
+  const color = parsedVariation.color;
+  const size = parsedVariation.size;
 
   if (!COLORS.includes(color) || !SIZES.includes(size)) {
     const err = new Error('Variation is not approved for web sale');
@@ -169,7 +182,8 @@ async function validateVariation(line, token) {
   const parentVariations = (parent.item_data && parent.item_data.variations) || [];
   const sameCombo = parentVariations.filter(function (candidate) {
     const candidateData = candidate.item_variation_data || {};
-    return getColor(candidateData.name) === color && getSize(candidateData.name) === size;
+    const parsedCandidate = parseVariationName(candidateData.name);
+    return parsedCandidate.color === color && parsedCandidate.size === size;
   });
 
   if (sameCombo.length !== 1 || sameCombo[0].id !== line.variationId) {
