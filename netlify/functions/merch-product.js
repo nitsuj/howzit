@@ -27,10 +27,10 @@ function getColor(name) {
   const n = normalize(name);
 
   // Explicit Square -> storefront color aliases.
-  if (n === 'lifeguard') return 'Yellow';
-  if (n === 'mint') return 'Mint';
-  if (n === 'black aqua') return 'Black';
-  if (n === 'gray blue') return 'Heather Gray';
+  if (/(^| )lifeguard( |$)/.test(n)) return 'Yellow';
+  if (/(^| )mint( |$)/.test(n)) return 'Mint';
+  if (n.includes('black aqua')) return 'Black';
+  if (n.includes('gray blue')) return 'Heather Gray';
 
   // Storefront/native labels and legacy fallbacks.
   if (n.includes('heather gray')) return 'Heather Gray';
@@ -537,6 +537,19 @@ exports.handler = async function (event) {
         itemImageResolved: !!itemImage,
         variationCountRaw: rawVariations.length,
         variationCountParsed: parsed.length,
+        rawVariationParsing: rawVariations.map(function (variation) {
+          const data = variation.item_variation_data || {};
+          const resolved = parseVariation(data, optionLookup);
+          return {
+            id: variation.id,
+            name: data.name || '',
+            resolvedColor: resolved.color,
+            resolvedSize: resolved.size,
+            usedStructuredColor: resolved.usedStructuredColor,
+            usedStructuredSize: resolved.usedStructuredSize,
+            imageIds: data.image_ids || []
+          };
+        }),
         variationCountStructuredColor: parsed.filter(function (v) { return v.usedStructuredColor; }).length,
         variationCountStructuredSize: parsed.filter(function (v) { return v.usedStructuredSize; }).length,
         parsedVariations: parsed.map(function (v) {
