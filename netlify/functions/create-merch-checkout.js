@@ -8,6 +8,7 @@ const {
   buildOptionLookup,
   parseVariation,
   variationEligibility,
+  selectTeeItem,
   square,
   listCatalog,
   resolveLocation
@@ -51,7 +52,7 @@ function publicError(message, status) {
   return error;
 }
 
-function validateVariation(line, variation, parent, optionLookup, locationId) {
+function validateVariation(line, variation, parent, optionLookup, locationId, teeItemId) {
   const data = variation && variation.item_variation_data;
 
   if (!variation || variation.type !== 'ITEM_VARIATION' || !data || !parent || parent.type !== 'ITEM') {
@@ -79,7 +80,7 @@ function validateVariation(line, variation, parent, optionLookup, locationId) {
     };
   }
 
-  if (parentName !== normalize(ITEM_NAME)) {
+  if (parent.id !== teeItemId) {
     throw publicError('Item is not approved for web sale', 400);
   }
 
@@ -180,11 +181,21 @@ exports.handler = async function (event) {
           include_related_objects: true
         })
       }),
-      listCatalog(token, ['ITEM_OPTION'])
+      listCatalog(token, ['ITEM', 'ITEM_OPTION'])
     ]);
 
     const catalog = results[0];
-    const optionLookup = buildOptionLookup(results[1]);
+    const catalogObjects = results[1];
+    const optionLookup = buildOptionLookup(catalogObjects);
+    const teeItem = selectTeeItem(
+      catalogObjects.filter(function (object) { return object.type === 'ITEM'; }),
+      optionLookup
+    );
+
+    if (!teeItem) {
+      throw publicError('Merch item is not configured for web sale', 503);
+    }
+
     const variationsById = {};
     const parentsById = {};
 
@@ -207,7 +218,8 @@ exports.handler = async function (event) {
         variation,
         parent,
         optionLookup,
-        locationId
+        locationId,
+        teeItem.id
       );
     });
 
