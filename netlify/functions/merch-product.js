@@ -8,6 +8,7 @@ const {
   parseVariation,
   effectivePriceCents,
   variationEligibility,
+  selectTeeItem,
   square,
   listCatalog,
   resolveLocation
@@ -89,9 +90,7 @@ exports.handler = async function (event) {
 
   const optionLookup = buildOptionLookup(objects);
 
-  const item = items.find(function (candidate) {
-    return normalize(candidate.item_data && candidate.item_data.name) === normalize(ITEM_NAME);
-  });
+  const item = selectTeeItem(items, optionLookup);
 
   if (!item) {
     return {
