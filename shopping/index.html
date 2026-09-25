@@ -789,6 +789,20 @@
         saveCart();
       });
 
+      function resetCheckoutButton() {
+        const hasTee = cart.some((item) => item.kind !== 'sticker');
+        cartCheckout.disabled = !cart.length || !hasTee;
+        cartCheckout.textContent = 'Checkout Now';
+        if (cartStatus.textContent === 'Opening secure checkout...') {
+          cartStatus.textContent = '';
+        }
+      }
+
+      window.addEventListener('pageshow', resetCheckoutButton);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) resetCheckoutButton();
+      });
+
       cartCheckout.addEventListener('click', async () => {
         if (!cart.length) return;
         const hasTee = cart.some((item) => item.kind !== 'sticker');
@@ -798,7 +812,7 @@
           return;
         }
         cartCheckout.disabled = true;
-        cartCheckout.textContent = 'Opening Square...';
+        cartCheckout.textContent = 'Checkout Now';
         cartStatus.textContent = 'Opening secure checkout...';
 
         try {
@@ -824,8 +838,7 @@
         } catch (error) {
           console.error('Merch checkout failed', error);
           cartStatus.textContent = error.message || 'Checkout is temporarily unavailable.';
-          cartCheckout.disabled = false;
-          cartCheckout.textContent = 'Checkout securely with Square';
+          resetCheckoutButton();
         }
       });
 
