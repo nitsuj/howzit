@@ -26,17 +26,13 @@ function normalize(value) {
 function getColor(name) {
   const n = normalize(name);
 
-  // Explicit Square -> storefront color aliases.
-  if (/(^| )lifeguard( |$)/.test(n)) return 'Yellow';
-  if (/(^| )mint( |$)/.test(n)) return 'Mint';
-  if (n.includes('black aqua')) return 'Black';
-  if (n.includes('gray blue')) return 'Heather Gray';
+  // Exact Square color option -> storefront color mapping.
+  // Do not fuzzy-match compound Square colorways such as "Green/Yellow".
+  if (n === 'lifeguard' || n === 'yellow') return 'Yellow';
+  if (n === 'mint') return 'Mint';
+  if (n === 'black aqua' || n === 'black') return 'Black';
+  if (n === 'gray blue' || n === 'heather gray') return 'Heather Gray';
 
-  // Storefront/native labels and legacy fallbacks.
-  if (n.includes('heather gray')) return 'Heather Gray';
-  if (/(^| )black( |$)/.test(n)) return 'Black';
-  if (/(^| )yellow( |$)/.test(n)) return 'Yellow';
-  if (/(^| )mint( |$)/.test(n)) return 'Mint';
   return null;
 }
 
