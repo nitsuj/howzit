@@ -22,9 +22,12 @@ function errorBody(error, stage) {
   };
 }
 
-function imageIdForVariation(data, parentItem) {
-  return (data.image_ids && data.image_ids[0]) ||
-    ((parentItem.item_data && parentItem.item_data.image_ids && parentItem.item_data.image_ids[0]) || null);
+function imageIdForVariation(data) {
+  return (data.image_ids && data.image_ids[0]) || null;
+}
+
+function imageIdForItem(item) {
+  return (item && item.item_data && item.item_data.image_ids && item.item_data.image_ids[0]) || null;
 }
 
 exports.handler = async function (event) {
@@ -116,7 +119,7 @@ exports.handler = async function (event) {
       usedStructuredColor: resolved.usedStructuredColor,
       usedStructuredSize: resolved.usedStructuredSize,
       priceCents: effectivePriceCents(data, locationId),
-      imageId: imageIdForVariation(data, item),
+      imageId: imageIdForVariation(data),
       eligibility: eligibility
     };
   }).filter(function (variation) {
@@ -137,7 +140,7 @@ exports.handler = async function (event) {
           id: variation.id,
           variationName: data.name || '',
           priceCents: effectivePriceCents(data, locationId),
-          imageId: imageIdForVariation(data, stickerItem),
+          imageId: imageIdForVariation(data) || imageIdForItem(stickerItem),
           eligibility: variationEligibility(variation, stickerItem, locationId)
         };
       })
