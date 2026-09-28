@@ -57,7 +57,7 @@
     return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
   }
 
-  function parseDate(value) {
+  function parseDate(value, fallbackYear) {
     const s = String(value || '').trim();
     if (!s) return null;
     let m;
@@ -67,6 +67,10 @@
     if ((m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/))) {
       let y = Number(m[3]);
       if (y < 100) y += 2000;
+      return new Date(Date.UTC(y, Number(m[1]) - 1, Number(m[2])));
+    }
+    if ((m = s.match(/^(\d{1,2})[\/-](\d{1,2})$/))) {
+      const y = Number(fallbackYear || new Date().getUTCFullYear());
       return new Date(Date.UTC(y, Number(m[1]) - 1, Number(m[2])));
     }
     const d = new Date(s);
@@ -144,7 +148,7 @@
     rows.forEach((row) => {
       const name = row.event || row.name || row.title;
       if (!name || isExplicitlyOff(row.active)) return;
-      const explicitDate = parseDate(row.date);
+      const explicitDate = parseDate(row.date, now.year);
       if (explicitDate) {
         if (explicitDate < today) return;
         oneOff.push({ ...row, event: name, eventDate: explicitDate, recurring: false });
