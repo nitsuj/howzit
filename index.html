@@ -106,6 +106,8 @@
     .merch-shell { max-width:1300px;margin:auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr);border:var(--border);border-radius:28px;background:var(--white);overflow:hidden;box-shadow:var(--shadow); }
     .merch-photo { background:var(--pink);padding:22px;border-right:var(--border);position:relative;min-height:520px;display:grid;place-items:center; }
     .merch-photo img { width:100%;height:100%;max-height:620px;object-fit:cover;border:var(--border);border-radius:20px;background:var(--cream); }
+    .merch-photo-placeholder { width:100%;height:100%;min-height:470px;border:var(--border);border-radius:20px;background:var(--cream);display:grid;place-items:center;text-align:center;padding:28px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:1.1rem;letter-spacing:.03em; }
+    .merch-photo-placeholder .bubble-mark { width:min(220px,52%);margin:0 auto 18px;color:var(--coral);display:block; }
     .merch-photo-note { position:absolute;left:38px;bottom:38px;background:var(--yellow);border:2px solid var(--ink);border-radius:999px;padding:6px 10px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;font-size:.66rem;box-shadow:3px 3px 0 var(--ink); }
     .merch-detail { padding:clamp(28px,5vw,58px);display:flex;flex-direction:column;justify-content:center; }
     .merch-detail h3 { margin:8px 0 10px;font-family:"Archivo Black",Impact,sans-serif;text-transform:uppercase;letter-spacing:-.04em;line-height:.94;font-size:clamp(2.8rem,5vw,5rem);color:var(--purple); }
@@ -322,8 +324,11 @@
       </div>
       <div class="merch-shell">
         <div class="merch-photo">
-          <img id="merch-image" src="https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400" alt="Temporary generic T-shirt photo">
-          <div class="merch-photo-note" id="merch-photo-note">Temporary photo</div>
+          <div class="merch-photo-placeholder" id="merch-photo-placeholder">
+            <div><span class="bubble-mark" aria-hidden="true"></span>Loading tee…</div>
+          </div>
+          <img id="merch-image" alt="Howzit Tee" hidden>
+          <div class="merch-photo-note" id="merch-photo-note" style="display:none">Live from Square</div>
         </div>
         <div class="merch-detail">
           <h3>THE TEE</h3>
@@ -470,7 +475,7 @@
       const PRODUCT_ENDPOINT = '/.netlify/functions/merch-product';
       const CHECKOUT_ENDPOINT = '/.netlify/functions/create-merch-checkout';
       const CART_KEY = 'howzit-merch-cart-v1';
-      const fallbackImage = 'https://images.pexels.com/photos/5746086/pexels-photo-5746086.jpeg?auto=compress&dpr=1&h=1200&w=1400';
+      const fallbackImage = '/bubble.svg';
 
       let product = null;
       let color = 'Black';
@@ -483,6 +488,7 @@
       const buy = document.getElementById('merch-buy');
       const priceEl = document.getElementById('merch-price');
       const imageEl = document.getElementById('merch-image');
+      const imagePlaceholder = document.getElementById('merch-photo-placeholder');
       const imageNote = document.getElementById('merch-photo-note');
       const cartToggle = document.getElementById('cart-toggle');
       const cartCount = document.getElementById('cart-count');
@@ -717,10 +723,33 @@
 
       function setImage(variation) {
         const liveImage = (variation && variation.image) || (product && product.image);
-        imageEl.src = liveImage || fallbackImage;
-        imageEl.alt = liveImage ? ('Howzit Tee - ' + color) : 'Temporary generic T-shirt photo';
-        imageNote.textContent = liveImage ? 'Live from Square' : 'Temporary photo';
-        imageNote.style.display = 'block';
+
+        if (!liveImage) {
+          imageEl.hidden = true;
+          imageEl.removeAttribute('src');
+          imagePlaceholder.hidden = false;
+          imagePlaceholder.innerHTML = '<div><span class="bubble-mark" aria-hidden="true"></span>Image coming soon</div>';
+          imageNote.style.display = 'none';
+          return;
+        }
+
+        imagePlaceholder.hidden = false;
+        imagePlaceholder.innerHTML = '<div><span class="bubble-mark" aria-hidden="true"></span>Loading tee…</div>';
+        imageEl.hidden = true;
+        imageEl.alt = 'Howzit Tee - ' + color;
+        imageEl.onload = function () {
+          imageEl.hidden = false;
+          imagePlaceholder.hidden = true;
+          imageNote.textContent = 'Live from Square';
+          imageNote.style.display = 'block';
+        };
+        imageEl.onerror = function () {
+          imageEl.hidden = true;
+          imagePlaceholder.hidden = false;
+          imagePlaceholder.innerHTML = '<div><span class="bubble-mark" aria-hidden="true"></span>Image coming soon</div>';
+          imageNote.style.display = 'none';
+        };
+        imageEl.src = liveImage;
       }
 
       function refreshSizes() {
