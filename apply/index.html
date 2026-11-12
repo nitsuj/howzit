@@ -292,10 +292,6 @@
               <label for="phone">Phone <span class="required">*</span></label>
               <input id="phone" name="phone" type="tel" autocomplete="tel" required>
             </div>
-            <div class="field">
-              <label for="location">Current location <span class="required">*</span></label>
-              <input id="location" name="location" type="text" autocomplete="address-level2" placeholder="City, State / Country" required>
-            </div>
           </div>
         </section>
 
@@ -366,7 +362,7 @@
         </div>
 
         <div class="submit-row">
-          <button class="submit-button" id="submit-button" type="submit" disabled>Submit application</button>
+          <button class="submit-button" id="submit-button" type="submit">Submit application</button>
           <p class="submit-help">All starred fields are required before you can submit.</p>
           <p class="status" id="status" role="status" aria-live="polite"></p>
         </div>
@@ -398,7 +394,6 @@
         'name',
         'email',
         'phone',
-        'location',
         'beer_scene',
         'favorite_beer',
         'favorite_style',
@@ -443,18 +438,19 @@
       function formReady() {
         const textReady = requiredTextIds.every((id) => {
           const field = document.getElementById(id);
-          return field && field.value.trim() && field.checkValidity();
+          return field && field.value.trim();
         });
 
+        const emailField = document.getElementById('email');
         const resume = resumeInput.files && resumeInput.files[0];
         const cover = coverInput.files && coverInput.files[0];
         const filesReady = validFile(resume) && (!cover || validFile(cover));
 
-        return Boolean(textReady && filesReady);
+        return Boolean(textReady && emailField.checkValidity() && filesReady);
       }
 
       function updateSubmitState() {
-        submitButton.disabled = !formReady();
+        if (!submitButton.dataset.sending) submitButton.disabled = false;
       }
 
       async function filePayload(file) {
@@ -493,11 +489,21 @@
         if (!formReady()) {
           form.reportValidity();
           status.className = 'status error';
-          status.textContent = 'Please complete every required field before submitting.';
+          const resume = resumeInput.files && resumeInput.files[0];
+          if (!requiredTextIds.every((id) => document.getElementById(id).value.trim())) {
+            status.textContent = 'Please answer every required field before submitting.';
+          } else if (!document.getElementById('email').checkValidity()) {
+            status.textContent = 'Please enter a valid email address.';
+          } else if (!resume) {
+            status.textContent = 'Please attach your résumé before submitting.';
+          } else {
+            status.textContent = 'Please check the attached file and try again.';
+          }
           return;
         }
 
         submitButton.disabled = true;
+        submitButton.dataset.sending = 'true';
         submitButton.textContent = 'Sending…';
         status.textContent = 'Sending your application…';
 
@@ -509,7 +515,6 @@
             name: document.getElementById('name').value.trim(),
             email: document.getElementById('email').value.trim(),
             phone: document.getElementById('phone').value.trim(),
-            location: document.getElementById('location').value.trim(),
             website: document.getElementById('website').value,
             answers: {
               beer_scene: document.getElementById('beer_scene').value.trim(),
@@ -543,7 +548,8 @@
           console.error('Application submission failed', error);
           status.className = 'status error';
           status.textContent = error.message || 'Application could not be sent. Please try again.';
-          submitButton.disabled = !formReady();
+          delete submitButton.dataset.sending;
+          submitButton.disabled = false;
           submitButton.textContent = 'Submit application';
         }
       });
