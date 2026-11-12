@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#69d8d1" />
+  <meta name="robots" content="noindex" />
+  <title>Mahalo — Howzit Brewing</title>
+  <meta name="description" content="Thanks for applying to Howzit Brewing." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:#111111;
+      --cream:#fff8e8;
+      --yellow:#f7ee69;
+      --aqua:#69d8d1;
+      --coral:#ff654f;
+      --purple:#7555e8;
+      --border:3px solid var(--ink);
+      --shadow:7px 7px 0 var(--ink);
+    }
+    * { box-sizing:border-box; }
+    html,body { min-height:100%; }
+    body {
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
+      background:var(--aqua);
+      font-family:"DM Sans",system-ui,sans-serif;
+      display:grid;
+      grid-template-rows:auto 1fr;
+    }
+    a { color:inherit; }
+    .bubble-mark {
+      display:block;
+      background:currentColor;
+      -webkit-mask:url("/bubble.svg") center/contain no-repeat;
+      mask:url("/bubble.svg") center/contain no-repeat;
+      aspect-ratio:983/533;
+    }
+    .topbar {
+      min-height:78px;
+      display:flex;
+      align-items:center;
+      padding:10px 24px;
+      border-bottom:var(--border);
+      background:var(--cream);
+    }
+    .brand { display:block;width:154px;color:var(--coral); }
+    .brand .bubble-mark { width:100%; }
+    main {
+      display:grid;
+      place-items:center;
+      padding:40px 20px 70px;
+    }
+    .confirmation {
+      width:min(760px,100%);
+      text-align:center;
+      border:var(--border);
+      border-radius:30px;
+      background:var(--yellow);
+      box-shadow:var(--shadow);
+      padding:clamp(38px,7vw,72px) clamp(24px,7vw,70px);
+      transform:rotate(-.5deg);
+    }
+    .confirmation .bubble-mark {
+      width:min(210px,46%);
+      margin:0 auto 26px;
+      color:var(--purple);
+    }
+    h1 {
+      margin:0 0 18px;
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      letter-spacing:-.055em;
+      line-height:.9;
+      font-size:clamp(4.5rem,14vw,8.5rem);
+      color:var(--coral);
+    }
+    p {
+      margin:0 auto;
+      max-width:570px;
+      font-size:clamp(1.05rem,2.5vw,1.3rem);
+      font-weight:800;
+      line-height:1.5;
+    }
+    .home-link {
+      display:inline-block;
+      margin-top:30px;
+      border:var(--border);
+      border-radius:999px;
+      background:var(--cream);
+      box-shadow:4px 4px 0 var(--ink);
+      padding:11px 18px;
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      text-decoration:none;
+      font-size:.82rem;
+    }
+    @media(max-width:650px) {
+      .topbar { min-height:66px;padding:9px 14px; }
+      .brand { width:128px; }
+      main { padding:28px 12px 48px; }
+      .confirmation { border-radius:20px;box-shadow:4px 4px 0 var(--ink); }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Howzit Brewing home"><span class="bubble-mark" aria-hidden="true"></span></a>
+  </header>
+
+  <main>
+    <section class="confirmation">
+      <span class="bubble-mark" aria-hidden="true"></span>
+      <h1>Mahalo.</h1>
+      <p>Your application made it through. We'll take a look and get in touch if it feels like a fit.</p>
+      <a class="home-link" href="/">Back to Howzit</a>
+    </section>
+  </main>
+</body>
+</html>
