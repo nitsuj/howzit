@@ -368,10 +368,6 @@
         </div>
       </form>
 
-      <section class="success" id="success" aria-live="polite">
-        <h2>Mahalo.</h2>
-        <p>Your application made it through. We'll take a look and get in touch if it feels like a fit.</p>
-      </section>
     </div>
   </main>
 
@@ -384,8 +380,6 @@
       const form = document.getElementById('application-form');
       const submitButton = document.getElementById('submit-button');
       const status = document.getElementById('status');
-      const success = document.getElementById('success');
-      const introCard = document.getElementById('intro-card');
       const resumeInput = document.getElementById('resume');
       const coverInput = document.getElementById('cover_letter');
       const resumeNote = document.getElementById('resume-note');
@@ -542,10 +536,7 @@
             throw new Error(data.error || 'Application could not be sent.');
           }
 
-          form.hidden = true;
-          introCard.hidden = true;
-          success.classList.add('show');
-          success.scrollIntoView({ behavior:'smooth', block:'center' });
+          window.location.href = '/apply/confirmation/';
         } catch (error) {
           console.error('Application submission failed', error);
           status.className = 'status error';
