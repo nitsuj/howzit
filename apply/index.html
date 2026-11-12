@@ -271,7 +271,7 @@
 
   <main>
     <div class="apply-wrap">
-      <section class="intro-card">
+      <section class="intro-card" id="intro-card">
         <h2>A few questions first.</h2>
         <p>Please answer the questions below when submitting your résumé and cover letter. There are obviously no right or wrong answers, and you don't need to write War and Peace. This just helps us get a feel for you, your palate, and your mindset when we're sorting through a pile of résumés.</p>
       </section>
@@ -385,6 +385,7 @@
       const submitButton = document.getElementById('submit-button');
       const status = document.getElementById('status');
       const success = document.getElementById('success');
+      const introCard = document.getElementById('intro-card');
       const resumeInput = document.getElementById('resume');
       const coverInput = document.getElementById('cover_letter');
       const resumeNote = document.getElementById('resume-note');
@@ -542,6 +543,7 @@
           }
 
           form.hidden = true;
+          introCard.hidden = true;
           success.classList.add('show');
           success.scrollIntoView({ behavior:'smooth', block:'center' });
         } catch (error) {
