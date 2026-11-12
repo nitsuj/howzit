@@ -127,7 +127,6 @@ function buildEmail(application) {
     'Name: ' + application.name,
     'Email: ' + application.email,
     'Phone: ' + application.phone,
-    'Current location: ' + application.location,
     '',
     ...QUESTIONS.flatMap(function (question) {
       return [
@@ -156,8 +155,7 @@ function buildEmail(application) {
     '<h1 style="margin:0 0 22px">Brewer Application</h1>',
     '<p><strong>Name:</strong> ' + escapeHtml(application.name) + '<br>',
     '<strong>Email:</strong> ' + escapeHtml(application.email) + '<br>',
-    '<strong>Phone:</strong> ' + escapeHtml(application.phone) + '<br>',
-    '<strong>Current location:</strong> ' + escapeHtml(application.location) + '</p>',
+    '<strong>Phone:</strong> ' + escapeHtml(application.phone) + '</p>',
     '<hr style="margin:28px 0">',
     answersHtml,
     '<hr style="margin:28px 0">',
@@ -173,7 +171,7 @@ async function sendEmail(application) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured');
 
-  const to = clean(process.env.APPLICATION_TO_EMAIL) || 'justin@howzitbrewing.com';
+  const to = clean(process.env.APPLICATION_TO_EMAIL) || 'nitsuj@gmail.com';
   const from = clean(process.env.APPLICATION_FROM_EMAIL) ||
     'Howzit Applications <applications@notify.howzitbrewing.com>';
 
@@ -242,9 +240,7 @@ exports.handler = async function (event) {
   const name = clean(body.name);
   const email = clean(body.email);
   const phone = clean(body.phone);
-  const location = clean(body.location);
-
-  if (!name || !email || !phone || !location) {
+  if (!name || !email || !phone) {
     return json(400, { error: 'Please complete all contact fields.' });
   }
 
@@ -283,7 +279,6 @@ exports.handler = async function (event) {
       name,
       email,
       phone,
-      location,
       answers,
       resume,
       coverLetter
