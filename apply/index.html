@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7ee69" />
+  <title>Apply — Howzit Brewing</title>
+  <meta name="description" content="Apply to brew with Howzit Brewing in Honolulu." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:#111111;
+      --cream:#fff8e8;
+      --yellow:#f7ee69;
+      --aqua:#69d8d1;
+      --coral:#ff654f;
+      --pink:#f2a8d5;
+      --purple:#7555e8;
+      --white:#fffdf8;
+      --border:3px solid var(--ink);
+      --shadow:7px 7px 0 var(--ink);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      color:var(--ink);
+      background:var(--cream);
+      font-family:"DM Sans",system-ui,sans-serif;
+      font-size:17px;
+      line-height:1.5;
+    }
+    a { color:inherit; }
+    button,input,textarea { font:inherit; }
+    button { -webkit-tap-highlight-color:transparent; }
+    .bubble-mark {
+      display:block;
+      background:currentColor;
+      -webkit-mask:url("/bubble.svg") center/contain no-repeat;
+      mask:url("/bubble.svg") center/contain no-repeat;
+      aspect-ratio:983/533;
+    }
+    .topbar {
+      min-height:78px;
+      display:flex;
+      align-items:center;
+      gap:24px;
+      padding:10px 24px;
+      border-bottom:var(--border);
+      background:var(--cream);
+    }
+    .brand { display:block;width:154px;color:var(--coral); }
+    .brand .bubble-mark { width:100%; }
+    .back-link {
+      margin-left:auto;
+      font-weight:900;
+      text-transform:uppercase;
+      text-decoration:none;
+      font-size:.85rem;
+    }
+    .back-link:hover { text-decoration:underline 3px;text-underline-offset:5px; }
+    .hero {
+      display:grid;
+      grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);
+      border-bottom:var(--border);
+      background:var(--yellow);
+    }
+    .hero-copy { padding:clamp(48px,8vw,100px) clamp(22px,6vw,80px); }
+    .eyebrow {
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      font-size:.8rem;
+    }
+    h1 {
+      margin:12px 0 22px;
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      letter-spacing:-.055em;
+      line-height:.9;
+      font-size:clamp(4.2rem,10vw,9rem);
+    }
+    .hero-copy p {
+      max-width:760px;
+      margin:0;
+      font-size:clamp(1.05rem,1.8vw,1.35rem);
+      font-weight:700;
+    }
+    .hero-art {
+      border-left:var(--border);
+      background:var(--aqua);
+      display:grid;
+      place-items:center;
+      padding:48px;
+      min-height:360px;
+    }
+    .hero-art .bubble-mark { width:min(420px,82%);color:var(--purple);transform:rotate(-5deg); }
+    main { padding:clamp(38px,6vw,76px) clamp(16px,4vw,48px) 80px; }
+    .apply-wrap { max-width:980px;margin:auto; }
+    .intro-card {
+      border:var(--border);
+      border-radius:24px;
+      background:var(--pink);
+      box-shadow:var(--shadow);
+      padding:clamp(22px,4vw,36px);
+      margin-bottom:28px;
+    }
+    .intro-card h2 {
+      margin:0 0 12px;
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      font-size:clamp(2rem,5vw,3.5rem);
+      letter-spacing:-.04em;
+      line-height:.95;
+    }
+    .intro-card p { margin:0;max-width:820px;font-weight:700; }
+    form {
+      border:var(--border);
+      border-radius:28px;
+      background:var(--white);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .form-section { padding:clamp(22px,4vw,38px);border-bottom:var(--border); }
+    .form-section:last-child { border-bottom:0; }
+    .section-title {
+      margin:0 0 18px;
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      font-size:clamp(1.8rem,4vw,2.8rem);
+      letter-spacing:-.035em;
+    }
+    .field-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px; }
+    .field { display:flex;flex-direction:column;gap:8px; }
+    .field.full { grid-column:1/-1; }
+    label,.question-label { font-weight:900; }
+    .required { color:var(--coral); }
+    input[type="text"],input[type="email"],input[type="tel"],textarea {
+      width:100%;
+      border:2px solid var(--ink);
+      border-radius:14px;
+      background:var(--cream);
+      padding:13px 14px;
+      color:var(--ink);
+      outline:none;
+    }
+    input:focus,textarea:focus { box-shadow:0 0 0 3px var(--aqua); }
+    textarea { min-height:130px;resize:vertical; }
+    .question { margin-bottom:24px; }
+    .question:last-child { margin-bottom:0; }
+    .question-label { display:block;margin-bottom:8px; }
+    .choice-note {
+      display:block;
+      margin-top:4px;
+      font-size:.88rem;
+      font-weight:700;
+      opacity:.7;
+    }
+    .uploads { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px; }
+    .upload-box {
+      border:2px dashed var(--ink);
+      border-radius:18px;
+      background:var(--yellow);
+      padding:18px;
+    }
+    .upload-box:nth-child(2) { background:var(--aqua); }
+    .upload-box label {
+      display:block;
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+    .upload-box input { width:100%; }
+    .file-note { margin:8px 0 0;font-size:.78rem;font-weight:700;opacity:.72; }
+    .honeypot {
+      position:absolute !important;
+      width:1px !important;
+      height:1px !important;
+      overflow:hidden !important;
+      clip:rect(1px,1px,1px,1px) !important;
+      white-space:nowrap !important;
+    }
+    .submit-row {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      padding:clamp(22px,4vw,34px);
+      background:var(--cream);
+    }
+    .submit-button {
+      border:var(--border);
+      border-radius:999px;
+      background:var(--coral);
+      color:var(--ink);
+      box-shadow:4px 4px 0 var(--ink);
+      padding:13px 22px;
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      cursor:pointer;
+    }
+    .submit-button:disabled { opacity:.4;cursor:not-allowed;box-shadow:none; }
+    .submit-help { margin:0;font-size:.84rem;font-weight:800;opacity:.72; }
+    .status {
+      width:100%;
+      margin:0;
+      font-weight:900;
+      min-height:1.5em;
+    }
+    .status.error { color:#a52118; }
+    .success {
+      display:none;
+      border:var(--border);
+      border-radius:28px;
+      background:var(--aqua);
+      box-shadow:var(--shadow);
+      padding:clamp(30px,6vw,60px);
+      text-align:center;
+    }
+    .success.show { display:block; }
+    .success h2 {
+      margin:0 0 12px;
+      font-family:"Archivo Black",Impact,sans-serif;
+      text-transform:uppercase;
+      font-size:clamp(2.6rem,7vw,5rem);
+      line-height:.92;
+    }
+    .success p { margin:0;font-weight:800;font-size:1.05rem; }
+    footer {
+      padding:28px 22px;
+      background:var(--ink);
+      color:var(--cream);
+      text-align:center;
+      font-weight:800;
+    }
+    @media(max-width:760px) {
+      .topbar { padding:9px 14px;min-height:66px; }
+      .brand { width:128px; }
+      .hero { grid-template-columns:1fr; }
+      .hero-art { display:none; }
+      .hero-copy { padding:42px 18px 48px; }
+      h1 { font-size:clamp(3.4rem,18vw,5.8rem); }
+      main { padding:28px 12px 56px; }
+      .field-grid,.uploads { grid-template-columns:1fr; }
+      .field.full { grid-column:auto; }
+      .intro-card,form,.success { border-radius:18px;box-shadow:4px 4px 0 var(--ink); }
+      .form-section { padding:20px 16px; }
+      textarea { min-height:150px; }
+      .submit-row { padding:18px 16px; }
+      .submit-button { width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Howzit Brewing home"><span class="bubble-mark" aria-hidden="true"></span></a>
+    <a class="back-link" href="/">Back to Howzit</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">Howzit Brewing · Honolulu, Hawaiʻi</div>
+      <h1>Come brew<br>with us.</h1>
+      <p>We're looking for someone who cares about great beer, thinks about the why behind the process, and wants some real ownership over what comes out of the brewhouse.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <span class="bubble-mark"></span>
+    </div>
+  </section>
+
+  <main>
+    <div class="apply-wrap">
+      <section class="intro-card">
+        <h2>A few questions first.</h2>
+        <p>Please answer the questions below when submitting your résumé and cover letter. There are obviously no right or wrong answers, and you don't need to write War and Peace. This just helps us get a feel for you, your palate, and your mindset when we're sorting through a pile of résumés.</p>
+      </section>
+
+      <form id="application-form" novalidate>
+        <section class="form-section">
+          <h2 class="section-title">You</h2>
+          <div class="field-grid">
+            <div class="field">
+              <label for="name">Name <span class="required">*</span></label>
+              <input id="name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="email">Email <span class="required">*</span></label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="phone">Phone <span class="required">*</span></label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="location">Current location <span class="required">*</span></label>
+              <input id="location" name="location" type="text" autocomplete="address-level2" placeholder="City, State / Country" required>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="section-title">Beer stuff</h2>
+
+          <div class="question">
+            <label class="question-label" for="beer_scene">What excites you the most in the current beer/brewing scene? <span class="required">*</span></label>
+            <textarea id="beer_scene" name="beer_scene" required></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="favorite_beer">What is your current favorite beer from any brewery, and why? <span class="required">*</span></label>
+            <textarea id="favorite_beer" name="favorite_beer" required></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="favorite_style">What is your favorite style of beer to brew, and why? <span class="required">*</span></label>
+            <textarea id="favorite_style" name="favorite_style" required></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="favorite_hop">What is your favorite hop, and why? <span class="required">*</span></label>
+            <textarea id="favorite_hop" name="favorite_hop" required></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="process_vs_materials">Do you think process or quality of raw materials has a bigger effect on the finished product, and why? <span class="required">*</span></label>
+            <span class="choice-note">And while we all know the real answer is both, you've got to choose one here.</span>
+            <textarea id="process_vs_materials" name="process_vs_materials" required></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="recipe_design">Briefly describe your thought process when designing a recipe for a new beer. <span class="required">*</span></label>
+            <textarea id="recipe_design" name="recipe_design" required></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="do_more">What would you like to do more of that you can't at your current or most recent brewery? <span class="required">*</span></label>
+            <textarea id="do_more" name="do_more" required></textarea>
+          </div>
+
+          <div class="question">
+            <label class="question-label" for="efficiency">What ONE THING do you think the average brewery producing under 2,000 bbl/year can do to increase efficiency? <span class="required">*</span></label>
+            <textarea id="efficiency" name="efficiency" required></textarea>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="section-title">The paperwork</h2>
+          <div class="uploads">
+            <div class="upload-box">
+              <label for="resume">Résumé <span class="required">*</span></label>
+              <input id="resume" name="resume" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
+              <p class="file-note" id="resume-note">PDF, DOC or DOCX · max 1.5 MB</p>
+            </div>
+            <div class="upload-box">
+              <label for="cover_letter">Cover letter <span style="font-family:'DM Sans',sans-serif;text-transform:none;font-size:.8rem">(optional)</span></label>
+              <input id="cover_letter" name="cover_letter" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+              <p class="file-note" id="cover-note">PDF, DOC or DOCX · max 1.5 MB</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="honeypot" aria-hidden="true">
+          <label for="website">Website</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="submit-row">
+          <button class="submit-button" id="submit-button" type="submit" disabled>Submit application</button>
+          <p class="submit-help">All starred fields are required before you can submit.</p>
+          <p class="status" id="status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <section class="success" id="success" aria-live="polite">
+        <h2>Mahalo.</h2>
+        <p>Your application made it through. We'll take a look and get in touch if it feels like a fit.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer>Howzit Brewing · 330 Kamani Street · Honolulu, Hawaiʻi</footer>
+
+  <script>
+    (() => {
+      const ENDPOINT = '/.netlify/functions/submit-application';
+      const MAX_FILE_BYTES = 1.5 * 1024 * 1024;
+      const form = document.getElementById('application-form');
+      const submitButton = document.getElementById('submit-button');
+      const status = document.getElementById('status');
+      const success = document.getElementById('success');
+      const resumeInput = document.getElementById('resume');
+      const coverInput = document.getElementById('cover_letter');
+      const resumeNote = document.getElementById('resume-note');
+      const coverNote = document.getElementById('cover-note');
+
+      const requiredTextIds = [
+        'name',
+        'email',
+        'phone',
+        'location',
+        'beer_scene',
+        'favorite_beer',
+        'favorite_style',
+        'favorite_hop',
+        'process_vs_materials',
+        'recipe_design',
+        'do_more',
+        'efficiency'
+      ];
+
+      function fileExtension(name) {
+        const match = String(name || '').toLowerCase().match(/\.([a-z0-9]+)$/);
+        return match ? match[1] : '';
+      }
+
+      function validFile(file) {
+        if (!file) return false;
+        return ['pdf', 'doc', 'docx'].includes(fileExtension(file.name)) &&
+          file.size > 0 &&
+          file.size <= MAX_FILE_BYTES;
+      }
+
+      function updateFileNote(input, note, required) {
+        const file = input.files && input.files[0];
+        if (!file) {
+          note.textContent = required
+            ? 'PDF, DOC or DOCX · max 1.5 MB'
+            : 'PDF, DOC or DOCX · max 1.5 MB';
+          return;
+        }
+
+        if (!validFile(file)) {
+          note.textContent = 'Please choose a PDF, DOC or DOCX file under 1.5 MB.';
+          note.style.color = '#a52118';
+          return;
+        }
+
+        note.textContent = file.name + ' · ' + Math.max(1, Math.round(file.size / 1024)) + ' KB';
+        note.style.color = '';
+      }
+
+      function formReady() {
+        const textReady = requiredTextIds.every((id) => {
+          const field = document.getElementById(id);
+          return field && field.value.trim() && field.checkValidity();
+        });
+
+        const resume = resumeInput.files && resumeInput.files[0];
+        const cover = coverInput.files && coverInput.files[0];
+        const filesReady = validFile(resume) && (!cover || validFile(cover));
+
+        return Boolean(textReady && filesReady);
+      }
+
+      function updateSubmitState() {
+        submitButton.disabled = !formReady();
+      }
+
+      async function filePayload(file) {
+        if (!file) return null;
+
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error('Could not read ' + file.name));
+          reader.onload = () => {
+            const result = String(reader.result || '');
+            const comma = result.indexOf(',');
+            if (comma === -1) return reject(new Error('Could not read ' + file.name));
+
+            resolve({
+              filename: file.name,
+              type: file.type || '',
+              content: result.slice(comma + 1)
+            });
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      form.addEventListener('input', updateSubmitState);
+      form.addEventListener('change', () => {
+        updateFileNote(resumeInput, resumeNote, true);
+        updateFileNote(coverInput, coverNote, false);
+        updateSubmitState();
+      });
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        status.className = 'status';
+        status.textContent = '';
+
+        if (!formReady()) {
+          form.reportValidity();
+          status.className = 'status error';
+          status.textContent = 'Please complete every required field before submitting.';
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending…';
+        status.textContent = 'Sending your application…';
+
+        try {
+          const resume = resumeInput.files[0];
+          const cover = coverInput.files && coverInput.files[0];
+
+          const payload = {
+            name: document.getElementById('name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            location: document.getElementById('location').value.trim(),
+            website: document.getElementById('website').value,
+            answers: {
+              beer_scene: document.getElementById('beer_scene').value.trim(),
+              favorite_beer: document.getElementById('favorite_beer').value.trim(),
+              favorite_style: document.getElementById('favorite_style').value.trim(),
+              favorite_hop: document.getElementById('favorite_hop').value.trim(),
+              process_vs_materials: document.getElementById('process_vs_materials').value.trim(),
+              recipe_design: document.getElementById('recipe_design').value.trim(),
+              do_more: document.getElementById('do_more').value.trim(),
+              efficiency: document.getElementById('efficiency').value.trim()
+            },
+            resume: await filePayload(resume),
+            coverLetter: cover ? await filePayload(cover) : null
+          };
+
+          const response = await fetch(ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || 'Application could not be sent.');
+          }
+
+          form.hidden = true;
+          success.classList.add('show');
+          success.scrollIntoView({ behavior:'smooth', block:'center' });
+        } catch (error) {
+          console.error('Application submission failed', error);
+          status.className = 'status error';
+          status.textContent = error.message || 'Application could not be sent. Please try again.';
+          submitButton.disabled = !formReady();
+          submitButton.textContent = 'Submit application';
+        }
+      });
+
+      updateSubmitState();
+    })();
+  </script>
+</body>
+</html>
